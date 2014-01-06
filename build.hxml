@@ -1,0 +1,8 @@
+-cp src/
+-main Main
+-lib nape
+-lib polygonal-ds
+-swf bin/Spaceship.swf
+-swf-version 11.3
+-swf-header 1000:700:60
+-debug
