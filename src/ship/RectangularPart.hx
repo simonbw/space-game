@@ -5,16 +5,20 @@ import nape.shape.Shape;
 import nape.shape.Polygon;
 import nape.phys.Material;
 
-class SmallPart extends ShipPart {
-	static inline var SIZE = 1;
+class RectangularPart extends ShipPart {
 	static var MATERIAL = Material.steel();
 
 	var shape:Shape;
 	var health:Float;
+	var maxHealth:Float;
+	var color:Int;
 	
-	public function new(health:Float = 100.0) {
-		super(Vec2.get(SIZE, SIZE));
+	public function new(width:Int, height:Int, health:Float = 100.0) {
+		super(Vec2.get(width, height));
 		this.health = health;
+		maxHealth = health;
+
+		color = 0xAAAAAA;
 	}
 
 	override public function addToShip(ship:Ship, position:Vec2, direction:Direction = null):Void {
@@ -26,10 +30,40 @@ class SmallPart extends ShipPart {
 		shape.translate(center);
 		shape.userData.entity = this;
 
-		adjacent.push({x: Std.int(position.x), y: Std.int(position.y) + 1});
-		adjacent.push({x: Std.int(position.x), y: Std.int(position.y) - 1});
-		adjacent.push({x: Std.int(position.x) + 1, y: Std.int(position.y)});
-		adjacent.push({x: Std.int(position.x) - 1, y: Std.int(position.y)});
+		for (i in 0...(Std.int(gridSize.x))) {
+			for (j in 0...(Std.int(gridSize.y))) {
+				var x:Int = i;
+				var y:Int = j;
+				switch (this.direction) {
+					case FORWARD:
+						x = i;
+						y = j;
+					case BACKWARD:
+						x = -i;
+						y = -j;
+					case LEFT:
+						x = j;
+						y = -i;
+					case RIGHT:
+						x = -j;
+						y = i;
+				}
+				gridpositions.push({
+					x: Std.int(position.x) + x,
+					y: Std.int(position.y) + y
+				});
+			}
+		}
+
+		for (i in 0...(Std.int(gridSize.x))) {
+			adjacent.push({x: Math.round(position.x + i), y: Math.round(position.y) - 1});
+			adjacent.push({x: Math.round(position.x + i), y: Math.round(position.y + gridSize.y)});
+		}
+
+		for (i in 0...(Std.int(gridSize.y))) {
+			adjacent.push({x: Math.round(position.x) - 1, y: Math.round(position.y) + i});
+			adjacent.push({x: Math.round(position.x + gridSize.x), y: Math.round(position.y) + i});
+		}
 
 		corners = new Array<Vec2>();
 		corners.push(Vec2.get(0, 0));
@@ -69,16 +103,24 @@ class SmallPart extends ShipPart {
 		}
 	}
 
-	override public function draw(g:flash.display.Graphics):Void {
+	override public function draw(g:flash.display.Graphics, lod:Float):Void {
 		g.lineStyle();
-		if (health > 99) {
-			g.beginFill(0xAAAAAA);
+		if (health >= maxHealth) {
+			g.beginFill(color);
 		} else {
 			g.beginFill(0xAA0000);
 		}
 			
 		g.drawRect(localPosition.x, localPosition.y, drawSize.x, drawSize.y);
 		g.endFill();
+
+		if (lod > 0.25) {
+			g.lineStyle(1, 0x00FFFF, 0.2);
+			for (part in connectedParts) {
+				g.moveTo(center.x, center.y);
+				g.lineTo(part.center.x, part.center.y);
+			}
+		}
 
 		//for (corner in corners) {
 			//g.lineStyle(0, 0x666666);

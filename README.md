@@ -1,4 +1,4 @@
 space-game
 ==========
 
-A game in space
+A game about building spaceships and destroying other people's space ships.

@@ -2,9 +2,9 @@ package ship;
 
 import nape.geom.Vec2;
 
-class Hull extends ship.SmallPart
+class Hull extends RectangularPart
 {
 	public function new() {
-		super();
+		super(1, 1, 300);
 	}
 }

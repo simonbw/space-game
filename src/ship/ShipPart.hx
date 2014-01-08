@@ -6,6 +6,7 @@ import de.polygonal.ds.Hashable;
 
 class ShipPart implements Hashable implements Hittable {
 
+	public var updatable:Bool;
 	public var key:Int;
 	public var gridPosition:Vec2;
 	public var gridSize:Vec2;
@@ -17,13 +18,16 @@ class ShipPart implements Hashable implements Hittable {
 	public var direction:Direction;
 	public var ship:Ship;
 	public var adjacent:Array<{x:Int, y:Int}>;
+	public var gridpositions:Array<{x:Int, y:Int}>;
 
 	public function new(size:Vec2) {
 		key = Std.int(Math.random() * (2<<16));
 		connectedParts = new HashSet<ShipPart>(2<<4);
 		adjacent = new Array<{x:Int, y:Int}>();
+		gridpositions = new Array<{x:Int, y:Int}>();
 		gridSize = size;
 		drawSize = Vec2.get(gridSize.x * Ship.GRID_SIZE, gridSize.y * Ship.GRID_SIZE);
+		updatable = false;
 	}
 
 	public function addToShip(ship:Ship, position:Vec2, direction:Direction = null):Void {
@@ -87,7 +91,7 @@ class ShipPart implements Hashable implements Hittable {
 
 	}
 
-	public function draw(g:flash.display.Graphics):Void {
+	public function draw(g:flash.display.Graphics, lod:Float):Void {
 
 	}
 
@@ -96,7 +100,7 @@ class ShipPart implements Hashable implements Hittable {
 	}
 	
 	public function hit(hitPos:Vec2, hitVelocity:Vec2):Void {
-		
+		ship.game.addEntity(new effects.ImapctEffect(hitPos));
 	}
 
 	public function dispose():Void {

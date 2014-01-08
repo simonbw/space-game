@@ -1,7 +1,7 @@
 
-
 import flash.display.Sprite;
 import util.Pool;
+import util.Random;
 
 import nape.geom.Vec2;
 import nape.callbacks.*;
@@ -10,7 +10,7 @@ import nape.phys.BodyType;
 import nape.dynamics.InteractionFilter;
 
 class Laser extends Entity implements Renderable implements Updatable {
-	static inline var SPEED = 3200;
+	static inline var SPEED = 10000;
 	public static var CB_LASER = new CbType();
 	public static var CB_LASER_HITTABLE = new CbType();
 	static var MATERIAL = new nape.phys.Material(0.1, 0.0, 0.0, 0.001, 1.0);
@@ -50,8 +50,9 @@ class Laser extends Entity implements Renderable implements Updatable {
 		
 		body = new Body(BodyType.DYNAMIC, position);
 		body.isBullet = true;
-		velocity = direction.unit();
-		velocity.muleq(SPEED);
+		direction = direction.unit();
+		velocity = direction.copy();
+		velocity.muleq(Random.normal(SPEED, SPEED / 10));
 		if (offset != null) {
 			velocity.addeq(offset);
 		}
@@ -65,8 +66,9 @@ class Laser extends Entity implements Renderable implements Updatable {
 		shape.cbTypes.add(CB_LASER);
 		
 		sprite = Pool.sprite();
-		sprite.graphics.lineStyle(0, 0xFFFF00);
-		sprite.graphics.lineTo(-velocity.x / Main.stage.frameRate * 0.8, -velocity.y / Main.stage.frameRate * 0.8);
+		sprite.graphics.lineStyle(0, 0xFFFF00, 0.5);
+		var l = SPEED * 0.8 / Main.stage.frameRate;
+		sprite.graphics.lineTo(-direction.x  * l, -direction.y * l);
 	}
 
 	public function update(timestep:Float):Void {

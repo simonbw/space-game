@@ -13,7 +13,6 @@ class PlayerShipController extends Entity implements Updatable {
 		this.ship = ship;
 		stabilize = false;
 
-		IO.addKeyDownCallback(IO.K_SHIELD, ship.toggleShield);
 		IO.addKeyDownCallback(IO.K_STABILIZE, function():Void {
 			stabilize = !stabilize;
 		});
@@ -64,7 +63,9 @@ class PlayerShipController extends Entity implements Updatable {
 		}
 		
 		if ((IO.keys[IO.K_KILL_ROTATION])) {
-			ship.stabilizeRotation();
+			if (!turning) {
+				ship.stabilizeRotation();
+			}
 			if (!thrusting) {
 				ship.stabilizeLinear();
 			}
