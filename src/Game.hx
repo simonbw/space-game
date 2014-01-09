@@ -210,7 +210,8 @@ class Game extends Sprite {
 		Main.log2("speed: " + Std.int(ship.body.velocity.length), 0);
 		Main.log2("energy: " + Std.int(ship.energy) + "/" + Std.int(ship.maxEnergy), 1);
 		Main.log2("energy load: " + Math.fround(ship.energyLoad * 10) / 10, 2);
-		Main.log2("bodies: " + space.bodies.length, 3);
+		Main.log2("shields: " + Std.int(ship.shield) + "/" + Std.int(ship.maxShield), 3);
+		Main.log2("bodies: " + space.bodies.length, 4);
 		profiler.update();
         render(e);
     }

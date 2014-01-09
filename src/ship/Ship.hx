@@ -22,12 +22,17 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 
 	var engines:Array<Engine>;
 	var reactors:Array<Reactor>;
+	var shieldGenerators:Array<ShieldGenerator>;
 
 	public var energy:Float;
 	public var energyConsumption:Float;
 	public var energyProduction:Float;
 	public var energyLoad:Float;
 	public var maxEnergy:Float;
+
+	public var shield:Float;
+	public var maxShield:Float;
+
 
 	var sprite:Sprite;
 	var drawOffset:Vec2;
@@ -42,12 +47,16 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		partMap = new util.CoordinateMap<ShipPart>();
 		engines = new Array<Engine>();
 		reactors = new Array<Reactor>();
+		shieldGenerators = new Array<ShieldGenerator>();
 		body = new Body();
 		body.position.set(position);
 		// body.isBullet = true;
 		energyLoad = 0.0;
 		maxEnergy = 10.0;
 		energy = maxEnergy;
+		shield = 0.0;
+		maxShield = 0.0;
+
 		this.drawOffset = Vec2.get(0, 0);
 		if (drawOffset != null) {
 			this.drawOffset.set(drawOffset);
@@ -85,6 +94,9 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		if (Std.is(part, Reactor)) {
 			reactors.push(cast(part, Reactor));
 		}
+		if (Std.is(part, ShieldGenerator)) {
+			shieldGenerators.push(cast(part, ShieldGenerator));
+		}
 	}
 
 	/**
@@ -104,6 +116,9 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		}
 		if (Std.is(part, Reactor)) {
 			reactors.remove(cast(part, Reactor));
+		}
+		if (Std.is(part, ShieldGenerator)) {
+			shieldGenerators.remove(cast(part, ShieldGenerator));
 		}
 
 		// remove from connections
@@ -186,6 +201,9 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		for (part in reactors) {
 			part.update(timestep);
 		}
+		for (part in shieldGenerators) {
+			part.update(timestep);
+		}
 		for (part in parts) {
 			if (part.updatable) {
 				part.update(timestep);
@@ -201,6 +219,9 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 
 		if (energy > maxEnergy) {
 			energy = maxEnergy;
+		}
+		if (shield > maxShield) {
+			shield = maxShield;
 		}
 	}
 
@@ -248,6 +269,12 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	public function giveEnergy(amount:Float):Void {
 		energyProduction += amount;
 		energy += amount;
+	}
+
+	public function requestShield(amount:Float):Float {
+		var result = MyMath.min(amount, shield);
+		shield -= result;
+		return result;
 	}
 
 	/**
@@ -390,5 +417,9 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		body.space = null;
 		Pool.disposeSprite(sprite);
 		sprite = null;
+		partMap = null;
+		shieldGenerators = null;
+		engines = null;
+		reactors = null;
 	}
 }

@@ -100,7 +100,7 @@ class ShipPart implements Hashable implements Hittable {
 	}
 	
 	public function hit(hitPos:Vec2, hitVelocity:Vec2):Void {
-		ship.game.addEntity(new effects.ImapctEffect(hitPos));
+		// do something
 	}
 
 	public function dispose():Void {

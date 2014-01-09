@@ -3,23 +3,26 @@ package effects;
 import nape.geom.Vec2;
 
 
-class ImapctEffect extends Entity implements Renderable implements Updatable {
-	static inline var LIFESPAN = 0.1;
+class ImpactEffect extends Entity implements Renderable implements Updatable {
+	static inline var LIFESPAN = 0.2;
 
 	public var renderDepth:Int;
 	var position:Vec2;
 	var lifespan:Float;
+	var size:Float;
+	var color:Int;
 	var sprite:flash.display.Sprite;
 
-	public function new(position:Vec2) {
+	public function new(position:Vec2, color:Int, size:Float) {
 		super();
 		renderDepth = 50;
 		lifespan = LIFESPAN;
-		sprite = util.Pool.sprite();
 		this.position = position.copy();
-
-		sprite.graphics.beginFill(0xFFFF00);
-		sprite.graphics.drawCircle(0, 0, 3);
+		this.color = color;
+		this.size = size;
+		sprite = util.Pool.sprite();
+		sprite.graphics.beginFill(color);
+		sprite.graphics.drawCircle(0, 0, size);
 		sprite.graphics.endFill();
 	}
 
@@ -33,8 +36,8 @@ class ImapctEffect extends Entity implements Renderable implements Updatable {
 	public function render(surface:flash.display.BitmapData, camera:Camera):Void {
 		var g = sprite.graphics;
 		g.clear();
-		g.beginFill(0xFFFF00);
-		g.drawCircle(0, 0, 3 * lifespan / LIFESPAN);
+		g.beginFill(color);
+		g.drawCircle(0, 0, size * lifespan / LIFESPAN);
 		g.endFill();
 
 		var m = new flash.geom.Matrix();
@@ -46,7 +49,9 @@ class ImapctEffect extends Entity implements Renderable implements Updatable {
 	override public function dispose():Void {
 		super.dispose();
 		position.dispose();
+		position = null;
 		util.Pool.disposeSprite(sprite);
+		sprite = null;
 	}
 
 }

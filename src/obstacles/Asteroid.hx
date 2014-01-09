@@ -85,6 +85,7 @@ class Asteroid extends Entity implements Renderable implements Hittable {
 	}
 	
 	public function hit(hitPos:Vec2, hitVelocity:Vec2):Void {
+		game.addEntity(new effects.AsteroidImpactEffect(hitPos, Random.normal(3, 0.3)));
 		if (!disposed && Random.bool(0.1)) {
 			// store stuff about the body
 			var pos2 = body.position.copy();

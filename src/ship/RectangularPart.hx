@@ -95,8 +95,17 @@ class RectangularPart extends ShipPart {
 	
 	override public function hit(hitPos:Vec2, hitVelocity:Vec2):Void {
 		super.hit(hitPos, hitVelocity);
-		if (ship != null) {
-			health -= 34.0;
+		if (ship != null && ship.game != null) {
+			var damage = 30.0;
+			var shielded = ship.requestShield(damage);
+			damage -= shielded;
+			health -= damage;
+			if (damage > 0.1) {
+				ship.game.addEntity(new effects.MetalImpactEffect(hitPos, Math.sqrt(damage)));
+			}
+			if (shielded > 0.1) {
+				ship.game.addEntity(new effects.ShieldImpactEffect(hitPos, Math.sqrt(shielded)));
+			}
 			if (health <= 0) {
 				ship.removePart(this);
 			}
@@ -114,7 +123,7 @@ class RectangularPart extends ShipPart {
 		g.drawRect(localPosition.x, localPosition.y, drawSize.x, drawSize.y);
 		g.endFill();
 
-		if (lod > 0.25) {
+		if (lod > 1.0) {
 			g.lineStyle(1, 0x00FFFF, 0.2);
 			for (part in connectedParts) {
 				g.moveTo(center.x, center.y);

@@ -25,7 +25,7 @@ class Stars implements Renderable {
 		surface.lock();
 		var m = new flash.geom.Matrix();
 		m.translate(-camera.width() / 2, -camera.height() / 2);
-		m.translate(-camera.position.x / 10, -camera.position.y / 10);
+		m.translate(-camera.position.x / 100, -camera.position.y / 100);
 		m.rotate(camera.angle);
 		m.translate(camera.width() / 2, camera.height() / 2);
 		for (point in points) {

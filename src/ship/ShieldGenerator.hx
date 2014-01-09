@@ -2,24 +2,35 @@ package ship;
 
 import nape.geom.Vec2;
 
-class ShieldGenerator extends SmallPart {
+class ShieldGenerator extends RectangularPart {
+	static inline var EFFICIENCY = 2.0;
 
 	public var rechargeRate:Float;
 	public var capacity:Float;
 
 	public function new() {
-		super();
+		super(1, 1, 50);
+		color = 0xFFEEBB;
 
-		rechargeRate = 3.0;
-		capacity = 10.0;
+		rechargeRate = 4.0;
+		capacity = 40.0;
 	}
 
-	override public function draw(g:flash.display.Graphics):Void {
-		g.lineStyle();
-		g.beginFill(0x888888);
-		g.drawRect(center.x - drawSize.x / 2, center.y - drawSize.y / 2, drawSize.x, drawSize.y);
-		g.endFill();
-		g.lineStyle(2, 0x00FFFF);
-		g.drawCircle(center.x, center.y, 2);
+	override public function addToShip(ship:Ship, position:nape.geom.Vec2, direction:Direction = null):Void {
+		super.addToShip(ship, position, direction);
+		ship.maxShield += capacity;
+	}
+
+	override public function onRemove():Void {
+		ship.maxShield -= capacity;
+		super.onRemove();
+	}
+
+	override public function update(timestep:Float):Void {
+		super.update(timestep);
+
+		var diff = ship.maxShield - ship.shield;
+		var e = util.MyMath.min(diff, rechargeRate * timestep) / EFFICIENCY;
+		ship.shield += ship.requestEnergy(e) * EFFICIENCY;
 	}
 }
