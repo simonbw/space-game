@@ -94,7 +94,7 @@ class Game extends Sprite {
 
                 var ship2 = new Ship(p);
 				addEntity(ship2);
-				PrebuiltShips.makeFreighter(ship2);
+				PrebuiltShips.makeCruiser(ship2);
 				addEntity(new StabilizeShipController(ship2));
             } catch(error:Dynamic) {
                 Main.log(error);

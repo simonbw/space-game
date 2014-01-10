@@ -67,4 +67,16 @@ class PrebuiltShips {
 		ship.removeDisconnected();
 		ship.realign();
 	}
+	
+	public static function makeCruiser(ship:ship.Ship):Void {
+		for (i in 0...100) {
+			for (j in -20...21) {
+				ship.addPart(new ship.Hull(), j, i);
+			}
+		}
+
+		ship.body.rotation = Math.PI;
+		ship.removeDisconnected();
+		ship.realign();
+	}
 }

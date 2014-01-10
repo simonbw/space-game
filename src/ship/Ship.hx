@@ -17,12 +17,15 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	public var renderDepth:Int;
 
 	var parts:Array<ShipPart>;
+	var dirtyParts:Array<ShipPart>;
 	var partMap:util.CoordinateMap<ShipPart>;
 	var needToRealign:Bool;
 
 	var engines:Array<Engine>;
 	var reactors:Array<Reactor>;
 	var shieldGenerators:Array<ShieldGenerator>;
+
+	var image:BitmapData;
 
 	public var energy:Float;
 	public var energyConsumption:Float;
@@ -36,6 +39,7 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 
 	var sprite:Sprite;
 	var drawOffset:Vec2;
+	var imageOffset:Vec2;
 	public var body:Body;
 
 	public function new(position:Vec2) {
@@ -44,6 +48,7 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 
 		needToRealign = false;
 		parts = new Array<ShipPart>();
+		dirtyParts = new Array<ShipPart>();
 		partMap = new util.CoordinateMap<ShipPart>();
 		engines = new Array<Engine>();
 		reactors = new Array<Reactor>();
@@ -57,10 +62,9 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		shield = 0.0;
 		maxShield = 0.0;
 
-		this.drawOffset = Vec2.get(0, 0);
-		if (drawOffset != null) {
-			this.drawOffset.set(drawOffset);
-		}
+		drawOffset = Vec2.get(0, 0);
+		imageOffset = Vec2.get(0, 0);
+		image = null;
 		sprite = Pool.sprite();
 	}
 
@@ -97,6 +101,7 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		if (Std.is(part, ShieldGenerator)) {
 			shieldGenerators.push(cast(part, ShieldGenerator));
 		}
+		dirtyParts.push(part);
 	}
 
 	/**
@@ -397,7 +402,56 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		}
 	}
 
+	public function makeImage():Void {
+		if (image != null) {
+			image.dispose();
+		}
+
+		var minX = 999999999;
+		var maxX = -999999999;
+		var minY = 999999999;
+		var maxY = -999999999;
+
+		for (part in parts) {
+			if (part.gridPosition.x < minX) {
+				minX = Std.int(part.gridPosition.x);
+			}
+			if (part.gridPosition.y < minY) {
+				minY = Std.int(part.gridPosition.y);
+			}
+			if (part.gridPosition.x + part.gridSize.x > maxX) {
+				maxX = Std.int(part.gridPosition.x + part.gridSize.x);
+			}
+			if (part.gridPosition.x + part.gridSize.y > maxY) {
+				maxY = Std.int(part.gridPosition.y + part.gridSize.y);
+			}
+		}
+
+		var buffer = 2;
+		var w = (maxX - minX + 2 * buffer) * GRID_SIZE; 
+		var h = (maxY - minY + 2 * buffer) * GRID_SIZE;
+
+		image = new BitmapData(w, h, true, 0x0);
+		imageOffset.setxy(-(minX - buffer) * GRID_SIZE - buffer, -(minY - buffer) * GRID_SIZE);
+	}
+
 	public function render(surface:BitmapData, camera:Camera):Void {
+		// if (image == null) {
+		// 	makeImage();
+		// }
+
+		// if (dirtyParts.length > 0) {
+		// 	var g = sprite.graphics;
+		// 	g.clear();
+		// 	for (part in dirtyParts) {
+		// 		part.draw(g, camera.zoom);
+		// 	}
+		// 	var m = new flash.geom.Matrix();
+		// 	m.translate(imageOffset.x, imageOffset.y);
+		// 	image.draw(sprite, m);
+		// 	dirtyParts.splice(0, dirtyParts.length);
+		// }
+
 		var g = sprite.graphics;
 		g.clear();
 		for (part in parts) {
@@ -405,11 +459,11 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		}
 
 		var m = new flash.geom.Matrix();
-		m.translate(drawOffset.x, drawOffset.y);
+		m.translate(drawOffset.x - imageOffset.x, drawOffset.y - imageOffset.y);
 		m.rotate(body.rotation);
 		m.translate(body.position.x, body.position.y);
 		camera.getMatrix(m);
-		surface.draw(sprite, m, null, null, null, true);
+		surface.draw(image, m, null, null, null, true);
 	}
 
 	override public function dispose():Void {
