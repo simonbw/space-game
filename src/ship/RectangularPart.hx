@@ -96,7 +96,7 @@ class RectangularPart extends ShipPart {
 	override public function hit(hitPos:Vec2, hitVelocity:Vec2):Void {
 		super.hit(hitPos, hitVelocity);
 		if (ship != null && ship.game != null) {
-			var damage = 30.0;
+			var damage = 15.0;
 			var shielded = ship.requestShield(damage);
 			damage -= shielded;
 			health -= damage;

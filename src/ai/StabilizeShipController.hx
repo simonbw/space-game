@@ -10,6 +10,10 @@ class StabilizeShipController extends Entity implements Updatable {
 	}
 
 	public function update(timestep:Float):Void {
+		if (ship.disposed) {
+			dispose();
+			return;
+		}
 		ship.clearEngines();
 		ship.stabilizeRotation();
 		ship.stabilizeLinear();
