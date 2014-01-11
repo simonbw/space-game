@@ -41,27 +41,41 @@ class PrebuiltShips {
 	}
 	
 	public static function makeFreighter(ship:ship.Ship):Void {
-		for (i in -3...13) {
-			ship.addPart(new Hull(), -1, i);
+		for (i in -3...12) {
 			if (util.MyMath.modInt(i, 3) == 1) {
+				ship.addPart(new ShieldCapacitor(), -1, i);
 				ship.addPart(new ShieldGenerator(), 0, i);
+				ship.addPart(new ShieldCapacitor(), 1, i);
 			} else {
+				ship.addPart(new Hull(), -1, i);
 				ship.addPart(new Hull(), 0, i);
+				ship.addPart(new Hull(), 1, i);
 			}
-			ship.addPart(new Hull(), 1, i);
 		}
-		ship.addPart(new Reactor(), -1, 13);
-		ship.addPart(new Engine(), -1, 16, BACKWARD);
-		ship.addPart(new Engine(), 0, 16, BACKWARD);
-		ship.addPart(new Engine(), 1, 16, BACKWARD);
-		ship.addPart(new Engine(), -2, 15, LEFT);
-		ship.addPart(new Engine(), 2, 15, RIGHT);
-		ship.addPart(new Engine(), -2, -2, LEFT);
-		ship.addPart(new Engine(), 2, -2, RIGHT);
-		ship.addPart(new Engine(), -2, -3, FORWARD);
-		ship.addPart(new Engine(), 2, -3, FORWARD);
-		ship.addPart(new Engine(), -2, -1, BACKWARD);
-		ship.addPart(new Engine(), 2, -1, BACKWARD);
+		for (i in -6...15) {
+			ship.addPart(new Hull(), -2, i);
+			ship.addPart(new Hull(), 2, i);
+		}
+
+		for (i in -6...15) {
+			if (util.MyMath.modInt(i, 3) == 1) {
+				ship.addPart(new Engine(true, 8), -3, i, LEFT);
+				ship.addPart(new Engine(true, 8), 3, i, RIGHT);
+			}
+		}
+
+		ship.addPart(new Engine(), -2, 15, BACKWARD);
+		ship.addPart(new Engine(), 0, 15, BACKWARD);
+		ship.addPart(new Engine(), 2, 15, BACKWARD);
+		ship.addPart(new LaserCannon(), -1, 15, FORWARD);
+		ship.addPart(new LaserCannon(), 1, 15, FORWARD);
+
+		for (i in -2...3) {
+			ship.addPart(new Engine(true, 12), i, -7, FORWARD);
+		}
+
+		ship.addPart(new Reactor(), -1, 12);
+		ship.addPart(new Reactor(), -1, -6);
 
 		ship.body.rotation = Math.PI;
 		ship.removeDisconnected();

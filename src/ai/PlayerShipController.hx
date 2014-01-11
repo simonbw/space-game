@@ -19,6 +19,10 @@ class PlayerShipController extends Entity implements Updatable {
 	}
 
 	public function update(timestep:Float):Void {
+		if (ship.disposed) {
+			dispose();
+			return;
+		}
 		var thrusting = false;
 		var turning = false;
 		ship.clearEngines();

@@ -114,8 +114,10 @@ class Game extends Sprite {
 		try {
 			if (Lib.current.stage.displayState == StageDisplayState.NORMAL) {
 				Lib.current.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+				IO.hideMouse();
 			} else {
 				Lib.current.stage.displayState = StageDisplayState.NORMAL;
+				IO.hideMouse();
 			}
 			createLayers();
 		} catch (error:Dynamic) {
@@ -168,7 +170,11 @@ class Game extends Sprite {
 		var timestep = 1 / stage.frameRate;
 		
 		for (entity in updatables) {
-			entity.update(timestep);
+			try {
+				entity.update(timestep);
+			} catch(error:Dynamic) {
+				Main.log("Updating " + entity + "failed: " + error);
+			}
 		}
 		
 		// pre-physics removal pass

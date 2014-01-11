@@ -12,7 +12,7 @@ class ShieldGenerator extends RectangularPart {
 		super(1, 1, 50);
 		color = 0xFFEEBB;
 
-		rechargeRate = 4.0;
+		rechargeRate = 10.0;
 		capacity = 40.0;
 	}
 

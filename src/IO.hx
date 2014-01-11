@@ -1,4 +1,5 @@
 import flash.geom.Point;
+import flash.ui.Mouse;
 
 /**
  * Static class for managing input.
@@ -47,6 +48,18 @@ class IO {
         flash.Lib.current.stage.addEventListener(flash.events.KeyboardEvent.KEY_DOWN, onKeyDown);
         flash.Lib.current.stage.addEventListener(flash.events.KeyboardEvent.KEY_UP, onKeyUp);
 	}
+
+    public static function hideMouse():Void {
+        Mouse.hide();
+    }
+
+    public static function showMouse():Void {
+        Mouse.show();
+    }
+
+    public static function toggleMouse():Void {
+        // toggle somehow. work on this later
+    }
 
     public static function addKeyDownCallback(key:Int, f:Void->Void):Void {
         if (keyDownCallbacks.get(key) == null) {
