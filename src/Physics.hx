@@ -64,14 +64,12 @@ class Physics {
 			var velocity2 = ship2.body.velocity.copy();
 			velocity2.addeq(a2);
 			var velocityDiff = velocity1.sub(velocity2);
-			var damage = Math.pow(Math.abs(velocityDiff.dot(arbiter.normal.unit(true))), 1.35) * Math.sqrt(ship1.body.inertia + ship2.body.inertia) / 10000;
+			var damage = Math.pow(Math.abs(velocityDiff.dot(arbiter.normal.unit(true))) / 1000, 2.2) * Math.sqrt(ship1.body.inertia + ship2.body.inertia) ;
 			impulseMultiplier += Math.max(Math.min(damage, part1.health), 0);
 			impulseMultiplier += Math.max(Math.min(damage, part2.health), 0);
 			part1.inflictDamage(damage);
 			part2.inflictDamage(damage);
-			impulseMultiplier *= 1.5;
-
-			Main.log("Ship Collision: " + Std.int(damage) + " " + impulseMultiplier);
+			impulseMultiplier *= 1.2;
 
 			for (contact in arbiter.contacts) {
 				ship1.game.addEntity(new effects.ImpactEffect(contact.position, 0xFFAA00, Math.sqrt(damage) / 2));

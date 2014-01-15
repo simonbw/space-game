@@ -77,8 +77,10 @@ class Game extends Sprite {
 		addEntity(ship);
 		if (Random.bool(0.5)) {
 			PrebuiltShips.makeFreighter(ship);
-		} else {
+		} else if (Random.bool(0.95)){
 			PrebuiltShips.makeXWing(ship);
+		} else {
+			PrebuiltShips.makeRam(ship);
 		}
         camera = new Camera();
 		
