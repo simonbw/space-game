@@ -11,14 +11,15 @@ class ShieldGenerator extends RectangularPart {
 	public function new() {
 		super(1, 1, 50);
 		color = 0xFFEEBB;
-
 		rechargeRate = 10.0;
 		capacity = 40.0;
+		updatePriority = 60;
 	}
 
 	override public function addToShip(ship:Ship, position:nape.geom.Vec2, direction:Direction = null):Void {
 		super.addToShip(ship, position, direction);
 		ship.maxShield += capacity;
+		ship.addUpdatePart(this);
 	}
 
 	override public function onRemove():Void {

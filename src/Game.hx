@@ -37,6 +37,7 @@ class Game extends Sprite {
 
 	var entities:Array<Entity>;
 	var updatables:Array<Updatable>;
+	var updatables2:Array<Updatable2>;
 	var entitiesToRemove:Array<Entity>;
     var ship:Ship;
     var shipController:PlayerShipController;
@@ -64,6 +65,7 @@ class Game extends Sprite {
 		entities = new Array<Entity>();
 		entitiesToRemove = new Array<Entity>();
 		updatables = new Array<Updatable>();
+		updatables2 = new Array<Updatable2>();
 		
         space = new Space();
 		space.worldLinearDrag = 0;
@@ -73,11 +75,15 @@ class Game extends Sprite {
 		shipController = new PlayerShipController(ship);
 		addEntity(shipController);
 		addEntity(ship);
-		PrebuiltShips.makeXWing(ship);
+		if (Random.bool(0.5)) {
+			PrebuiltShips.makeFreighter(ship);
+		} else {
+			PrebuiltShips.makeXWing(ship);
+		}
         camera = new Camera();
 		
 		// initialize modules
-		Laser.initLaser(space);
+		Physics.init(space);
 
 			
         // register event handlers
@@ -94,7 +100,7 @@ class Game extends Sprite {
 
                 var ship2 = new Ship(p);
 				addEntity(ship2);
-				PrebuiltShips.makeCruiser(ship2);
+				PrebuiltShips.makeFreighter(ship2);
 				addEntity(new StabilizeShipController(ship2));
             } catch(error:Dynamic) {
                 Main.log(error);
@@ -153,6 +159,9 @@ class Game extends Sprite {
 			if (Std.is(entity, Updatable)) {
 				updatables.push(cast(entity, Updatable));
 			}
+			if (Std.is(entity, Updatable2)) {
+				updatables2.push(cast(entity, Updatable2));
+			}
 		} catch(error:Dynamic) {
 			trace("Failed to add entity:" + entity + error);
 		}
@@ -160,6 +169,16 @@ class Game extends Sprite {
 	
 	public function removeEntity(entity:Entity):Void {
 		entitiesToRemove.push(entity);
+	}
+
+	inline function removeEntityTrue(entity:Entity):Void {
+		entities.remove(entity);
+		if (Std.is(entity, Updatable)) {
+			updatables.remove(cast(entity, Updatable));
+		}
+		if (Std.is(entity, Updatable2)) {
+			updatables2.remove(cast(entity, Updatable2));
+		}
 	}
 
 	/**
@@ -179,27 +198,36 @@ class Game extends Sprite {
 		
 		// pre-physics removal pass
 		for (entity in entitiesToRemove) {
-			entities.remove(entity);
-			if (Std.is(entity, Updatable)) {
-				updatables.remove(cast(entity, Updatable));
-			}
+			removeEntityTrue(entity);
 		}
-		entitiesToRemove = [];
+		entitiesToRemove.splice(0, entitiesToRemove.length);
 		
 		try {
 			space.step(timestep);
 		} catch (error:Dynamic) {
 			Main.log("Physics Error: " + error);
 		}
+
+		// post-physics removal pass
+		for (entity in entitiesToRemove) {
+			removeEntityTrue(entity);
+		}
+		entitiesToRemove.splice(0, entitiesToRemove.length);
+
+		// post physics updates
+		for (entity in updatables2) {
+			try {
+				entity.update2(timestep);
+			} catch(error:Dynamic) {
+				Main.log("Updating2 " + entity + "failed: " + error);
+			}
+		}
 		
 		// pre-render removal pass
 		for (entity in entitiesToRemove) {
-			entities.remove(entity);
-			if (Std.is(entity, Updatable)) {
-				updatables.remove(cast(entity, Updatable));
-			}
+			removeEntityTrue(entity);
 		}
-		entitiesToRemove = [];
+		entitiesToRemove.splice(0, entitiesToRemove.length);
 
 		// Camera Control should be done elsewhere
 		if (FOLLOWING) {
@@ -226,18 +254,21 @@ class Game extends Sprite {
      * Render everything to the screen.
      */
     public function render(e: Event = null):Void {
-        try {
-            surface.fillRect(surface.rect, 0x000000);
-            stars.render(surface, camera);
-            for (entity in entities) {
+		try {
+			surface.fillRect(surface.rect, 0x000000);
+			stars.render(surface, camera);
+			for (entity in entities) {
 				if (Std.is(entity, Renderable) && !entity.disposed) {
-					cast(entity, Renderable).render(surface, camera);
+					try {
+						cast(entity, Renderable).render(surface, camera);
+					} catch (error: Dynamic) {
+						Main.log("Render Failed:" + entity + " " + error);
+					}
 				}
 			}
-            ship.render(surface, camera);
-        } catch(error:Dynamic) {
-            Main.log("Render Error:" + error);
-        }
+		} catch (error: Dynamic) {
+			Main.log("Render Error:" + error);
+		}
 		profiler.render(surface);
-    }
+	}
 }

@@ -16,38 +16,62 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 
 	public var renderDepth:Int;
 
+	/** All the parts on the ship **/
 	var parts:Array<ShipPart>;
+	/** Parts that need to be updated **/
+	var updateParts:Array<ShipPart>;
+	/** Parts that need to be updated **/
+	public var partsToRemove:Array<ShipPart>;
+	/** parts that need to be redrawn **/
 	var dirtyParts:Array<ShipPart>;
+	/** A map from grid position to part **/
 	var partMap:util.CoordinateMap<ShipPart>;
+	/** True if the ship needs to be realigned because its local COM has changed **/
 	var needToRealign:Bool;
-
+	/** All the engines on the ship **/
 	var engines:Array<Engine>;
+	/** All the reactors on the ship **/
 	var reactors:Array<Reactor>;
+	/** All the shield generators on the ship **/
 	var shieldGenerators:Array<ShieldGenerator>;
-
+	/** An image used for caching **/
 	var image:BitmapData;
-
+	/** The amount of energy available **/
 	public var energy:Float;
+	/** The amount of energy being consumed per second **/
 	public var energyConsumption:Float;
+	/** The amount of energy being produced per second **/
 	public var energyProduction:Float;
+	/** energyConsumption / energyProduction if energy is running low **/
 	public var energyLoad:Float;
+	/** The maximum amount of energy the ship can hold **/
 	public var maxEnergy:Float;
-
+	/** The amount of shielding currently available **/
 	public var shield:Float;
+	/** The maximum value the shields can reach **/
 	public var maxShield:Float;
-
-
+	/** The sprite used for drawing **/
 	var sprite:Sprite;
+	/** The offset of the sprite from the local COM **/
 	var drawOffset:Vec2;
+	/** The offset of the image from the sprite location **/
 	var imageOffset:Vec2;
+	/** The physics body of the ship **/
 	public var body:Body;
 
+	/**
+	 * Create a new ship.
+	 * @param  position The world coordinates of the ship.
+	 * @return
+	 */
 	public function new(position:Vec2) {
 		super();
 		renderDepth = 100;
 
 		needToRealign = false;
 		parts = new Array<ShipPart>();
+		updateParts = new Array<ShipPart>();
+		partsToRemove = new Array<ShipPart>();
 		dirtyParts = new Array<ShipPart>();
 		partMap = new util.CoordinateMap<ShipPart>();
 		engines = new Array<Engine>();
@@ -68,16 +92,31 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		sprite = Pool.sprite();
 	}
 
+	/**
+	 * Called when added to a game.
+	 * @param  game
+	 */
 	override public function init(game:Game):Void {
 		super.init(game);
 		body.space = game.space;
 	}
 
+	/**
+	 * Realigns the sprite with the center of mass.
+	 * @return [description]
+	 */
 	public function realign():Void {
 		drawOffset.subeq(body.localCOM);
 		body.align();
 	}
 
+	/**
+	 * Add a part to the ship.
+	 * @param part      [description]
+	 * @param x         [description]
+	 * @param y         [description]
+	 * @param direction [description]
+	 */
 	public function addPart(part:ShipPart, x:Int, y:Int, direction:Direction = null):Void {
 		needToRealign = true;
 		parts.push(part);
@@ -104,6 +143,21 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		dirtyParts.push(part);
 	}
 
+	public function addUpdatePart(part:ShipPart):Void {
+		// check if already here
+		for (p in updateParts) {
+			if (part == p) {
+				return;
+			}
+		}
+		// else
+		updateParts.push(part);
+	}
+
+	public function removeUpdatePart(part:ShipPart):Void {
+		updateParts.remove(part);
+	}
+
 	/**
 	 * Remove a part from the ship. Does not handle what the part should do.
 	 * @param	part
@@ -111,7 +165,13 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	 */
 	public function removePart(part:ShipPart):Void {
 		needToRealign = true;
-		part.onRemove();
+		try {
+			if (part.ship == this) {
+				part.onRemove();
+			}
+		} catch(error:Dynamic) {
+			throw new flash.errors.Error("part.remove() " + part + ": " + error);
+		}
 		parts.remove(part);
 		for (p in part.gridpositions) {
 			partMap.remove(p.x, p.y);
@@ -130,6 +190,8 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		for (connectedPart in part.connectedParts) {
 			connectedPart.connectedParts.remove(part);
 		}
+
+		removeUpdatePart(part);
 
 		if (parts.length == 0) {
 			dispose();
@@ -152,40 +214,44 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	 * Removes all parts that are not connected to (0,0) from the ship.
 	 */
 	public function removeDisconnected():Void {
-		var queue = new Array<ShipPart>();
-		var connected = new de.polygonal.ds.HashSet<ShipPart>(256);
-		queue.push(parts[0]);
-		while (queue.length > 0) {
-			var part = queue.pop();
-			connected.set(part);
-			for (connectedPart in part.connectedParts) {
-				if (!connected.contains(connectedPart)) {
-					queue.push(connectedPart);
+		try {
+			var queue = new Array<ShipPart>();
+			var connected = new de.polygonal.ds.HashSet<ShipPart>(256);
+			queue.push(parts[0]);
+			while (queue.length > 0) {
+				var part = queue.pop();
+				connected.set(part);
+				for (connectedPart in part.connectedParts) {
+					if (!connected.contains(connectedPart)) {
+						queue.push(connectedPart);
+					}
 				}
 			}
-		}
 
-		var toRemove = new Array<ShipPart>();
-		for (part in parts) {
-			if (!connected.contains(part)) {
-				toRemove.push(part);
-			}
-		}
-
-		if (toRemove.length > 0) {
-			var other = new Ship(body.position.add(body.localVectorToWorld(drawOffset)));
-			other.body.rotation = body.rotation;
-			other.body.velocity.set(body.velocity);
-			for (part in toRemove) {
-				var x = Std.int(part.gridPosition.x);
-				var y = Std.int(part.gridPosition.y);
-				var d = part.direction;
-				removePart(part);
-				other.addPart(part, x, y, d);
+			var toRemove = new Array<ShipPart>();
+			for (part in parts) {
+				if (!connected.contains(part)) {
+					toRemove.push(part);
+				}
 			}
 
-			other.realign();
-			game.addEntity(other);
+			if (toRemove.length > 0) {
+				var other = new Ship(body.position.add(body.localVectorToWorld(drawOffset)));
+				other.body.rotation = body.rotation;
+				other.body.velocity.set(body.velocity);
+				for (part in toRemove) {
+					var x = Std.int(part.gridPosition.x);
+					var y = Std.int(part.gridPosition.y);
+					var d = part.direction;
+					removePart(part);
+					other.addPart(part, x, y, d);
+				}
+
+				other.realign();
+				game.addEntity(other);
+			}
+		} catch(error:Dynamic) {
+			throw new flash.errors.Error("removeDisconnected failed: " + error);
 		}
 	}
 
@@ -203,15 +269,15 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		energyConsumption = 0.0;
 		energyProduction = 0.0;
 		giveEnergy(timestep);
-		for (part in reactors) {
-			part.update(timestep);
-		}
-		for (part in shieldGenerators) {
-			part.update(timestep);
-		}
-		for (part in parts) {
-			if (part.updatable) {
+		updateParts.sort(function(a: ship.ShipPart, b: ship.ShipPart): Int {
+			return b.updatePriority - a.updatePriority;
+		});
+
+		for (part in updateParts) {
+			try {
 				part.update(timestep);
+			} catch (error:Dynamic) {
+				throw new flash.errors.Error("" + part + ": " + error);
 			}
 		}
 
@@ -235,7 +301,13 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	 * @param	timestep
 	 */
  	public function update2(timestep:Float):Void {
-
+ 		if (disposed) {
+ 			return;
+ 		}
+ 		for (part in partsToRemove) {
+ 			removePart(part);
+ 		}
+ 		partsToRemove.splice(0, partsToRemove.length);
 	}
 
 	/**
@@ -459,11 +531,11 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		}
 
 		var m = new flash.geom.Matrix();
-		m.translate(drawOffset.x - imageOffset.x, drawOffset.y - imageOffset.y);
+		m.translate(drawOffset.x, drawOffset.y);
 		m.rotate(body.rotation);
 		m.translate(body.position.x, body.position.y);
 		camera.getMatrix(m);
-		surface.draw(image, m, null, null, null, true);
+		surface.draw(sprite, m, null, null, null, true);
 	}
 
 	override public function dispose():Void {

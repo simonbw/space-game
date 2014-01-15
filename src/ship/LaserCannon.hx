@@ -1,8 +1,9 @@
 package ship;
 
-
 import nape.geom.Vec2;
 import nape.phys.Material;
+
+import projectiles.Laser;
 
 class LaserCannon extends RectangularPart {
 	
@@ -14,12 +15,16 @@ class LaserCannon extends RectangularPart {
 	public function new() {
 		super(1, 1);
 		cooldown = 0;
-		updatable = true;
-
 		color = 0xFFFFFF;
 	}
 
+	override public function addToShip(ship:Ship, position:Vec2, direction:Direction = null):Void {
+		super.addToShip(ship, position, direction);
+		ship.addUpdatePart(this);
+	}
+
 	override public function update(timestep:Float):Void {
+		super.update(timestep);
 		if (cooldown > 0) {
 			cooldown -= ship.requestEnergy(timestep * ENERGY_USE) / ENERGY_USE;
 		}

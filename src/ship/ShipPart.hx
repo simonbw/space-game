@@ -6,7 +6,6 @@ import de.polygonal.ds.Hashable;
 
 class ShipPart implements Hashable implements Hittable {
 
-	public var updatable:Bool;
 	public var key:Int;
 	public var gridPosition:Vec2;
 	public var gridSize:Vec2;
@@ -19,15 +18,22 @@ class ShipPart implements Hashable implements Hittable {
 	public var ship:Ship;
 	public var adjacent:Array<{x:Int, y:Int}>;
 	public var gridpositions:Array<{x:Int, y:Int}>;
+	public var updatePriority:Int;
+	public var health:Float;
+	public var armor:Float;
+	public var maxHealth:Float;
 
-	public function new(size:Vec2) {
+	public function new(size:Vec2, health:Float = 100.0, armor:Float = 1.0, updatePriority = 0) {
+		this.health = health;
+		this.maxHealth = health;
+		this.armor = armor;
+		this.updatePriority = updatePriority;
 		key = Std.int(Math.random() * (2<<16));
 		connectedParts = new HashSet<ShipPart>(2<<4);
 		adjacent = new Array<{x:Int, y:Int}>();
 		gridpositions = new Array<{x:Int, y:Int}>();
 		gridSize = size;
 		drawSize = Vec2.get(gridSize.x * Ship.GRID_SIZE, gridSize.y * Ship.GRID_SIZE);
-		updatable = false;
 	}
 
 	public function addToShip(ship:Ship, position:Vec2, direction:Direction = null):Void {
@@ -39,6 +45,22 @@ class ShipPart implements Hashable implements Hittable {
 			direction = Direction.FORWARD;
 		}
 		this.direction = direction;
+	}
+
+	/**
+	 * Inflict a certain amount of damage to the ship.
+	 * @param  amount damage to inflict
+	 * @return        true if the part is destroyed
+	 */
+	public inline function inflictDamage(amount:Float):Bool {
+		amount = Math.max(amount - armor, 0);
+		health -= amount;
+		if (health <= 0) {
+			ship.partsToRemove.push(this);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public function onRemove():Void {
@@ -87,8 +109,15 @@ class ShipPart implements Hashable implements Hittable {
 		return vector;
 	}
 
-	public function update(timestep:Float):Void {
 
+	public inline function getWorldPosition(weak:Bool = false):Vec2 {
+		return ship.body.localPointToWorld(center, weak);
+	}
+
+	public function update(timestep:Float):Void {
+		if (health <= 0) {
+			ship.removePart(this);
+		}
 	}
 
 	public function draw(g:flash.display.Graphics, lod:Float):Void {
@@ -104,6 +133,7 @@ class ShipPart implements Hashable implements Hittable {
 	}
 
 	public function dispose():Void {
+		Main.log("DISPOSING " + this);
 		gridPosition.dispose();
 		gridSize.dispose();
 		drawSize.dispose();

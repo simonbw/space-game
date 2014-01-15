@@ -37,8 +37,8 @@ class Asteroid extends Entity implements Renderable implements Hittable {
 		
 		for (poly in gpoly.convexDecomposition()) {
 			var shape = new Polygon(poly, MATERIAL);
-			shape.cbTypes.add(CB_ASTEROID);
-			shape.cbTypes.add(Laser.CB_LASER_HITTABLE);
+			shape.cbTypes.add(Physics.CB_ASTEROID);
+			shape.cbTypes.add(Physics.CB_HITTABLE);
 			shape.userData.entity = this;
 			body.shapes.add(shape);
 		}

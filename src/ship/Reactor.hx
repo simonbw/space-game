@@ -6,17 +6,19 @@ class Reactor extends RectangularPart {
 
 	public function new() {
 		super(3, 3, 500);
-
+		updatePriority = 1000;
 		color = 0x777777;
 	}
 
 	override public function update(timestep:Float):Void {
+		super.update(timestep);
 		ship.giveEnergy(timestep * ENERGY_PRODUCTION);
 	}
 
 	override public function addToShip(ship:Ship, position:nape.geom.Vec2, direction:Direction = null):Void {
 		super.addToShip(ship, position, direction);
 		ship.maxEnergy += ENERGY_CAPACITY;
+		ship.addUpdatePart(this);
 	}
 
 	override public function onRemove():Void {

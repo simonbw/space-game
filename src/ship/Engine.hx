@@ -23,7 +23,12 @@ class Engine extends RectangularPart {
 		this.maneuverable = maneuverable;
 		targetThrottle = 0.0;
 		_throttle = 0.0;
-		updatable = true;
+		updatePriority = 50;
+	}
+
+	override public function addToShip(ship:Ship, position:Vec2, direction:Direction = null):Void {
+		super.addToShip(ship, position, direction);
+		ship.addUpdatePart(this);
 	}
 
 	public inline function set_throttle(value:Float):Float {
@@ -36,6 +41,7 @@ class Engine extends RectangularPart {
 	}
 
 	override public function update(timestep:Float):Void {
+		super.update(timestep);
 		var diff = Math.min(Math.max(targetThrottle - _throttle, -THROTTLE_INCREMENT), THROTTLE_INCREMENT);
 		_throttle = Math.max(Math.min(_throttle + diff, 1.0), 0.0);
 		if (_throttle > 0) {

@@ -1,3 +1,4 @@
+package projectiles;
 
 import flash.display.Sprite;
 import util.Pool;
@@ -11,8 +12,6 @@ import nape.dynamics.InteractionFilter;
 
 class Laser extends Entity implements Renderable implements Updatable {
 	static inline var SPEED = 10000;
-	public static var CB_LASER = new CbType();
-	public static var CB_LASER_HITTABLE = new CbType();
 	static var MATERIAL = new nape.phys.Material(0.1, 0.0, 0.0, 0.001, 1.0);
 	
 	public var renderDepth:Int;
@@ -22,26 +21,6 @@ class Laser extends Entity implements Renderable implements Updatable {
 	public var velocity:Vec2;
 	var lifespan:Float;
 	static private inline var SIZE:Int = 2;
-
-	static public function initLaser(space:nape.space.Space):Void {
-		var listener = new InteractionListener(CbEvent.BEGIN, InteractionType.COLLISION, [CB_LASER], [CB_LASER_HITTABLE], function(cb:InteractionCallback) {
-			var laser = cast(cb.int1.castShape.userData.entity, Laser);
-			if (laser != null && !laser.disposed) {
-				var other = cast(cb.int2.castShape.userData.entity, Hittable);
-				try {
-					if (other != null) {
-						var p = laser.body.position;
-						var v = laser.velocity;
-						other.hit(p, v);
-					}
-				} catch (error:Dynamic) {
-					Main.log("Collision Error: " + error);
-				}
-				laser.hit();
-			}
-		});
-		listener.space = space;
-	}
 	
 	public function new(position:Vec2, direction:Vec2, offset:Vec2 = null, lifespan:Float = 5.0) {
 		super();
@@ -63,7 +42,7 @@ class Laser extends Entity implements Renderable implements Updatable {
 		var shape = new nape.shape.Circle(SIZE, Vec2.get(0,0), MATERIAL, new InteractionFilter(2, ~2));
 		shape.body = body;
 		shape.userData.entity = this;
-		shape.cbTypes.add(CB_LASER);
+		shape.cbTypes.add(Physics.CB_PROJECTILE);
 		
 		sprite = Pool.sprite();
 		sprite.graphics.lineStyle(0, 0xFFFF00, 0.5);

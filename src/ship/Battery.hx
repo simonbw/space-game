@@ -14,8 +14,8 @@ class Battery extends RectangularPart {
 	}
 
 	override public function onRemove():Void {
-		super.onRemove();
 		ship.maxEnergy -= ENERGY_CAPACITY;
+		super.onRemove();
 	}
 
 }

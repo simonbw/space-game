@@ -6,18 +6,13 @@ import nape.shape.Polygon;
 import nape.phys.Material;
 
 class RectangularPart extends ShipPart {
-	static var MATERIAL = Material.steel();
+	static var MATERIAL = new Material(0.3, 0.5, 1.1, 3.0, 0);
 
 	var shape:Shape;
-	var health:Float;
-	var maxHealth:Float;
 	var color:Int;
 	
-	public function new(width:Int, height:Int, health:Float = 100.0) {
-		super(Vec2.get(width, height));
-		this.health = health;
-		maxHealth = health;
-
+	public function new(width:Int, height:Int, health:Float = 100.0, armor:Float = 1.0) {
+		super(Vec2.get(width, height), health, armor);
 		color = 0xAAAAAA;
 	}
 
@@ -25,7 +20,8 @@ class RectangularPart extends ShipPart {
 		super.addToShip(ship, position, direction);
 		
 		shape = new Polygon(Polygon.box(drawSize.x, drawSize.y, true), MATERIAL);
-		shape.cbTypes.add(Laser.CB_LASER_HITTABLE);
+		shape.cbTypes.add(Physics.CB_SHIP_PART);
+		shape.cbTypes.add(Physics.CB_HITTABLE);
 		ship.body.shapes.add(shape);
 		shape.translate(center);
 		shape.userData.entity = this;
@@ -99,15 +95,12 @@ class RectangularPart extends ShipPart {
 			var damage = 15.0;
 			var shielded = ship.requestShield(damage);
 			damage -= shielded;
-			health -= damage;
+			inflictDamage(damage);
 			if (damage > 0.1) {
 				ship.game.addEntity(new effects.MetalImpactEffect(hitPos, Math.sqrt(damage)));
 			}
 			if (shielded > 0.1) {
 				ship.game.addEntity(new effects.ShieldImpactEffect(hitPos, Math.sqrt(shielded)));
-			}
-			if (health <= 0) {
-				ship.removePart(this);
 			}
 		}
 	}
