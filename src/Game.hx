@@ -1,21 +1,22 @@
 import ai.StabilizeShipController;
-import flash.display.Sprite;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
+import flash.display.Sprite;
 import flash.display.StageDisplayState;
 import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.Lib;
-import util.MyMath;
-import util.Random;
 
-import nape.space.Space;
 import nape.geom.Vec2;
+import nape.space.Space;
 
-import ship.Ship;
-import ship.PrebuiltShips;
 import ai.PlayerShipController;
 import obstacles.Asteroid;
+import ship.PrebuiltShips;
+import ship.Ship;
+import util.MyMath;
+import util.Profiler;
+import util.Random;
 
 /**
  * The top level control structure for the game.
@@ -41,7 +42,7 @@ class Game extends Sprite {
 	var entitiesToRemove:Array<Entity>;
     var ship:Ship;
     var shipController:PlayerShipController;
-    var stars:Stars;
+    var stars:effects.Stars;
     var camera:Camera;
 
     /**
@@ -70,7 +71,7 @@ class Game extends Sprite {
         space = new Space();
 		space.worldLinearDrag = 0;
 		space.worldAngularDrag = 0;
-        stars = new Stars();
+        stars = new effects.Stars();
 		ship = new Ship(Vec2.get(200, 200));
 		shipController = new PlayerShipController(ship);
 		addEntity(shipController);
@@ -100,9 +101,15 @@ class Game extends Sprite {
                 //asteroid.body.applyImpulse(Vec2.get(10000, 0, true));
                 // addEntity(asteroid);
 
-                var ship2 = new Ship(p);
+				var ship2 = new Ship(p);
 				addEntity(ship2);
-				PrebuiltShips.makeFreighter(ship2);
+				if (Random.bool(0.4)) {
+					PrebuiltShips.makeFreighter(ship2);
+				} else if (Random.bool(0.4)) {
+					PrebuiltShips.makeXWing(ship2);
+				} else {
+					PrebuiltShips.makeCruiser(ship2);
+				}
 				addEntity(new StabilizeShipController(ship2));
             } catch(error:Dynamic) {
                 Main.log(error);
@@ -245,9 +252,8 @@ class Game extends Sprite {
 
 		Main.log2("speed: " + Std.int(ship.body.velocity.length), 0);
 		Main.log2("energy: " + Std.int(ship.energy) + "/" + Std.int(ship.maxEnergy), 1);
-		Main.log2("energy load: " + Math.fround(ship.energyLoad * 10) / 10, 2);
-		Main.log2("shields: " + Std.int(ship.shield) + "/" + Std.int(ship.maxShield), 3);
-		Main.log2("bodies: " + space.bodies.length, 4);
+		Main.log2("shields: " + Std.int(ship.shield) + "/" + Std.int(ship.maxShield), 2);
+		Main.log2("bodies: " + space.bodies.length, 3);
 		profiler.update();
         render(e);
     }

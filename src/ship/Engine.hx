@@ -46,7 +46,7 @@ class Engine extends RectangularPart {
 		_throttle = Math.max(Math.min(_throttle + diff, 1.0), 0.0);
 		if (_throttle > 0) {
 			var energyRequired = timestep * _throttle * energyUse * power;
-			_throttle *= ship.requestEnergy(energyRequired) / energyRequired;
+			_throttle *= ship.requestEnergy(energyRequired, EnergyType.ENGINE) / energyRequired;
 			var d = Math.PI / 2 + ship.body.rotation + directionToRadian();
 			var thrust = _throttle * timestep * power * POWER_MULTIPLIER;
 			var impulse = Vec2.get(Math.cos(d) * thrust, Math.sin(d) * thrust, true);

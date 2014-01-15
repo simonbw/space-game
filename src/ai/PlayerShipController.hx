@@ -1,5 +1,6 @@
 package ai;
 import ship.Ship;
+import ship.EnergyType;
 import util.MyMath;
 
 import nape.geom.Vec2;
@@ -15,6 +16,12 @@ class PlayerShipController extends Entity implements Updatable {
 
 		IO.addKeyDownCallback(IO.K_STABILIZE, function():Void {
 			stabilize = !stabilize;
+		});
+
+		IO.addKeyDownCallback(IO.K_SHIELD, function():Void {
+			Main.log("toggling shields");
+			var multiplier = ship.energyManager.multipliers.get(EnergyType.SHIELD);
+			ship.energyManager.multipliers.set(EnergyType.SHIELD, 0.0);
 		});
 	}
 

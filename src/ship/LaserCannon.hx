@@ -26,7 +26,7 @@ class LaserCannon extends RectangularPart {
 	override public function update(timestep:Float):Void {
 		super.update(timestep);
 		if (cooldown > 0) {
-			cooldown -= ship.requestEnergy(timestep * ENERGY_USE) / ENERGY_USE;
+			cooldown -= ship.requestEnergy(timestep * ENERGY_USE, EnergyType.WEAPON) / ENERGY_USE;
 		}
 	}
 

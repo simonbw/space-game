@@ -6,12 +6,12 @@ import nape.shape.Polygon;
 import nape.phys.Material;
 
 class RectangularPart extends ShipPart {
-	static var MATERIAL = new Material(0.3, 0.5, 1.1, 3.0, 0);
+	static var MATERIAL = new Material(0.3, 0.5, 1.1, 5.0, 0);
 
 	var shape:Shape;
 	var color:Int;
 	
-	public function new(width:Int, height:Int, health:Float = 100.0, armor:Float = 1.0) {
+	public function new(width:Int, height:Int, health:Float = 100.0, armor:Float = 15.0) {
 		super(Vec2.get(width, height), health, armor);
 		color = 0xAAAAAA;
 	}

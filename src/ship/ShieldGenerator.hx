@@ -32,6 +32,6 @@ class ShieldGenerator extends RectangularPart {
 
 		var diff = ship.maxShield - ship.shield;
 		var e = util.MyMath.min(diff, rechargeRate * timestep) / EFFICIENCY;
-		ship.shield += ship.requestEnergy(e) * EFFICIENCY;
+		ship.shield += ship.requestEnergy(e, EnergyType.SHIELD) * EFFICIENCY;
 	}
 }

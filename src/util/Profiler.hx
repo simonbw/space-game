@@ -1,3 +1,5 @@
+package util;
+
 import flash.display.BitmapData;
 import flash.text.TextField;
 import flash.text.TextFormat;

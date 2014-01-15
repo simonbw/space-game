@@ -1,3 +1,5 @@
+package effects;
+
 import flash.geom.Point;
 import util.MyMath;
 

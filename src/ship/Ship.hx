@@ -38,12 +38,9 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	var image:BitmapData;
 	/** The amount of energy available **/
 	public var energy:Float;
-	/** The amount of energy being consumed per second **/
-	public var energyConsumption:Float;
-	/** The amount of energy being produced per second **/
-	public var energyProduction:Float;
-	/** energyConsumption / energyProduction if energy is running low **/
-	public var energyLoad:Float;
+	/** Manages the energy flow **/
+	public var energyManager:EnergyManager;
+	
 	/** The maximum amount of energy the ship can hold **/
 	public var maxEnergy:Float;
 	/** The amount of shielding currently available **/
@@ -80,9 +77,9 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		body = new Body();
 		body.position.set(position);
 		// body.isBullet = true;
-		energyLoad = 0.0;
 		maxEnergy = 10.0;
 		energy = maxEnergy;
+		energyManager = new EnergyManager(this);
 		shield = 0.0;
 		maxShield = 0.0;
 
@@ -266,8 +263,8 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 			needToRealign = false;
 		}
 
-		energyConsumption = 0.0;
-		energyProduction = 0.0;
+		energyManager.update(timestep);
+		
 		giveEnergy(timestep);
 		updateParts.sort(function(a: ship.ShipPart, b: ship.ShipPart): Int {
 			return b.updatePriority - a.updatePriority;
@@ -279,13 +276,6 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 			} catch (error:Dynamic) {
 				throw new flash.errors.Error("" + part + ": " + error);
 			}
-		}
-
-		if (energy < energyConsumption) {
-			energyLoad = 0.8 * energyLoad + 0.2 * energyConsumption / energyProduction;
-		} else {
-			energyLoad = 0.8 * energyLoad;
-
 		}
 
 		if (energy > maxEnergy) {
@@ -332,19 +322,15 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 
 	}
 
-	public function requestEnergy(amount:Float):Float {
-		energyConsumption += amount;
-		var result = MyMath.min(amount, energy);
-		if (energyLoad > 1.0) {
-			result /= energyLoad;
-		}
+	public function requestEnergy(amount:Float, energyType:EnergyType):Float {
+		var result = energyManager.requestEnergy(amount, energyType);
 		energy -= result;
 		energy = MyMath.max(energy, 0);
 		return result;
 	}
 
 	public function giveEnergy(amount:Float):Void {
-		energyProduction += amount;
+		energyManager.giveEnergy(amount);
 		energy += amount;
 	}
 
