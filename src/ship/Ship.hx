@@ -264,8 +264,10 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		}
 
 		energyManager.update(timestep);
-		
 		giveEnergy(timestep);
+		if (shield > 0) {
+			shield -= maxShield * timestep * 0.002;
+		}
 		updateParts.sort(function(a: ship.ShipPart, b: ship.ShipPart): Int {
 			return b.updatePriority - a.updatePriority;
 		});
@@ -325,7 +327,7 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	public function requestEnergy(amount:Float, energyType:EnergyType):Float {
 		var result = energyManager.requestEnergy(amount, energyType);
 		energy -= result;
-		energy = MyMath.max(energy, 0);
+		energy = Math.max(energy, 0);
 		return result;
 	}
 
@@ -335,7 +337,7 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	}
 
 	public function requestShield(amount:Float):Float {
-		var result = MyMath.min(amount, shield);
+		var result = Math.min(amount, shield);
 		shield -= result;
 		return result;
 	}

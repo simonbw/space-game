@@ -92,10 +92,9 @@ class RectangularPart extends ShipPart {
 	override public function hit(hitPos:Vec2, hitVelocity:Vec2):Void {
 		super.hit(hitPos, hitVelocity);
 		if (ship != null && ship.game != null) {
-			var damage = 15.0;
-			var shielded = ship.requestShield(damage);
+			var damage = 50.0;
+			var shielded = damage - inflictDamage(damage);
 			damage -= shielded;
-			inflictDamage(damage);
 			if (damage > 0.1) {
 				ship.game.addEntity(new effects.MetalImpactEffect(hitPos, Math.sqrt(damage)));
 			}

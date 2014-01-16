@@ -50,17 +50,16 @@ class ShipPart implements Hashable implements Hittable {
 	/**
 	 * Inflict a certain amount of damage to the ship.
 	 * @param  amount damage to inflict
-	 * @return        true if the part is destroyed
+	 * @return        amount of damage done
 	 */
-	public inline function inflictDamage(amount:Float):Bool {
+	public inline function inflictDamage(amount:Float):Float {
+		amount -= ship.requestShield(amount);
 		amount = Math.max(amount - armor, 0);
 		health -= amount;
 		if (health <= 0) {
 			ship.partsToRemove.push(this);
-			return true;
-		} else {
-			return false;
 		}
+		return amount;
 	}
 
 	public function onRemove():Void {

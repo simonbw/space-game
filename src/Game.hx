@@ -76,13 +76,15 @@ class Game extends Sprite {
 		shipController = new PlayerShipController(ship);
 		addEntity(shipController);
 		addEntity(ship);
-		if (Random.bool(0.5)) {
+		if (Random.bool(0.4)) {
 			PrebuiltShips.makeFreighter(ship);
-		} else if (Random.bool(0.95)){
+		} else if (Random.bool(0.8)){
 			PrebuiltShips.makeXWing(ship);
 		} else {
-			PrebuiltShips.makeRam(ship);
+			PrebuiltShips.makeCruiser(ship);
 		}
+		addEntity(new ui.EnergyMeter(ship));
+
         camera = new Camera();
 		
 		// initialize modules

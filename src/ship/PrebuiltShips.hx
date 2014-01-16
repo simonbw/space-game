@@ -13,8 +13,8 @@ class PrebuiltShips {
 		ship.addPart(new Engine(false), -1, 2, BACKWARD);
 		ship.addPart(new Engine(false), 0, 2, BACKWARD);
 		ship.addPart(new Engine(false), 1, 2, BACKWARD);
-		ship.addPart(new Battery(), 2, 1);
-		ship.addPart(new Battery(), -2, 1);
+		ship.addPart(new ShieldCapacitor(), 2, 1);
+		ship.addPart(new ShieldCapacitor(), -2, 1);
 		ship.addPart(new ShieldGenerator(), 2, -1);
 		ship.addPart(new ShieldGenerator(), -2, -1);
 
@@ -138,7 +138,7 @@ class PrebuiltShips {
 		}
 		for (i in -4...5) {
 			ship.addPart(new ship.Engine(false, 50), i, -1, FORWARD);
-			ship.addPart(new ship.Engine(false, 30), i, 14, BACKWARD);
+			ship.addPart(new ship.Engine(false, 30), i, 33, BACKWARD);
 		}
 		for (i in 0...31) {
 			if (util.MyMath.modInt(i, 2) == 1) {

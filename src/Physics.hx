@@ -24,7 +24,6 @@ class Physics {
 
 	static function initProjectiles(space:Space):Void {
 		var listener = new InteractionListener(CbEvent.BEGIN, InteractionType.COLLISION, [CB_PROJECTILE], [CB_HITTABLE], function(cb:InteractionCallback):Void {
-			var arbiter = cb.arbiters.at(0).collisionArbiter;
 			var laser = cast(cb.int1.userData.entity, Laser);
 			if (laser != null && !laser.disposed) {
 				var other = cast(cb.int2.userData.entity, Hittable);
