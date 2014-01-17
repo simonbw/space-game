@@ -5,6 +5,7 @@ import nape.geom.Vec2;
 
 class Particle extends Entity implements Updatable {
 	
+	var particleSystem:ParticleSystem;
 	var position:Vec2;
 	var velocity:Vec2;
 
