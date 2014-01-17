@@ -37,7 +37,7 @@ class LaserCannon extends RectangularPart {
 			var dir = ship.body.localVectorToWorld(rotateVec(Vec2.get(0, 1, true)));
 			var l = new Laser(pos, dir, ship.body.velocity);
 			// pos.dispose();
-			// dir.dispose();
+			dir.dispose();
 			Main.currentGame.addEntity(l);
 			return true;
 		} else {

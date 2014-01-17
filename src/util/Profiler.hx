@@ -127,7 +127,7 @@ class Profiler {
 			var section = sections.get(name);
 			field.text += section.name + ": " + Std.int(100 * (section.avgDuration / frameTime)) + "% \n";
 		}
-		
+		field.text += "\n";
 		for (line in customData) {
 			field.text += line + "\n";
 		}

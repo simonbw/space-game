@@ -39,7 +39,7 @@ class Laser extends Entity implements Renderable implements Updatable {
 		
 		body.space = Main.currentGame.space;
 		
-		var shape = new nape.shape.Circle(SIZE, Vec2.get(0,0), MATERIAL, new InteractionFilter(2, ~2));
+		var shape = new nape.shape.Circle(SIZE, Vec2.get(0,0), MATERIAL, Physics.F_HOLLOW_PROJECTILE);
 		shape.body = body;
 		shape.userData.entity = this;
 		shape.cbTypes.add(Physics.CB_PROJECTILE);
@@ -74,7 +74,7 @@ class Laser extends Entity implements Renderable implements Updatable {
 
 	override public function dispose():Void {
 		super.dispose();
-		Pool.disposeSprite(sprite);
+		// Pool.disposeSprite(sprite);
 		sprite = null;
 		body.space = null;
 		velocity.dispose();

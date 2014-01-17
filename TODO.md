@@ -1,7 +1,7 @@
 To Do
 ========
 
-+ Energy System
-    + Request energy at beginning of update
-    + 
++ Generalize Projectile System
++ Explosions
 + Optimize ship drawing
++ Profile code

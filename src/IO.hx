@@ -22,7 +22,8 @@ class IO {
     static public inline var K_ZOOM_IN = 187;       // +
     static public inline var K_ZOOM_OUT = 189;      // -
 	static public inline var K_CAMERA_LOCK = 70;	// F
-	static public inline var K_FULLSCREEN = 71;		// G
+    static public inline var K_FULLSCREEN = 71;     // G
+	static public inline var K_RESET = 82;		    // R
 
     static public var mousePos:Point;
 	static public var keys:Array<Bool>;
@@ -66,6 +67,20 @@ class IO {
             keyDownCallbacks.set(key, new Array<Void->Void>());
         }
         keyDownCallbacks.get(key).push(f);
+    }
+
+    public static function removeKeyDownCallback(key:Int, f:Void->Void):Void {
+        keyDownCallbacks.get(key).remove(f);
+    }
+
+    public static function clearKeyDownCallbacks(key:Int):Void {
+        keyDownCallbacks.get(key).splice(0, keyDownCallbacks.get(key).length);
+    }
+
+    public static function clearAllKeyDownCallbacks():Void {
+        for (key in keyDownCallbacks.keys()) {
+            keyDownCallbacks.get(key).splice(0, keyDownCallbacks.get(key).length);
+        }
     }
 
     /**

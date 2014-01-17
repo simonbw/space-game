@@ -1,5 +1,9 @@
 package ship;
 
+
+/**
+ * Manages energy distribution on a ship.
+ */
 class EnergyManager {
 	/** Percent of full power the system is at **/
 	public var multipliers:Map<EnergyType, Float>;
@@ -56,11 +60,11 @@ class EnergyManager {
 		amount *= multipliers.get(energyType);
 		consumptions.set(energyType, consumptions.get(energyType) + amount);
 		totalConsumption += amount;
-		var result = Math.min(amount, ship.energy);
+		amount = Math.min(amount, ship.energy);
 		if (energyLoad > 1.0) {
-			result /= energyLoad;
+			amount /= energyLoad;
 		}
-		return result;
+		return amount;
 	}
 
 }

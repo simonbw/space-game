@@ -19,7 +19,6 @@ class PlayerShipController extends Entity implements Updatable {
 		});
 
 		IO.addKeyDownCallback(IO.K_SHIELD, function():Void {
-			Main.log("toggling shields");
 			var multiplier = ship.energyManager.multipliers.get(EnergyType.SHIELD);
 			if (multiplier > 0) {
 				multiplier = 0;

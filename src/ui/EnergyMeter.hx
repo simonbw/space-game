@@ -60,16 +60,22 @@ class EnergyMeter extends Entity implements Renderable {
 		g.beginFill(color, 0.5);
 		g.drawRect(surface.width - i * w, surface.height - h, w, h);
 		g.endFill();
-		i++;
 
 		h = ship.energy / ship.maxEnergy * maxH;
 		g.beginFill(0xFFFF00, 0.7);
-		g.drawRect(surface.width - i * w, surface.height - h, 5, h);
+		g.drawRect(surface.width - (i + 0.5) * w, surface.height - h, w / 2, h);
 		g.endFill();
+
+		if (ship.maxShield > 0) {
+			h = ship.shield / ship.maxShield * maxH;
+			g.beginFill(0xFF00FF, 0.7);
+			g.drawRect(surface.width - (i + 1) * w, surface.height - h, w / 2, h);
+			g.endFill();
+		}
 
 		g.lineStyle(1, 0x00FFFF);
 		g.moveTo(surface.width, surface.height - maxH);
-		g.lineTo(surface.width - 85, surface.height - maxH);
+		g.lineTo(surface.width - 100, surface.height - maxH);
 		surface.draw(sprite);
 	}
 

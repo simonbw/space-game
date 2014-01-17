@@ -19,12 +19,7 @@ class RectangularPart extends ShipPart {
 	override public function addToShip(ship:Ship, position:Vec2, direction:Direction = null):Void {
 		super.addToShip(ship, position, direction);
 		
-		shape = new Polygon(Polygon.box(drawSize.x, drawSize.y, true), MATERIAL);
-		shape.cbTypes.add(Physics.CB_SHIP_PART);
-		shape.cbTypes.add(Physics.CB_HITTABLE);
-		ship.body.shapes.add(shape);
-		shape.translate(center);
-		shape.userData.entity = this;
+		makeShape();
 
 		for (i in 0...(Std.int(gridSize.x))) {
 			for (j in 0...(Std.int(gridSize.y))) {
@@ -83,6 +78,15 @@ class RectangularPart extends ShipPart {
 			corners.unshift(corners.pop());
 		}
 	}
+
+	function makeShape():Void {
+		shape = new Polygon(Polygon.box(drawSize.x, drawSize.y, true), MATERIAL, Physics.F_SOLID_SHIP);
+		shape.cbTypes.add(Physics.CB_SHIP_PART);
+		shape.cbTypes.add(Physics.CB_HITTABLE);
+		ship.body.shapes.add(shape);
+		shape.translate(center);
+		shape.userData.entity = this;
+	}
 	
 	override public function onRemove():Void {
 		super.onRemove();
@@ -93,7 +97,7 @@ class RectangularPart extends ShipPart {
 		super.hit(hitPos, hitVelocity);
 		if (ship != null && ship.game != null) {
 			var damage = 50.0;
-			var shielded = damage - inflictDamage(damage);
+			var shielded = inflictDamage(damage);
 			damage -= shielded;
 			if (damage > 0.1) {
 				ship.game.addEntity(new effects.MetalImpactEffect(hitPos, Math.sqrt(damage)));
@@ -109,7 +113,7 @@ class RectangularPart extends ShipPart {
 		if (health >= maxHealth) {
 			g.beginFill(color);
 		} else {
-			g.beginFill(0xAA0000);
+			g.beginFill(util.Color.interpolate(color, 0xFF0000, 1.0 - health / maxHealth));
 		}
 			
 		g.drawRect(localPosition.x, localPosition.y, drawSize.x, drawSize.y);

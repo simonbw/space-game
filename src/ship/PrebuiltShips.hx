@@ -128,25 +128,29 @@ class PrebuiltShips {
 	
 	public static function makeCruiser(ship:ship.Ship):Void {
 		for (i in 0...11) {
-			ship.addPart(new LargeHull(), -4, i * 3);
+			for (j in 0...3) {
+				ship.addPart(new Hull(), -5, i * 3 + j);
+				ship.addPart(new Hull(), 5, i * 3 + j);
+			}
+			ship.addPart(new LargeInterior(), -4, i * 3);
 			if (util.MyMath.modInt(i, 2) == 1) {
 				ship.addPart(new Reactor(), -1, i * 3);
 			} else {
-				ship.addPart(new LargeHull(), -1, i * 3);
+				ship.addPart(new LargeInterior(), -1, i * 3);
 			}
-			ship.addPart(new LargeHull(), 2, i * 3);
+			ship.addPart(new LargeInterior(), 2, i * 3);
 		}
 		for (i in -4...5) {
 			ship.addPart(new ship.Engine(false, 50), i, -1, FORWARD);
 			ship.addPart(new ship.Engine(false, 30), i, 33, BACKWARD);
 		}
 		for (i in 0...31) {
-			if (util.MyMath.modInt(i, 2) == 1) {
-				ship.addPart(new Engine(true, 20), -5, i, LEFT);
-				ship.addPart(new Engine(true, 20), 5, i, RIGHT);
+			if (util.MyMath.modInt(i, 3) == 2) {
+				ship.addPart(new Engine(true, 10), -6, i, LEFT);
+				ship.addPart(new Engine(true, 10), 6, i, RIGHT);
 			} else {
-				ship.addPart(new LaserCannon(), -5, i, RIGHT);
-				ship.addPart(new LaserCannon(), 5, i, LEFT);
+				ship.addPart(new Hull(), -5, i);
+				ship.addPart(new Hull(), 5, i);
 			}
 		}
 		

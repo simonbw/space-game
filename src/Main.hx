@@ -11,12 +11,25 @@ class Main {
 	static function main() {
 		stage = flash.Lib.current.stage;
 		IO.init();
+		ui.Cursor.init();
+		reset();
+	}
+
+	static public function reset():Void {
+		if (currentGame != null) {
+			try {
+				currentGame.dispose();
+			} catch(error:Dynamic) {
+				trace(error);
+			}
+		}
 		currentGame = new Game();
 		try {
 			currentGame.init();
 		} catch (error:Dynamic) {
 			trace("error: " + error);
 		}
+		IO.addKeyDownCallback(IO.K_RESET, reset);
 	}
 
 	/**

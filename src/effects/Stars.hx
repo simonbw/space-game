@@ -5,12 +5,13 @@ import util.MyMath;
 
 import nape.geom.Vec2;
 
-class Stars implements Renderable {
+class Stars extends Entity implements Renderable {
 	var points:Array<Point>;
 	public var renderDepth:Int;
 
 	public function new() {
-		renderDepth = 1000;
+		super();
+		renderDepth = 100000;
 		
 		points = new Array<Point>();
 		var s = flash.Lib.current.stage;
@@ -27,7 +28,7 @@ class Stars implements Renderable {
 		surface.lock();
 		var m = new flash.geom.Matrix();
 		m.translate(-camera.width() / 2, -camera.height() / 2);
-		m.translate(-camera.position.x / 100, -camera.position.y / 100);
+		// m.translate(-camera.position.x / 100, -camera.position.y / 100);
 		m.rotate(camera.angle);
 		m.translate(camera.width() / 2, camera.height() / 2);
 		for (point in points) {

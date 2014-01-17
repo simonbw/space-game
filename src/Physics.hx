@@ -7,7 +7,9 @@ import nape.callbacks.InteractionType;
 import nape.callbacks.PreCallback;
 import nape.callbacks.PreFlag;
 import nape.callbacks.PreListener;
+import nape.dynamics.InteractionFilter;
 import nape.space.Space;
+
 import projectiles.Laser;
 
 class Physics {
@@ -16,6 +18,22 @@ class Physics {
 	public static var CB_PROJECTILE = new CbType();
 	public static var CB_SHIP_PART = new CbType();
 	public static var CB_ASTEROID = new CbType();
+
+	public static inline var G_SHIP_1 = 1<<0;
+	public static inline var G_SHIP_2 = 1<<1;
+	public static inline var G_SHIP_3 = 1<<1;
+	public static inline var G_SHIP_4 = 1<<1;
+	public static inline var G_ASTEROID = 1<<5;
+	public static inline var G_PROJECTILE_1 = 1<<9;
+	public static inline var G_PROJECTILE_2 = 1<<10;
+	public static inline var G_PROJECTILE_3 = 1<<11;
+	public static inline var G_PROJECTILE_4 = 1<<12;
+
+	public static var F_ASTEROID = new InteractionFilter(G_ASTEROID);
+	public static var F_SOLID_SHIP = new InteractionFilter(G_SHIP_1);
+	public static var F_HOLLOW_SHIP = new InteractionFilter(G_SHIP_1, ~G_SHIP_1);
+	public static var F_SOLID_PROJECTILE = new InteractionFilter(G_PROJECTILE_1);
+	public static var F_HOLLOW_PROJECTILE = new InteractionFilter(G_PROJECTILE_1, ~G_PROJECTILE_1);
 
 	public static function init(space:Space) {
 		initProjectiles(space);
@@ -64,15 +82,15 @@ class Physics {
 			var velocity2 = ship2.body.velocity.copy();
 			velocity2.addeq(a2);
 			var velocityDiff = velocity1.sub(velocity2);
-			var damage = Math.pow(Math.abs(velocityDiff.dot(arbiter.normal.unit(true))) / 1000, 2.2) * Math.sqrt(ship1.body.inertia + ship2.body.inertia) ;
+			var damage = Math.pow(Math.abs(velocityDiff.dot(arbiter.normal.unit(true))) / 1000, 2.2) * Math.sqrt(ship1.body.inertia + ship2.body.inertia) * 0.9;
 			impulseMultiplier += Math.max(Math.min(damage, part1.health), 0);
 			impulseMultiplier += Math.max(Math.min(damage, part2.health), 0);
 			part1.inflictDamage(damage);
 			part2.inflictDamage(damage);
-			impulseMultiplier *= 1.2;
+			impulseMultiplier *= 1.4;
 
 			for (contact in arbiter.contacts) {
-				ship1.game.addEntity(new effects.ImpactEffect(contact.position, 0xFFAA00, Math.sqrt(damage) / 2));
+				ship1.game.addEntity(new effects.CollisionEffect(contact.position, arbiter.normal, Math.sqrt(damage) / 2));
 			}
 
 			if ((part1.health > 0 && part2.health > 0)) {

@@ -6,15 +6,15 @@ import flash.Lib;
 
 import nape.geom.Vec2;
 
-class Camera {
+class Camera extends Entity {
 
 	public var position:Vec2;
 	public var zoom:Float;
 	public var angle:Float;
 
 	public function new() {
+		super();
 		position = Vec2.get(0,0);
-
 		zoom = 0.6;
 		angle = 0.0;
 	}
@@ -66,6 +66,12 @@ class Camera {
 		m.translate(width() / 2, height() / 2);
 
 		return m;
+	}
+
+	override public function dispose():Void {
+		super.dispose();
+		position.dispose();
+		position = null;
 	}
 
 }

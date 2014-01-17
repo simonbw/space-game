@@ -61,6 +61,17 @@ class MyMath {
 	}
 	
 	/**
+	 * Limit a float to between min and max.
+	 * @param  a   value to limit
+	 * @param  min minimum value
+	 * @param  max maximum value
+	 * @return     
+	 */
+	static public inline function limit(a:Float, min:Float = 0.0, max:Float = 1.0):Float {
+		return Math.min(Math.max(a, min), max);
+	}
+
+	/**
 	 * Returns the greater of two Ints.
 	 * @param	a
 	 * @param	b
