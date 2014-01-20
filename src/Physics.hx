@@ -28,12 +28,15 @@ class Physics {
 	public static inline var G_PROJECTILE_2 = 1<<10;
 	public static inline var G_PROJECTILE_3 = 1<<11;
 	public static inline var G_PROJECTILE_4 = 1<<12;
+	public static inline var G_PARTICLE_1 = 1<<13;
+	public static inline var G_PARTICLE_2 = 1<<14;
 
 	public static var F_ASTEROID = new InteractionFilter(G_ASTEROID);
 	public static var F_SOLID_SHIP = new InteractionFilter(G_SHIP_1);
 	public static var F_HOLLOW_SHIP = new InteractionFilter(G_SHIP_1, ~G_SHIP_1);
 	public static var F_SOLID_PROJECTILE = new InteractionFilter(G_PROJECTILE_1);
 	public static var F_HOLLOW_PROJECTILE = new InteractionFilter(G_PROJECTILE_1, ~G_PROJECTILE_1);
+	public static var F_SOLID_PARTICLE = new InteractionFilter(G_PARTICLE_1, ~(G_PROJECTILE_1|G_PROJECTILE_2|G_PROJECTILE_3|G_PROJECTILE_4));
 
 	public static function init(space:Space) {
 		initProjectiles(space);
@@ -87,15 +90,15 @@ class Physics {
 			impulseMultiplier += Math.max(Math.min(damage, part2.health), 0);
 			part1.inflictDamage(damage);
 			part2.inflictDamage(damage);
-			impulseMultiplier *= 1.4;
+			impulseMultiplier *= 2.0;
 
+			var avgVelocity = velocity1.add(velocity2).mul(0.5);
 			for (contact in arbiter.contacts) {
-				ship1.game.addEntity(new effects.CollisionEffect(contact.position, arbiter.normal, Math.sqrt(damage) / 2));
+				ship1.game.addEntity(new effects.CollisionEffect(contact.position, avgVelocity, arbiter.normal, Math.sqrt(damage) / 2));
 			}
 
-			if ((part1.health > 0 && part2.health > 0)) {
-				return PreFlag.ACCEPT_ONCE;
-			} else {
+			var result = PreFlag.ACCEPT_ONCE;
+			if (!(part1.health > 0 && part2.health > 0)) {
 				var impulse1 = arbiter.normal.unit();
 				impulse1.muleq(Math.abs(velocityDiff.unit(true).dot(arbiter.normal.unit(true))) * impulseMultiplier);
 				var impulse2 = impulse1.mul(-1);
@@ -105,16 +108,19 @@ class Physics {
 				}
 				ship1.body.applyImpulse(impulse2, arbiter.shape1.worldCOM);
 				ship2.body.applyImpulse(impulse1, arbiter.shape2.worldCOM);
-
-				velocityDiff.dispose();
-				velocity1.dispose();
-				velocity2.dispose();
-				a1.dispose();
-				a2.dispose();
+				result = PreFlag.IGNORE_ONCE;
 				impulse1.dispose();
 				impulse2.dispose();
-				return PreFlag.IGNORE_ONCE;
 			}
+
+			velocityDiff.dispose();
+			velocity1.dispose();
+			velocity2.dispose();
+			avgVelocity.dispose();
+			a1.dispose();
+			a2.dispose();
+
+			return result;
 		});
 		listener.space = space;
 	}

@@ -27,7 +27,7 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	/** A map from grid position to part **/
 	var partMap:util.CoordinateMap<ShipPart>;
 	/** True if the ship needs to be realigned because its local COM has changed **/
-	var needToRealign:Bool;
+	public var needToRealign:Bool;
 	/** All the engines on the ship **/
 	var engines:Array<Engine>;
 	/** All the reactors on the ship **/
@@ -40,7 +40,6 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	public var energy:Float;
 	/** Manages the energy flow **/
 	public var energyManager:EnergyManager;
-	
 	/** The maximum amount of energy the ship can hold **/
 	public var maxEnergy:Float;
 	/** The amount of shielding currently available **/

@@ -61,6 +61,9 @@ class PrebuiltShips {
 			if (util.MyMath.modInt(i, 3) == 1) {
 				ship.addPart(new Engine(true, 8), -3, i, LEFT);
 				ship.addPart(new Engine(true, 8), 3, i, RIGHT);
+			} else {
+				ship.addPart(new Hull(), -3, i);
+				ship.addPart(new Hull(), 3, i);
 			}
 		}
 

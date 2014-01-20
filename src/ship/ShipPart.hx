@@ -59,8 +59,13 @@ class ShipPart implements Hashable implements Hittable {
 		health -= amount;
 		if (health <= 0) {
 			ship.partsToRemove.push(this);
+			onDestroy();
 		}
 		return shielded;
+	}
+
+	function onDestroy():Void {
+
 	}
 
 	public function onRemove():Void {

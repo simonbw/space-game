@@ -2,55 +2,45 @@ package effects;
 
 import nape.geom.Vec2;
 
+import util.Random;
 
-class CollisionEffect extends Entity implements Renderable implements Updatable {
-	static inline var LIFESPAN = 0.2;
+class CollisionEffect extends ParticleSystem<CollisionParticle> implements Renderable implements Updatable {
+	public function new(position:Vec2, velocity:Vec2, normal:Vec2, size:Float) {
+		super(position);
+		renderDepth = 2000;
 
-	public var renderDepth:Int;
-	var position:Vec2;
-	var lifespan:Float;
-	var size:Float;
-	var color:Int;
-	var sprite:flash.display.Sprite;
-
-	public function new(position:Vec2, normal:Vec2, size:Float, color:Int = 0xFFBB00) {
-		super();
-		renderDepth = 50;
-		lifespan = LIFESPAN;
-		this.position = position.copy();
-		this.size = size;
-		this.color = color;
-		sprite = util.Pool.sprite();
-		sprite.graphics.beginFill(color);
-		sprite.graphics.drawCircle(0, 0, size);
-		sprite.graphics.endFill();
-	}
-
-	public function update(timestep:Float):Void {
-		lifespan -= timestep;
-		if (lifespan <= 0) {
-			dispose();
+		normal = normal.unit().perp();
+		size = Math.sqrt(size);
+		var i =  size / 3;
+		while (i > 1 || (i > 0 && Random.bool(i))) {
+			i--;
+			var speed = Random.normal(300, 160) * Random.sign() * size;
+			var v = Vec2.fromPolar(speed, Random.uniform(0, Math.PI * 2));
+			v.addeq(velocity);
+			addParticle(new CollisionParticle(Vec2.get(0,0), v, Random.normal(1.0, 0.2)));
 		}
 	}
 
-	public function render(surface:flash.display.BitmapData, camera:Camera):Void {
+	override function draw():Void {
 		var g = sprite.graphics;
 		g.clear();
-		g.beginFill(color);
-		g.drawCircle(0, 0, size * lifespan / LIFESPAN);
-		g.endFill();
+		for (particle in particles) {
+			g.beginFill(particle.color, particle.alpha);
+			g.drawCircle(particle.position.x, particle.position.y, particle.size);
+			g.endFill();
+		}
+	}
+}
 
-		var m = new flash.geom.Matrix();
-		m.translate(position.x, position.y);
-		camera.getMatrix(m);
-		surface.draw(sprite, m);
+class CollisionParticle extends SimpleParticle {
+	static inline var LIFESPAN = 1.5;
+	public function new(position:Vec2, velocity:Vec2, size:Float = 1.0) {
+		super(position, velocity, 0xFFFF00, 1.0, 2.0 * size, LIFESPAN);
+		color = 0xFFFF00;
 	}
 
-	override public function dispose():Void {
-		super.dispose();
-		position.dispose();
-		position = null;
-		util.Pool.disposeSprite(sprite);
-		sprite = null;
+	override public function update(timestep:Float):Void {
+		alpha = lifespan / LIFESPAN;
+		super.update(timestep);
 	}
 }

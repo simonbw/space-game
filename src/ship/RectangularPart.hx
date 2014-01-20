@@ -93,6 +93,10 @@ class RectangularPart extends ShipPart {
 		shape.body = null;
 	}
 	
+	override function onDestroy():Void {
+		ship.game.addEntity(new effects.PartDestroyedEffect(shape.worldCOM, ship.body.velocity.copy()));
+	}
+
 	override public function hit(hitPos:Vec2, hitVelocity:Vec2):Void {
 		super.hit(hitPos, hitVelocity);
 		if (ship != null && ship.game != null) {

@@ -8,6 +8,7 @@ class Entity {
 	
 	public function new() {
 		disposed = false;
+		game = null;
 	}
 	
 	public function init(game:Game):Void {
@@ -21,7 +22,9 @@ class Entity {
 		if (disposed) {
 			Main.log("already disposed");
 		}
-		game.removeEntity(this);
+		if (game != null) {
+			game.removeEntity(this);
+		}
 		disposed = true;
 	}
 
