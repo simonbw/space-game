@@ -3,7 +3,7 @@ package ship;
 class PrebuiltShips {
 
 	public static function makeXWing(ship:ship.Ship):Void {
-		for (i in 2...8) {
+		for (i in 2...9) {
 			ship.addPart(new Hull(), i, 0);
 			ship.addPart(new Hull(), -i, 0);
 		}
@@ -25,14 +25,17 @@ class PrebuiltShips {
 		ship.addPart(new LaserCannon(), 2, 2, FORWARD);
 		ship.addPart(new LaserCannon(), -2, 2, FORWARD);
 
+		ship.addPart(new MissileLauncher(), 3, 1, FORWARD);
+		ship.addPart(new MissileLauncher(), -3, 1, FORWARD);
+
 		for (i in -1...2) {
-			ship.addPart(new Engine(false), 8, i, RIGHT);
-			ship.addPart(new Engine(false), -8, i, LEFT);
+			ship.addPart(new Engine(false), 9, i, RIGHT);
+			ship.addPart(new Engine(false), -9, i, LEFT);
 		}
-		ship.addPart(new Engine(true, 15), 8, -2, FORWARD);
-		ship.addPart(new Engine(true, 15), 8, 2, BACKWARD);
-		ship.addPart(new Engine(true, 15), -8, -2, FORWARD);
-		ship.addPart(new Engine(true, 15), -8, 2, BACKWARD);
+		ship.addPart(new Engine(true, 15), 9, -2, FORWARD);
+		ship.addPart(new Engine(true, 15), 9, 2, BACKWARD);
+		ship.addPart(new Engine(true, 15), -9, -2, FORWARD);
+		ship.addPart(new Engine(true, 15), -9, 2, BACKWARD);
 
 
 		ship.body.rotation = Math.PI;

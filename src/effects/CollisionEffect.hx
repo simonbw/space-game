@@ -11,7 +11,7 @@ class CollisionEffect extends ParticleSystem<CollisionParticle> implements Rende
 
 		normal = normal.unit().perp();
 		size = Math.sqrt(size);
-		var i =  size / 3;
+		var i =  size / 10;
 		while (i > 1 || (i > 0 && Random.bool(i))) {
 			i--;
 			var speed = Random.normal(300, 160) * Random.sign() * size;
@@ -33,7 +33,7 @@ class CollisionEffect extends ParticleSystem<CollisionParticle> implements Rende
 }
 
 class CollisionParticle extends SimpleParticle {
-	static inline var LIFESPAN = 1.5;
+	static inline var LIFESPAN = 0.4;
 	public function new(position:Vec2, velocity:Vec2, size:Float = 1.0) {
 		super(position, velocity, 0xFFFF00, 1.0, 2.0 * size, LIFESPAN);
 		color = 0xFFFF00;

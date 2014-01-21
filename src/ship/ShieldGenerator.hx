@@ -3,7 +3,7 @@ package ship;
 import nape.geom.Vec2;
 
 class ShieldGenerator extends RectangularPart {
-	static inline var EFFICIENCY = 2.0;
+	static inline var EFFICIENCY = 8.0;
 
 	public var rechargeRate:Float;
 	public var capacity:Float;
@@ -11,8 +11,8 @@ class ShieldGenerator extends RectangularPart {
 	public function new() {
 		super(1, 1, 50);
 		color = 0xFFEEBB;
-		rechargeRate = 10.0;
-		capacity = 40.0;
+		rechargeRate = 64.0;
+		capacity = 64.0;
 		updatePriority = 60;
 	}
 

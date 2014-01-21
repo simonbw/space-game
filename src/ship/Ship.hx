@@ -49,7 +49,7 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	/** The sprite used for drawing **/
 	var sprite:Sprite;
 	/** The offset of the sprite from the local COM **/
-	var drawOffset:Vec2;
+	public var drawOffset:Vec2;
 	/** The offset of the image from the sprite location **/
 	var imageOffset:Vec2;
 	/** The physics body of the ship **/
@@ -242,9 +242,21 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 					removePart(part);
 					other.addPart(part, x, y, d);
 				}
-
 				other.realign();
 				game.addEntity(other);
+
+				var out1 = Vec2.get();
+				var out2 = Vec2.get();
+				nape.geom.Geom.distanceBody(body, other.body, out1, out2);
+				var impulse = out1.sub(out2);
+				if (impulse.length != 0) {
+					impulse.normalise().muleq(200);
+}				impulse.add(Vec2.get(util.Random.normal(0, 100), util.Random.normal(0, 100), true));
+				body.applyImpulse(impulse);
+				other.body.applyImpulse(impulse.mul(-1, true));				
+				impulse.dispose();
+				out1.dispose();
+				out2.dispose();
 			}
 		} catch(error:Dynamic) {
 			throw new flash.errors.Error("removeDisconnected failed: " + error);
@@ -405,11 +417,12 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	 * Attempt to stop the rotation of the ship.
 	 */
 	public function stabilizeRotation():Void {
-		if (body.angularVel > 0.0001) {
-			turnLeft(Math.min(0.9, 1.5 * body.angularVel));
+		var multiplier = body.inertia * 0.000008;
+		if (body.angularVel > 10.0 / body.inertia) {
+			turnLeft(Math.min(0.9, body.angularVel * multiplier));
 		}
-		if (body.angularVel < -0.0001) {
-			turnRight(-Math.max(-0.9, 1.5 * body.angularVel));
+		if (body.angularVel < -10.0 / body.inertia) {
+			turnRight(-Math.max(-0.9, body.angularVel * multiplier));
 		}
 	}
 
@@ -423,22 +436,23 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		}
 
 		var v = body.velocity.sub(targetVelocity);
-		if (v.length > 0.01) {
+		var multiplier = body.mass * 0.0008;
+		if (v.length > 1.0 / body.mass) {
 			var a = body.localVectorToWorld(Vec2.get(1, 0, true));
 			var b = body.localVectorToWorld(Vec2.get(0, 1, true));
 
 			var adotv = a.dot(v);
 			var bdotv = b.dot(v);
 			if (adotv > 0.01) {
-				thrust(Math.min(0.9, adotv / 10), RIGHT);
+				thrust(Math.min(0.9, adotv * multiplier), RIGHT);
 			} else if (a.dot(v) < -0.01) {
-				thrust(Math.min(0.9, -adotv / 10), LEFT);
+				thrust(Math.min(0.9, -adotv * multiplier), LEFT);
 			}
 
 			if (bdotv > 0.01) {
-				thrust(Math.min(0.9, bdotv / 10), BACKWARD);
+				thrust(Math.min(0.9, bdotv * multiplier), BACKWARD);
 			} else if (b.dot(v) < -0.01) {
-				thrust(Math.min(0.9, -bdotv / 10), FORWARD);
+				thrust(Math.min(0.9, -bdotv * multiplier), FORWARD);
 			}
 
 			a.dispose();
@@ -455,8 +469,8 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 
 	public function fireLasers() {
 		for (part in parts) {
-			if (Std.is(part, ship.LaserCannon)) {
-				cast(part, ship.LaserCannon).fire();
+			if (Std.is(part, Weapon)) {
+				cast(part, Weapon).fire();
 			}
 		}
 	}

@@ -2,7 +2,7 @@ package ship;
 
 class Reactor extends RectangularPart {
 	static inline var ENERGY_CAPACITY = 100;
-	static inline var ENERGY_PRODUCTION = 15;
+	static inline var ENERGY_PRODUCTION = 28;
 
 	public function new() {
 		super(3, 3, 500);
@@ -12,7 +12,7 @@ class Reactor extends RectangularPart {
 
 	override public function update(timestep:Float):Void {
 		super.update(timestep);
-		ship.giveEnergy(timestep * ENERGY_PRODUCTION);
+		ship.giveEnergy(timestep * ENERGY_PRODUCTION * health / maxHealth);
 	}
 
 	override public function addToShip(ship:Ship, position:nape.geom.Vec2, direction:Direction = null):Void {

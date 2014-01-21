@@ -7,7 +7,7 @@ import nape.phys.Material;
 
 class Engine extends RectangularPart {
 	static inline var THROTTLE_INCREMENT = 0.3;
-	static inline var POWER_MULTIPLIER = 500.0;
+	static inline var THRUST_MULTIPLIER = 200.0;
 
 	public var throttle(get, set):Float;
 	var _throttle:Float;
@@ -16,7 +16,7 @@ class Engine extends RectangularPart {
 	public var energyUse:Float;
 	public var maneuverable:Bool;
 
-	public function new(maneuverable:Bool = true, power:Float = 10.0, energyUse:Float = 0.1) {
+	public function new(maneuverable:Bool = true, power:Float = 10.0, energyUse:Float = 0.15) {
 		super(1, 1);
 		this.power = power;
 		this.energyUse = energyUse;
@@ -48,7 +48,7 @@ class Engine extends RectangularPart {
 			var energyRequired = timestep * _throttle * energyUse * power;
 			_throttle *= ship.requestEnergy(energyRequired, EnergyType.ENGINE) / energyRequired;
 			var d = Math.PI / 2 + ship.body.rotation + directionToRadian();
-			var thrust = _throttle * timestep * power * POWER_MULTIPLIER;
+			var thrust = _throttle * timestep * power * THRUST_MULTIPLIER;
 			var impulse = Vec2.get(Math.cos(d) * thrust, Math.sin(d) * thrust, true);
 			var impulsePoint = shape.worldCOM;
 			ship.body.applyImpulse(impulse, impulsePoint);

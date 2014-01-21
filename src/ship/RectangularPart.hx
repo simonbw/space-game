@@ -6,8 +6,6 @@ import nape.shape.Polygon;
 import nape.phys.Material;
 
 class RectangularPart extends ShipPart {
-	static var MATERIAL = new Material(0.3, 0.5, 1.1, 5.0, 0);
-
 	var shape:Shape;
 	var color:Int;
 	
@@ -80,7 +78,7 @@ class RectangularPart extends ShipPart {
 	}
 
 	function makeShape():Void {
-		shape = new Polygon(Polygon.box(drawSize.x, drawSize.y, true), MATERIAL, Physics.F_SOLID_SHIP);
+		shape = new Polygon(Polygon.box(drawSize.x, drawSize.y, true), Physics.M_MEDIUM_METAL, Physics.F_SOLID_SHIP);
 		shape.cbTypes.add(Physics.CB_SHIP_PART);
 		shape.cbTypes.add(Physics.CB_HITTABLE);
 		ship.body.shapes.add(shape);
@@ -95,21 +93,6 @@ class RectangularPart extends ShipPart {
 	
 	override function onDestroy():Void {
 		ship.game.addEntity(new effects.PartDestroyedEffect(shape.worldCOM, ship.body.velocity.copy()));
-	}
-
-	override public function hit(hitPos:Vec2, hitVelocity:Vec2):Void {
-		super.hit(hitPos, hitVelocity);
-		if (ship != null && ship.game != null) {
-			var damage = 50.0;
-			var shielded = inflictDamage(damage);
-			damage -= shielded;
-			if (damage > 0.1) {
-				ship.game.addEntity(new effects.MetalImpactEffect(hitPos, Math.sqrt(damage)));
-			}
-			if (shielded > 0.1) {
-				ship.game.addEntity(new effects.ShieldImpactEffect(hitPos, Math.sqrt(shielded)));
-			}
-		}
 	}
 
 	override public function draw(g:flash.display.Graphics, lod:Float):Void {

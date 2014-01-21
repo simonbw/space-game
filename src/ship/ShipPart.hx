@@ -47,23 +47,6 @@ class ShipPart implements Hashable implements Hittable {
 		this.direction = direction;
 	}
 
-	/**
-	 * Inflict a certain amount of damage to the ship.
-	 * @param  amount damage to inflict
-	 * @return        amount of damage shielded
-	 */
-	public inline function inflictDamage(amount:Float):Float {
-		var shielded = ship.requestShield(amount);
-		amount -= shielded;
-		amount = Math.max(amount - armor, 0);
-		health -= amount;
-		if (health <= 0) {
-			ship.partsToRemove.push(this);
-			onDestroy();
-		}
-		return shielded;
-	}
-
 	function onDestroy():Void {
 
 	}
@@ -109,8 +92,8 @@ class ShipPart implements Hashable implements Hittable {
 	}
 
 	inline function toShipCoords(vector:Vec2):Vec2 {
-		rotateVec(vector);
-		vector.addeq(gridPosition.mul(Ship.GRID_SIZE, true));
+		// rotateVec(vector);
+		vector.addeq(center);
 		return vector;
 	}
 
@@ -133,8 +116,49 @@ class ShipPart implements Hashable implements Hittable {
 		return 0.0;
 	}
 	
-	public function hit(hitPos:Vec2, hitVelocity:Vec2):Void {
-		// do something
+	/**
+	 * Inflict a certain amount of damage to the ship.
+	 * @param  amount damage to inflict
+	 * @return        amount of damage shielded
+	 */
+	public inline function inflictDamage(amount:Float, damageType:DamageType):Float {
+		var shielded = ship.requestShield(amount);
+		amount -= shielded;
+		amount = Math.max(amount - armor, 0);
+		health -= amount;
+		if (health <= 0) {
+			ship.partsToRemove.push(this);
+			onDestroy();
+		} else if (amount > 0) {
+			if (connectedParts.size() > 0) {
+				var chance = 2.0 * amount / (maxHealth + 1.5 * health) / connectedParts.size();
+				if (util.Random.bool(chance)) {
+					Main.log("Disconnecting part");
+					for (p in connectedParts) {
+						p.connectedParts.remove(this);
+					}
+					connectedParts.clear();
+					ship.needToRealign = true;
+				}
+			}
+		}
+		return shielded;
+	}
+
+	public function hit(hitPos:Vec2, projectile:projectiles.Projectile):Void {
+		if (ship != null && ship.game != null) {
+			var damage = projectile.info.damage;
+			var shielded = inflictDamage(damage, projectile.info.damageType);
+			
+			// effects
+			damage -= shielded;
+			if (damage > 0.1) {
+				ship.game.addEntity(new effects.MetalImpactEffect(hitPos, Math.sqrt(damage)));
+			}
+			if (shielded > 0.1) {
+				ship.game.addEntity(new effects.ShieldImpactEffect(hitPos, Math.sqrt(shielded)));
+			}
+		}
 	}
 
 	public function dispose():Void {

@@ -6,26 +6,28 @@ import util.MyMath;
 import nape.geom.Vec2;
 
 class PlayerShipController extends Entity implements Updatable {
+	static inline var SHIELD_MODES = 10;
 	var ship:Ship;
 	var stabilize:Bool;
+	var shieldMode:Int;
 
 	public function new(ship:Ship) {
 		super();
 		this.ship = ship;
 		stabilize = false;
-
+		shieldMode = SHIELD_MODES;
 		IO.addKeyDownCallback(IO.K_STABILIZE, function():Void {
 			stabilize = !stabilize;
 		});
 
-		IO.addKeyDownCallback(IO.K_SHIELD, function():Void {
-			var multiplier = ship.energyManager.multipliers.get(EnergyType.SHIELD);
-			if (multiplier > 0) {
-				multiplier = 0;
-			} else {
-				multiplier = 1.0;
-			}
-			ship.energyManager.multipliers.set(EnergyType.SHIELD, multiplier);
+		IO.addKeyDownCallback(IO.K_SHIELD_UP, function():Void {
+			shieldMode = util.MyMath.minInt(shieldMode + 1, SHIELD_MODES);
+			ship.energyManager.multipliers.set(EnergyType.SHIELD, shieldMode / SHIELD_MODES);
+		});
+
+		IO.addKeyDownCallback(IO.K_SHIELD_DOWN, function():Void {
+			shieldMode = util.MyMath.maxInt(shieldMode - 1, 0);
+			ship.energyManager.multipliers.set(EnergyType.SHIELD, shieldMode / SHIELD_MODES);
 		});
 	}
 

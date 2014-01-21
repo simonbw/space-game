@@ -8,7 +8,7 @@ class ShieldCapacitor extends RectangularPart {
 	public function new() {
 		super(1, 1, 50);
 		color = 0xFFDDAA;
-		capacity = 200.0;
+		capacity = 512.0;
 	}
 
 	override public function addToShip(ship:Ship, position:nape.geom.Vec2, direction:Direction = null):Void {

@@ -19,8 +19,6 @@ class Asteroid extends Entity implements Renderable implements Hittable {
 	
 	public static var CB_ASTEROID = new CbType();
 	
-	static var MATERIAL = new Material(0.3, 0.8, 1.8, 12.0);
-
 	public var renderDepth:Int;
 	public var body:Body;
 	public var gpoly:GeomPoly;
@@ -36,7 +34,7 @@ class Asteroid extends Entity implements Renderable implements Hittable {
 		body.position.set(position);
 		
 		for (poly in gpoly.convexDecomposition()) {
-			var shape = new Polygon(poly, MATERIAL, Physics.F_ASTEROID);
+			var shape = new Polygon(poly, Physics.M_ROCK, Physics.F_ASTEROID);
 			shape.cbTypes.add(Physics.CB_ASTEROID);
 			shape.cbTypes.add(Physics.CB_HITTABLE);
 			shape.userData.entity = this;
@@ -84,10 +82,11 @@ class Asteroid extends Entity implements Renderable implements Hittable {
 		surface.draw(sprite, m);
 	}
 	
-	public function hit(hitPos:Vec2, hitVelocity:Vec2):Void {
+	public function hit(hitPos:Vec2, projectile:projectiles.Projectile):Void {
 		game.addEntity(new effects.AsteroidImpactEffect(hitPos, Random.normal(3, 0.3)));
 		if (!disposed && Random.bool(0.1)) {
 			// store stuff about the body
+			var hitVelocity = projectile.velocity;
 			var pos2 = body.position.copy();
 			var pos = body.position.copy().sub(body.localVectorToWorld(offset));
 			var vel = body.velocity.copy();

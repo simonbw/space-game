@@ -226,7 +226,7 @@ class Game extends Sprite {
 		
 		profiler.startSection("physics");
 		try {
-			space.step(timestep);
+			space.step(timestep, 1, 1);
 		} catch (error: Dynamic) {
 			Main.log("Physics Error: " + error);
 		}

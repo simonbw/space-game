@@ -9,35 +9,55 @@ import nape.callbacks.PreFlag;
 import nape.callbacks.PreListener;
 import nape.dynamics.InteractionFilter;
 import nape.space.Space;
+import nape.phys.Material;
 
-import projectiles.Laser;
+import projectiles.Projectile;
 
 class Physics {
 
+	// CallBack types
 	public static var CB_HITTABLE = new CbType();
 	public static var CB_PROJECTILE = new CbType();
+	public static var CB_SHIP = new CbType();
 	public static var CB_SHIP_PART = new CbType();
 	public static var CB_ASTEROID = new CbType();
 
+	// Collision Groups
 	public static inline var G_SHIP_1 = 1<<0;
 	public static inline var G_SHIP_2 = 1<<1;
 	public static inline var G_SHIP_3 = 1<<1;
 	public static inline var G_SHIP_4 = 1<<1;
+	public static inline var G_SHIP = G_SHIP_1 | G_SHIP_2 | G_SHIP_3 | G_SHIP_4;
 	public static inline var G_ASTEROID = 1<<5;
 	public static inline var G_PROJECTILE_1 = 1<<9;
 	public static inline var G_PROJECTILE_2 = 1<<10;
 	public static inline var G_PROJECTILE_3 = 1<<11;
 	public static inline var G_PROJECTILE_4 = 1<<12;
+	public static inline var G_PROJECTILE = G_PROJECTILE_1 | G_PROJECTILE_2 | G_PROJECTILE_3 | G_PROJECTILE_4;
 	public static inline var G_PARTICLE_1 = 1<<13;
 	public static inline var G_PARTICLE_2 = 1<<14;
+	public static inline var G_PARTICLE = G_PARTICLE_1 | G_PARTICLE_2;
 
+	// Premade collision filters
 	public static var F_ASTEROID = new InteractionFilter(G_ASTEROID);
-	public static var F_SOLID_SHIP = new InteractionFilter(G_SHIP_1);
-	public static var F_HOLLOW_SHIP = new InteractionFilter(G_SHIP_1, ~G_SHIP_1);
-	public static var F_SOLID_PROJECTILE = new InteractionFilter(G_PROJECTILE_1);
-	public static var F_HOLLOW_PROJECTILE = new InteractionFilter(G_PROJECTILE_1, ~G_PROJECTILE_1);
-	public static var F_SOLID_PARTICLE = new InteractionFilter(G_PARTICLE_1, ~(G_PROJECTILE_1|G_PROJECTILE_2|G_PROJECTILE_3|G_PROJECTILE_4));
+	public static var F_SOLID_SHIP = new InteractionFilter(G_SHIP);
+	public static var F_HOLLOW_SHIP = new InteractionFilter(G_SHIP, ~G_SHIP);
+	public static var F_SOLID_PROJECTILE = new InteractionFilter(G_PROJECTILE);
+	public static var F_HOLLOW_PROJECTILE = new InteractionFilter(G_PROJECTILE, ~G_PROJECTILE);
+	public static var F_SOLID_PARTICLE = new InteractionFilter(G_PARTICLE, ~(G_PROJECTILE));
 
+	// Materials
+	public static var M_ENERGY = new Material(-1.0, 0.0, 0.0, 0.001, 1.0);
+	public static var M_LIGHT_METAL = new Material(0.15, 0.8, 1.5, 1.0, 1.0);
+	public static var M_MEDIUM_METAL = new Material(0.15, 0.8, 1.5, 2.0, 1.0);
+	public static var M_HEAVY_METAL = new Material(0.15, 0.8, 1.5, 3.0, 1.0);
+	public static var M_ROCK = new Material(0.5, 1.2, 1.8, 1.0);
+
+	/**
+	 * Initialize all the listeners on a space.
+	 * @param  space [description]
+	 * @return       [description]
+	 */
 	public static function init(space:Space) {
 		initProjectiles(space);
 		initShipCollisions(space);
@@ -45,19 +65,18 @@ class Physics {
 
 	static function initProjectiles(space:Space):Void {
 		var listener = new InteractionListener(CbEvent.BEGIN, InteractionType.COLLISION, [CB_PROJECTILE], [CB_HITTABLE], function(cb:InteractionCallback):Void {
-			var laser = cast(cb.int1.userData.entity, Laser);
-			if (laser != null && !laser.disposed) {
+			var projectile = cast(cb.int1.userData.entity, Projectile);
+			if (projectile != null && !projectile.disposed) {
 				var other = cast(cb.int2.userData.entity, Hittable);
 				try {
 					if (other != null) {
-						var p = laser.body.position; //arbiter.contacts.at(0).position;
-						var v = laser.velocity;
-						other.hit(p, v);
+						var p = projectile.body.position;
+						other.hit(p, projectile);
 					}
 				} catch (error:Dynamic) {
 					Main.log("Collision Error: " + error);
 				}
-				laser.hit();
+				projectile.hit();
 			}
 		});
 		listener.space = space;
@@ -88,8 +107,8 @@ class Physics {
 			var damage = Math.pow(Math.abs(velocityDiff.dot(arbiter.normal.unit(true))) / 1000, 2.2) * Math.sqrt(ship1.body.inertia + ship2.body.inertia) * 0.9;
 			impulseMultiplier += Math.max(Math.min(damage, part1.health), 0);
 			impulseMultiplier += Math.max(Math.min(damage, part2.health), 0);
-			part1.inflictDamage(damage);
-			part2.inflictDamage(damage);
+			part1.inflictDamage(damage, DamageType.Collsion);
+			part2.inflictDamage(damage, DamageType.Collsion);
 			impulseMultiplier *= 2.0;
 
 			var avgVelocity = velocity1.add(velocity2).mul(0.5);

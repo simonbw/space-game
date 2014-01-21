@@ -3,19 +3,19 @@ package ship;
 import nape.geom.Vec2;
 import nape.phys.Material;
 
-import projectiles.Laser;
+import projectiles.Missile;
 
-class LaserCannon extends RectangularPart implements Weapon {
+class MissileLauncher extends RectangularPart implements Weapon{
 	
-	static inline var INTERVAL = 0.15;
-	static inline var ENERGY_USE = 8.0;
+	static inline var INTERVAL = 2.0;
+	static inline var ENERGY_USE = 2.0;
 	
 	var cooldown:Float;
 
 	public function new() {
-		super(1, 1);
+		super(1, 2);
 		cooldown = 0;
-		color = 0xFFFFFF;
+		color = 0x666666;
 	}
 
 	override public function addToShip(ship:Ship, position:Vec2, direction:Direction = null):Void {
@@ -33,12 +33,12 @@ class LaserCannon extends RectangularPart implements Weapon {
 	public function fire():Bool {
 		if (cooldown <= 0) {
 			cooldown += INTERVAL;
-			var pos = ship.body.localPointToWorld(toShipCoords(Vec2.get(0, 20, true).addeq(ship.drawOffset)));
+			var pos = ship.body.localPointToWorld(toShipCoords(Vec2.get(0, 40, true).addeq(ship.drawOffset)));
 			var dir = ship.body.localVectorToWorld(rotateVec(Vec2.get(0, 1, true)));
-			var l = new Laser(pos, dir, ship.body.velocity);
+			var missile = new Missile(pos, dir, ship.body.velocity);
 			// pos.dispose();
 			dir.dispose();
-			Main.currentGame.addEntity(l);
+			Main.currentGame.addEntity(missile);
 			return true;
 		} else {
 			return false;
