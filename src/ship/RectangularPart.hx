@@ -88,7 +88,15 @@ class RectangularPart extends ShipPart {
 	
 	override public function onRemove():Void {
 		super.onRemove();
-		shape.body = null;
+		if (shape.body.isStatic()) {
+			var body = shape.body;
+			var space = body.space;
+			body.space = null;
+			shape.body = null;
+			body.space = space;
+		} else {
+			shape.body = null;
+		}
 	}
 	
 	override function onDestroy():Void {

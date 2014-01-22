@@ -10,7 +10,7 @@ import flash.Lib.getTimer;
  */
 class Profiler {
 	/** Maximum characters in a line */
-	static inline var MAX_LOG_CHAR = 120;
+	static inline var MAX_LOG_CHAR = 180;
 	/** Maximum log messages */
 	public var maxLogs = 10;
 

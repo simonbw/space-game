@@ -36,14 +36,14 @@ class Game extends Sprite {
 
 	public var space: Space;
 
-	var entities: Array<Entity>;
-	var updatables: Array<Updatable>;
-	var updatables2: Array<Updatable2>;
-	var entitiesToRemove: Array<Entity>;
-	var ship: Ship;
-	var shipController: PlayerShipController;
-	var stars: effects.Stars;
-	var camera: Camera;
+	var entities:Array<Entity>;
+	var updatables:Array<Updatable>;
+	var updatables2:Array<Updatable2>;
+	var entitiesToRemove:Array<Entity>;
+	var ship:Ship;
+	var shipController:PlayerShipController;
+	var stars:effects.Stars;
+	var camera:Camera;
 
 	/**
 	 * Create a new Game.
@@ -104,6 +104,9 @@ class Game extends Sprite {
 		}
 		addEntity(new ui.EnergyMeter(ship));
 
+		var station = new ship.SpaceStation(Vec2.get(1000, 500));
+		PrebuiltShips.makeTradingStation(station);
+		addEntity(station);
 
 		IO.addKeyDownCallback(IO.K_ASTEROID, function(): Void {
 			try {

@@ -21,7 +21,7 @@ class CollisionEffect extends ParticleSystem<CollisionParticle> implements Rende
 		}
 	}
 
-	override function draw():Void {
+	override public function draw():Void {
 		var g = sprite.graphics;
 		g.clear();
 		for (particle in particles) {
