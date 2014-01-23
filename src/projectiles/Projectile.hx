@@ -10,7 +10,7 @@ import nape.shape.Shape;
 import nape.phys.BodyType;
 import nape.dynamics.InteractionFilter;
 
-class Projectile extends Entity implements Renderable implements Updatable {
+class Projectile extends Entity implements Renderable implements Updatable implements Updatable2 {
 	static inline var SIZE:Int = 2;
 	
 	public var renderDepth:Int;
@@ -49,18 +49,24 @@ class Projectile extends Entity implements Renderable implements Updatable {
 
 	public function update(timestep:Float):Void {
 		velocity.set(body.velocity);
-		if (lifespan >= 0) {
+		if (lifespan != 0) {
 			lifespan -= timestep;
-			if (lifespan < 0) {
+			if (lifespan <= 0) {
 				dispose();
 			}
 		}
 	}
-	
-	public function hit():Void {
-		if (!disposed) {
+
+
+	public function update2(timestep:Float):Void {
+		if (!disposed && lifespan < 0) {
 			dispose();
 		}
+	}
+	
+	public function hit():Bool {
+		lifespan = -1;
+		return true;
 	}
 
 	function draw():Void {

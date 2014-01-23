@@ -147,7 +147,7 @@ class ShipPart implements Hashable implements Hittable {
 		return shielded;
 	}
 
-	public function hit(hitPos:Vec2, projectile:projectiles.Projectile):Void {
+	public function hit(hitPos:Vec2, projectile:projectiles.Projectile):Bool {
 		if (ship != null && ship.game != null) {
 			var damage = projectile.info.damage;
 			var shielded = inflictDamage(damage, projectile.info.damageType);
@@ -161,6 +161,7 @@ class ShipPart implements Hashable implements Hittable {
 				ship.game.addEntity(new effects.ShieldImpactEffect(hitPos, Math.sqrt(shielded)));
 			}
 		}
+		return (health > 0);
 	}
 
 	public function dispose():Void {

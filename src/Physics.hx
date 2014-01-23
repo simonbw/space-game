@@ -64,19 +64,30 @@ class Physics {
 	}
 
 	static function initProjectiles(space:Space):Void {
-		var listener = new InteractionListener(CbEvent.BEGIN, InteractionType.COLLISION, [CB_PROJECTILE], [CB_HITTABLE], function(cb:InteractionCallback):Void {
+		var listener = new PreListener(InteractionType.COLLISION, [CB_PROJECTILE], [CB_HITTABLE], function(cb:PreCallback):PreFlag {
+			var arbiter = cb.arbiter.collisionArbiter;
 			var projectile = cast(cb.int1.userData.entity, Projectile);
+			var other = cast(cb.int2.userData.entity, Hittable);
+			var collide = false;
 			if (projectile != null && !projectile.disposed) {
-				var other = cast(cb.int2.userData.entity, Hittable);
 				try {
 					if (other != null) {
 						var p = projectile.body.position;
-						other.hit(p, projectile);
+						collide = other.hit(p, projectile) || collide;
+					} else {
+						Main.log("Hit null");
 					}
 				} catch (error:Dynamic) {
-					Main.log("Collision Error: " + error);
+					Main.log("ProjectileHit: " + error);
 				}
-				projectile.hit();
+				collide = projectile.hit() || collide;
+			} else {
+				Main.log("projectile" + projectile + "is already disposed");
+			}
+			if (collide) {
+				return PreFlag.ACCEPT_ONCE;
+			} else {
+				return PreFlag.IGNORE_ONCE;
 			}
 		});
 		listener.space = space;

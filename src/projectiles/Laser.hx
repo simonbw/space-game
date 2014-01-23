@@ -41,8 +41,6 @@ class Laser extends projectiles.Projectile {
 
 	override public function dispose():Void {
 		super.dispose();
-		velocity.dispose();
-		velocity = null;
 		direction.dispose();
 		direction = null;
 	}

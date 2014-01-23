@@ -18,7 +18,7 @@ class EngineEffect extends SimpleParticleSystem<EngineParticle> {
 
 	public function thrust(impulse:Vec2):Void {
 		if (impulse.length > 0.1) {
-			addParticle(new EngineParticle(impulse.length * 10, velocity.add(impulse)));
+			addParticle(new EngineParticle(impulse.length * 1.0, velocity.add(impulse)));
 		}
 	}
 

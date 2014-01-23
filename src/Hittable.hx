@@ -10,5 +10,5 @@ interface Hittable {
 	 * @param  projectile.Projectile [description]
 	 * @return                       [description]
 	 */
-	function hit(position:nape.geom.Vec2, projectile:projectiles.Projectile):Void;
+	function hit(position:nape.geom.Vec2, projectile:projectiles.Projectile):Bool;
 }

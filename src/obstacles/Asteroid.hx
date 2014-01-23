@@ -82,7 +82,7 @@ class Asteroid extends Entity implements Renderable implements Hittable {
 		surface.draw(sprite, m);
 	}
 	
-	public function hit(hitPos:Vec2, projectile:projectiles.Projectile):Void {
+	public function hit(hitPos:Vec2, projectile:projectiles.Projectile):Bool {
 		game.addEntity(new effects.AsteroidImpactEffect(hitPos, Random.normal(3, 0.3)));
 		if (!disposed && Random.bool(0.1)) {
 			// store stuff about the body
@@ -121,6 +121,7 @@ class Asteroid extends Entity implements Renderable implements Hittable {
 			
 			dispose();
 		}
+		return true;
 	}
 
 	override public function dispose():Void {
