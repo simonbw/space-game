@@ -114,6 +114,9 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	 * @param direction [description]
 	 */
 	public function addPart(part:ShipPart, x:Int, y:Int, direction:Direction = null):Void {
+		if (part == null) {
+			throw "Cannot add null part";
+		}
 		needToRealign = true;
 		parts.push(part);
 		part.addToShip(this, Vec2.get(x, y), direction);
@@ -213,7 +216,9 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		try {
 			var queue = new Array<ShipPart>();
 			var connected = new de.polygonal.ds.HashSet<ShipPart>(256);
-			queue.push(parts[0]);
+			if (parts.length > 0) {
+				queue.push(parts[0]);
+			}
 			while (queue.length > 0) {
 				var part = queue.pop();
 				connected.set(part);

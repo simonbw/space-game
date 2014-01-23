@@ -6,14 +6,18 @@ class SpaceStation extends Ship {
 	
 	public function new(position:Vec2) {
 		super(position);
-		body.type = nape.phys.BodyType.STATIC;
+		// body.type = nape.phys.BodyType.STATIC;
+
+		body.allowMovement = false;
+		body.allowRotation = false;
 
 		renderDepth -= 1;
 	}
 
-	override public function removeDisconnected():Void {
-		// do nothing
-	}
+	// override public function removeDisconnected():Void {
+	// 	// do nothing
+	// }
+
 	override public function realign():Void {
 		// do nothing
 	}

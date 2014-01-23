@@ -129,6 +129,7 @@ class PrebuiltShips {
 			ship.addPart(new Hull(), -i, 0);
 			ship.addPart(new Hull(), 0, -i);
 		}
+		ship.addPart(new Hull(), 0, 0);
 
 		ship.body.rotation = Math.PI;
 		ship.removeDisconnected();

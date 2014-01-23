@@ -122,7 +122,10 @@ class ShipPart implements Hashable implements Hittable {
 	 * @return        amount of damage shielded
 	 */
 	public inline function inflictDamage(amount:Float, damageType:DamageType):Float {
-		var shielded = ship.requestShield(amount);
+		var shielded = 0.0;
+		if (damageType != DamageType.Collsion) {
+			shielded = ship.requestShield(amount);
+		}
 		amount -= shielded;
 		amount = Math.max(amount - armor, 0);
 		health -= amount;
@@ -133,7 +136,6 @@ class ShipPart implements Hashable implements Hittable {
 			if (connectedParts.size() > 0) {
 				var chance = 2.0 * amount / (maxHealth + 1.5 * health) / connectedParts.size();
 				if (util.Random.bool(chance)) {
-					Main.log("Disconnecting part");
 					for (p in connectedParts) {
 						p.connectedParts.remove(this);
 					}
