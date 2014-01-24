@@ -11,7 +11,7 @@ class SpaceStation extends Ship {
 		body.allowMovement = false;
 		body.allowRotation = false;
 
-		renderDepth -= 1;
+		renderDepth += 1;
 	}
 
 	// override public function removeDisconnected():Void {

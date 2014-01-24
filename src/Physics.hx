@@ -115,7 +115,7 @@ class Physics {
 			var velocity2 = ship2.body.velocity.copy();
 			velocity2.addeq(a2);
 			var velocityDiff = velocity1.sub(velocity2);
-			var damage = Math.pow(Math.abs(velocityDiff.dot(arbiter.normal.unit(true))) / 100, 2.2) * Math.sqrt(ship1.body.mass + ship2.body.mass);
+			var damage = Math.pow(Math.abs(velocityDiff.dot(arbiter.normal.unit(true))) / 140, 2.2) * (Math.log(ship1.body.mass) + Math.log(ship2.body.mass));
 			impulseMultiplier += Math.max(Math.min(damage, part1.health), 0);
 			impulseMultiplier += Math.max(Math.min(damage, part2.health), 0);
 			part1.inflictDamage(damage, DamageType.Collsion);

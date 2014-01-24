@@ -12,7 +12,7 @@ import util.Random;
 import effects.EngineEffect;
 
 class Missile extends projectiles.Projectile {
-	static inline var SPEED = 200;
+	static inline var SPEED = 150;
 	static inline var LIFESPAN = 10.0;
 	static inline var BURN_TIME = 2.0;
 	static inline var THRUST = 96.0;
@@ -45,12 +45,20 @@ class Missile extends projectiles.Projectile {
 	override public function update(timestep:Float):Void {
 		super.update(timestep);
 		if (!disposed) {
-			if (lifespan > LIFESPAN - BURN_TIME) {
+			if (lifespan > LIFESPAN - BURN_TIME) { // burning
 				var impulse = Vec2.fromPolar(timestep * THRUST, body.rotation);
 				body.applyImpulse(impulse);
-				engineEffect.thrust(impulse);
+				engineEffect.applyThrust(impulse);
 				impulse.dispose();
+			} else { // coasting
+				engineEffect.off();
 			}
+		}
+	}
+
+	override public function update2(timestep:Float):Void {
+		super.update2(timestep);
+		if (!disposed) {
 			engineEffect.move(body.position, velocity);
 		}
 	}
