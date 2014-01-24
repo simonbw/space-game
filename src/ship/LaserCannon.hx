@@ -26,7 +26,7 @@ class LaserCannon extends RectangularPart implements Weapon {
 	override public function update(timestep:Float):Void {
 		super.update(timestep);
 		if (cooldown > 0) {
-			cooldown -= ship.requestEnergy(timestep * ENERGY_USE, EnergyType.WEAPON) / ENERGY_USE;
+			cooldown -= ship.requestEnergy((0.7 * health / maxHealth + 0.3) * timestep * ENERGY_USE, EnergyType.WEAPON) / ENERGY_USE;
 		}
 	}
 
@@ -36,7 +36,7 @@ class LaserCannon extends RectangularPart implements Weapon {
 			var pos = ship.body.localPointToWorld(toShipCoords(Vec2.get(0, 20, true).addeq(ship.drawOffset)));
 			var dir = ship.body.localVectorToWorld(rotateVec(Vec2.get(0, 1, true)));
 			var l = new Laser(pos, dir, ship.body.velocity);
-			// pos.dispose();
+			// l.addDoNotHit(ship);
 			dir.dispose();
 			Main.currentGame.addEntity(l);
 			return true;

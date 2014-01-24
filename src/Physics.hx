@@ -69,7 +69,7 @@ class Physics {
 			var projectile = cast(cb.int1.userData.entity, Projectile);
 			var other = cast(cb.int2.userData.entity, Hittable);
 			var collide = false;
-			if (projectile != null && !projectile.disposed) {
+			if (projectile != null && !projectile.disposed && projectile.canHit(other)) {
 				try {
 					if (other != null) {
 						var p = projectile.body.position;
@@ -81,8 +81,6 @@ class Physics {
 					Main.log("ProjectileHit: " + error);
 				}
 				collide = projectile.hit() || collide;
-			} else {
-				Main.log("projectile" + projectile + "is already disposed");
 			}
 			if (collide) {
 				return PreFlag.ACCEPT_ONCE;

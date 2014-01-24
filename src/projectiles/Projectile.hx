@@ -4,12 +4,17 @@ import flash.display.Sprite;
 import util.Pool;
 import util.Random;
 
+import de.polygonal.ds.HashSet;
+
 import nape.geom.Vec2;
 import nape.phys.Body;
 import nape.shape.Shape;
 import nape.phys.BodyType;
 import nape.dynamics.InteractionFilter;
 
+/**
+ * Base class for all projectiles
+ */
 class Projectile extends Entity implements Renderable implements Updatable implements Updatable2 {
 	static inline var SIZE:Int = 2;
 	
@@ -20,6 +25,7 @@ class Projectile extends Entity implements Renderable implements Updatable imple
 	var needToDraw:Bool;
 	var sprite:Sprite;
 	var lifespan:Float;
+	var doNotHit:HashSet<Hittable>;
 	
 	public function new(position:Vec2, info:ProjectileInfo, lifespan:Float = 5.0) {
 		super();
@@ -30,6 +36,8 @@ class Projectile extends Entity implements Renderable implements Updatable imple
 		makeBody(position);
 		sprite = Pool.sprite();
 		needToDraw = true;
+
+		doNotHit = new HashSet<Hittable>(16);
 	}
 
 	function makeBody(position:Vec2):Void{
@@ -57,6 +65,9 @@ class Projectile extends Entity implements Renderable implements Updatable imple
 		}
 	}
 
+	public function addDoNotHit(other:Hittable):Void {
+		doNotHit.set(other);
+	}
 
 	public function update2(timestep:Float):Void {
 		if (!disposed && lifespan < 0) {
@@ -67,6 +78,13 @@ class Projectile extends Entity implements Renderable implements Updatable imple
 	public function hit():Bool {
 		lifespan = -1;
 		return true;
+	}
+
+	public function canHit(other:Hittable):Bool {
+		if (Std.is(other, ship.ShipPart)) {
+			return !doNotHit.contains(cast(other, ship.ShipPart).ship) && !doNotHit.contains(other);
+		}
+		return !doNotHit.contains(other);
 	}
 
 	function draw():Void {
@@ -92,6 +110,7 @@ class Projectile extends Entity implements Renderable implements Updatable imple
 	override public function dispose():Void {
 		super.dispose();
 		Pool.disposeSprite(sprite);
+		doNotHit.free();
 		sprite = null;
 		body.space = null;
 		body = null;

@@ -11,13 +11,13 @@ import nape.phys.Body;
 import nape.shape.Shape;
 import nape.geom.Vec2;
 
-class Ship extends Entity implements Renderable implements Updatable implements Updatable2 {
+class Ship extends Entity implements Renderable implements Updatable implements Updatable2 implements Hittable {
 	static public inline var GRID_SIZE = 16;
 
 	public var renderDepth:Int;
 
 	/** All the parts on the ship **/
-	var parts:Array<ShipPart>;
+	public var parts:Array<ShipPart>;
 	/** Parts that need to be updated **/
 	var updateParts:Array<ShipPart>;
 	/** Parts that need to be updated **/
@@ -336,8 +336,8 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	 * @param	position
 	 * @param	velocity
 	 */
-	public function hit(position:Vec2, velocity:Vec2):Void {
-
+	public function hit(position:Vec2, projectile:projectiles.Projectile):Bool {
+		return true;
 	}
 
 	public function requestEnergy(amount:Float, energyType:EnergyType):Float {

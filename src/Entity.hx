@@ -1,16 +1,27 @@
 
+import de.polygonal.ds.Hashable;
 
-class Entity {
+class Entity implements Hashable {
+	static var keyCount = 0;
 
 	/** set to true when this object should be disposed of */
 	public var game:Game;
+	/** Used for hashing */
+	public var key:Int;
+	/** True once this has been disposed */
 	public var disposed:Bool;
 	
 	public function new() {
 		disposed = false;
 		game = null;
+		key = keyCount;
+		keyCount++;
 	}
 	
+	/**
+	 * Called when added to the game.
+	 * @param  game game added to
+	 */
 	public function init(game:Game):Void {
 		this.game = game;
 	}

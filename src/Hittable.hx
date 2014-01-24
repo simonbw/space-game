@@ -1,9 +1,7 @@
-package ;
-
 /**
  * Something that can be hit by a projectile.
  */
-interface Hittable {
+interface Hittable extends de.polygonal.ds.Hashable {
 	/**
 	 * Called when hit by a projectile.
 	 * @param  position.geom.Vec2    [description]

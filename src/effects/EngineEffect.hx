@@ -49,7 +49,7 @@ class EngineEffect extends SimpleParticleSystem<EngineParticle> {
 
 	override function draw():Void {
 		super.draw();
-		if (thrust > 0.01) {
+		if (!readyToDispose && thrust > 0.01) {
 			var g = sprite.graphics;
 			g.beginFill(util.Color.interpolate(0xFFFF00, 0xFF8800, Math.random()));
 			g.drawCircle(0, 0, thrust);

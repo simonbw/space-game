@@ -1,29 +1,10 @@
 package ship;
 
-class Reactor extends RectangularPart {
-	static inline var ENERGY_CAPACITY = 100;
-	static inline var ENERGY_PRODUCTION = 28;
+class Reactor extends BaseReactor {
 
 	public function new() {
-		super(3, 3, 500);
-		updatePriority = 1000;
+		super(28, 128, 3, 3, 500);
 		color = 0x777777;
-	}
-
-	override public function update(timestep:Float):Void {
-		super.update(timestep);
-		ship.giveEnergy(timestep * ENERGY_PRODUCTION * health / maxHealth);
-	}
-
-	override public function addToShip(ship:Ship, position:nape.geom.Vec2, direction:Direction = null):Void {
-		super.addToShip(ship, position, direction);
-		ship.maxEnergy += ENERGY_CAPACITY;
-		ship.addUpdatePart(this);
-	}
-
-	override public function onRemove():Void {
-		ship.maxEnergy -= ENERGY_CAPACITY;
-		super.onRemove();
 	}
 
 	override public function draw(g:flash.display.Graphics, lod:Float):Void {

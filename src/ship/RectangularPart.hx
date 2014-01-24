@@ -114,8 +114,8 @@ class RectangularPart extends ShipPart {
 		g.drawRect(localPosition.x, localPosition.y, drawSize.x, drawSize.y);
 		g.endFill();
 
-		if (lod > 1.0) {
-			g.lineStyle(1, 0x00FFFF, 0.2);
+		if (lod > 2.4) {
+			g.lineStyle(1, 0x00FFFF, util.MyMath.limit(0.2 * (lod - 2.4), 0, 0.3));
 			for (part in connectedParts) {
 				g.moveTo(center.x, center.y);
 				g.lineTo(part.center.x, part.center.y);

@@ -47,7 +47,7 @@ class PartDestroyedParticle extends Particle {
 		size = Math.random() * Math.random() * 16 + 3;
 		color = util.Color.interpolate(0xFFFF00, 0xFF5500, Math.random());
 		alpha = util.MyMath.limit(Random.normal(0.6, 0.3));
-		velocity.setxy(Random.normal(0, 10), Random.normal(0, 10));
+		velocity.setxy(Random.normal(0, 60), Random.normal(0, 60));
 	}
 
 	override public function update(timestep):Void {
