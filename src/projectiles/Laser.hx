@@ -12,7 +12,7 @@ import nape.dynamics.InteractionFilter;
 
 class Laser extends projectiles.Projectile {
 	static inline var SPEED = 10000;
-	static inline var ACCURACY = 0.05;
+	static inline var ACCURACY = 0.02;
 	static inline var LIFESPAN = 5.0;
 	
 	var direction:Vec2;
@@ -26,9 +26,8 @@ class Laser extends projectiles.Projectile {
 		}
 
 		this.direction = direction.unit();
-		velocity = direction.copy();
-		velocity.x *= util.Random.normal(1.0, ACCURACY);
-		velocity.y *= util.Random.normal(1.0, ACCURACY);
+		this.direction.angle += Random.normal(0.0, ACCURACY);
+		velocity = this.direction.copy();
 		velocity.muleq(Random.normal(SPEED, SPEED / 16));
 		if (offset != null) {
 			velocity.addeq(offset);

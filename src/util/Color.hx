@@ -23,23 +23,23 @@ class Color {
 		return makeColor(r, g, b);
 	}
 
-	static inline function red(c:Int):Int {
+	public static inline function red(c:Int):Int {
 		return (0xFF0000 & c) >> 16;
 	}
 
-	static inline function green(c:Int):Int {
+	public static inline function green(c:Int):Int {
 		return ((0x00FF00) & c) >> 8;
 	}
 	
-	static inline function blue(c:Int):Int {
+	public static inline function blue(c:Int):Int {
 		return (0x0000FF) & c;
 	}
 
-	static inline function makeColor(r:Int, g:Int, b:Int):Int {
+	public static inline function makeColor(r:Int, g:Int, b:Int):Int {
 		return r << 16 | g << 8 | b;
 	}
 
-	static inline function makeGray(v:Int):Int {
+	public static inline function makeGray(v:Int):Int {
 		return return v << 16 | v << 8 | v;
 	}
 

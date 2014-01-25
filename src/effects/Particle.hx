@@ -23,5 +23,7 @@ class Particle extends Entity implements Updatable {
 
 	override public function dispose():Void {
 		super.dispose();
+		position.dispose();
+		velocity.dispose();
 	}
 }

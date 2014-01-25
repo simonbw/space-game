@@ -3,6 +3,7 @@ package ship;
 import nape.geom.Vec2;
 import nape.phys.Material;
 
+import effects.LaserBurstEffect;
 import projectiles.Laser;
 
 class LaserCannon extends RectangularPart implements Weapon {
@@ -33,9 +34,10 @@ class LaserCannon extends RectangularPart implements Weapon {
 	public function fire():Bool {
 		if (cooldown <= 0) {
 			cooldown += INTERVAL;
-			var pos = ship.body.localPointToWorld(toShipCoords(Vec2.get(0, 20, true).addeq(ship.drawOffset)));
+			var pos = ship.body.localPointToWorld(toShipCoords(Vec2.get(0, 18, true).addeq(ship.drawOffset)));
 			var dir = ship.body.localVectorToWorld(rotateVec(Vec2.get(0, 1, true)));
 			var l = new Laser(pos, dir, ship.body.velocity);
+			ship.game.addEntity(new LaserBurstEffect(pos.addMul(dir, -3), dir, ship.body.velocity.copy()));
 			// l.addDoNotHit(ship);
 			dir.dispose();
 			Main.currentGame.addEntity(l);

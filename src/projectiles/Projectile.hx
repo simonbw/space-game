@@ -16,7 +16,7 @@ import nape.dynamics.InteractionFilter;
  * Base class for all projectiles
  */
 class Projectile extends Entity implements Renderable implements Updatable implements Updatable2 {
-	static inline var SIZE:Int = 2;
+	static inline var SIZE = 1.2;
 	
 	public var renderDepth:Int;
 	public var body:Body;
