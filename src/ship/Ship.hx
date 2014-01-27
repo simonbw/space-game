@@ -554,4 +554,31 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		engines = null;
 		reactors = null;
 	}
+
+	public function serialize():String {
+		var s = "";
+		for (part in parts) {
+			s += part.serialize() + "\n";
+		}
+		return s;
+	}
+
+	/**
+	 * Converts 
+	 * @param  s    string containing ship data
+	 * @param  ship ship to add parts to
+	 */
+	public static function deserialize(s:String, ship:Ship):Void {
+		var lines = s.split("\n");
+		for (line in lines) {
+			var words = line.split(" ");
+			var type = Type.resolveClass(words[0]);
+			var x = Std.parseInt(words[1]);
+			var y = Std.parseInt(words[2]);
+			var dir:Direction = Type.createEnum(Direction, words[3]);
+			var part = Type.createInstance(type, []);
+
+			ship.addPart(part, x, y, dir);
+		}
+	}
 }

@@ -183,4 +183,8 @@ class ShipPart implements Hashable implements Hittable {
 		// }
 		adjacent = null;
 	}
+
+	public function serialize():String {
+		return Type.getClassName(Type.getClass(this)) + " " + gridPosition.x + " " + gridPosition.y + " " + direction;
+	}
 }

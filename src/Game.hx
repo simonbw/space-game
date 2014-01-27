@@ -102,6 +102,7 @@ class Game extends Sprite {
 		} else {
 			PrebuiltShips.makeCruiser(ship);
 		}
+		Main.log(ship.serialize());
 		addEntity(new ui.EnergyMeter(ship));
 
 		var station = new ship.SpaceStation(Vec2.get(1000, 500));
