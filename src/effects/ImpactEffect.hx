@@ -24,6 +24,8 @@ class ImpactEffect extends Entity implements Renderable implements Updatable {
 		sprite.graphics.beginFill(color);
 		sprite.graphics.drawCircle(0, 0, size);
 		sprite.graphics.endFill();
+
+		SoundManager.playSound("laser_hit");
 	}
 
 	public function update(timestep:Float):Void {

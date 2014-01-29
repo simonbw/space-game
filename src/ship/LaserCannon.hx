@@ -40,6 +40,9 @@ class LaserCannon extends RectangularPart implements Weapon {
 			ship.game.addEntity(new LaserBurstEffect(pos.addMul(dir, -3), dir, ship.body.velocity.copy()));
 			// l.addDoNotHit(ship);
 			dir.dispose();
+
+			SoundManager.playSound("laser");
+
 			Main.currentGame.addEntity(l);
 			return true;
 		} else {
