@@ -6,3 +6,8 @@
 -swf-version 11.3
 -swf-header 1000:700:60
 -debug
+
+-resource resources/sounds/missile_launch.mp3@s_missile_launch
+-resource resources/sounds/laser.mp3@s_laser
+-resource resources/sounds/explosion1.mp3@s_explosion1
+-resource resources/sounds/laser_hit.mp3@s_laser_hit

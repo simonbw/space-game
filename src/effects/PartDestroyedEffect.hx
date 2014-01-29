@@ -14,6 +14,8 @@ class PartDestroyedEffect extends ParticleSystem<PartDestroyedParticle> {
 			var p = Vec2.get(Random.normal(0, ship.Ship.GRID_SIZE / 2), Random.normal(0, ship.Ship.GRID_SIZE / 2));
 			addParticle(new PartDestroyedParticle(p));
 		}
+
+		SoundManager.playSound("explosion1");
 	}
 
 	override public function update(timestep:Float):Void {

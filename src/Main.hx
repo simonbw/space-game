@@ -11,6 +11,11 @@ class Main {
 	static function main() {
 		stage = flash.Lib.current.stage;
 		IO.init();
+		try {
+			SoundManager.init();
+		} catch (error:Dynamic) {
+			trace(error.name + " " + error.message + " " + error.errorID);
+		}
 		ui.Cursor.init();
 		reset();
 	}

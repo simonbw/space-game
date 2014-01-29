@@ -36,6 +36,9 @@ class MissileLauncher extends RectangularPart implements Weapon{
 			var pos = ship.body.localPointToWorld(toShipCoords(Vec2.get(0, 40, true).addeq(ship.drawOffset)));
 			var dir = ship.body.localVectorToWorld(rotateVec(Vec2.get(0, 1, true)));
 			var missile = new Missile(pos, dir, ship.body.velocity);
+
+			SoundManager.playSound("missile_launch");
+			
 			// pos.dispose();
 			dir.dispose();
 			Main.currentGame.addEntity(missile);
