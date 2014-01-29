@@ -1,7 +1,19 @@
 To Do
 ========
 
-+ Particle Physics
++ Ship Editing
+	- save ships
+		- ShipPart.serialize()
+			x y package.Type args
+		- ship.serialize() calls serialize on all parts
+	- load ships
+		- Type.resolveClass()
+		- Type.createInstance()
+		- Ship.addPart()
+	- The Editor
+		- 
+
+
 + EngineManager class
 + Engine Particle Effects
 + AI
