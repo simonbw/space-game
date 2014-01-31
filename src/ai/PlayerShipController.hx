@@ -29,6 +29,10 @@ class PlayerShipController extends Entity implements Updatable {
 			shieldMode = util.MyMath.maxInt(shieldMode - 1, 0);
 			ship.energyManager.multipliers.set(EnergyType.SHIELD, shieldMode / SHIELD_MODES);
 		});
+
+		IO.addKeyDownCallback(IO.K_MISSILE, function():Void {
+			ship.explode();
+		});
 	}
 
 	public function update(timestep:Float):Void {

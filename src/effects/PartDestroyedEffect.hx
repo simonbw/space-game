@@ -15,7 +15,7 @@ class PartDestroyedEffect extends ParticleSystem<PartDestroyedParticle> {
 			addParticle(new PartDestroyedParticle(p));
 		}
 
-		SoundManager.playSound("explosion1");
+		SoundManager.playSoundAt("explosion1", position.copy());
 	}
 
 	override public function update(timestep:Float):Void {

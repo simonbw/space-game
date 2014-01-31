@@ -1,0 +1,6 @@
+
+
+
+class ShipEditor extends GameState {
+	
+}

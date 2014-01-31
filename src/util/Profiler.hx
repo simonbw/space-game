@@ -12,7 +12,7 @@ class Profiler {
 	/** Maximum characters in a line */
 	static inline var MAX_LOG_CHAR = 180;
 	/** Maximum log messages */
-	public var maxLogs = 10;
+	public var maxLogs = 16;
 
 	var field:TextField;
 	var field2:TextField;

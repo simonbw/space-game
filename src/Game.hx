@@ -89,7 +89,6 @@ class Game extends Sprite {
 		profiler.addSection("system");
 
 
-
 		// test code junk
 		ship = new Ship(Vec2.get(200, 200));
 		shipController = new PlayerShipController(ship);
@@ -102,7 +101,7 @@ class Game extends Sprite {
 		} else {
 			PrebuiltShips.makeCruiser(ship);
 		}
-		Main.log(ship.serialize());
+		// Main.log(ship.serialize());
 		addEntity(new ui.EnergyMeter(ship));
 
 		var station = new ship.SpaceStation(Vec2.get(1000, 500));
@@ -261,6 +260,9 @@ class Game extends Sprite {
 		if (following) {
 			camera.smoothCenter(ship.body.position, 0.5);
 		}
+		
+		SoundManager.setEarPosition(camera.position.copy());
+
 		//camera.angle = Math.PI - ship.body.rotation;
 		if (IO.keys[IO.K_ZOOM_IN]) {
 			camera.zoom *= 1.01;

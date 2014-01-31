@@ -331,6 +331,13 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		}
 	}
 
+	public function explode():Void {
+		for (part in parts) {
+			part.connectedParts.clear(true);
+			needToRealign = true;
+		}
+	}
+
 	/**
 	 * Event handler for when hit by a projectile.
 	 * @param	position

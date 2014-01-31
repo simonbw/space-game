@@ -41,7 +41,7 @@ class LaserCannon extends RectangularPart implements Weapon {
 			// l.addDoNotHit(ship);
 			dir.dispose();
 
-			SoundManager.playSound("laser");
+			SoundManager.playSoundAt("laser", pos.copy(), 4);
 
 			Main.currentGame.addEntity(l);
 			return true;

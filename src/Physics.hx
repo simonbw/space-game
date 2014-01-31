@@ -8,8 +8,9 @@ import nape.callbacks.PreCallback;
 import nape.callbacks.PreFlag;
 import nape.callbacks.PreListener;
 import nape.dynamics.InteractionFilter;
-import nape.space.Space;
+import nape.geom.Vec2;
 import nape.phys.Material;
+import nape.space.Space;
 
 import projectiles.Projectile;
 
@@ -52,6 +53,9 @@ class Physics {
 	public static var M_MEDIUM_METAL = new Material(0.15, 0.8, 1.5, 2.0, 1.0);
 	public static var M_HEAVY_METAL = new Material(0.15, 0.8, 1.5, 3.0, 1.0);
 	public static var M_ROCK = new Material(0.5, 1.2, 1.8, 1.0);
+
+	// physics calculation constants
+	static var SOUND_THRESHOLD = 4.0;
 
 	/**
 	 * Initialize all the listeners on a space.
@@ -121,8 +125,14 @@ class Physics {
 			impulseMultiplier *= 2.0;
 
 			var avgVelocity = velocity1.add(velocity2).mul(0.5);
+			var soundPos = Vec2.get();
 			for (contact in arbiter.contacts) {
 				ship1.game.addEntity(new effects.CollisionEffect(contact.position, avgVelocity, arbiter.normal, Math.sqrt(damage) / 2));
+				soundPos.set(contact.position);
+			}
+
+			if (damage > SOUND_THRESHOLD) {
+				SoundManager.playSoundAt("laser_hit", soundPos, 3);
 			}
 
 			var result = PreFlag.ACCEPT_ONCE;
