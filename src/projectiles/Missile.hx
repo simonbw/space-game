@@ -63,7 +63,7 @@ class Missile extends projectiles.Projectile {
 		}
 	}
 
-	override function draw():Void {
+	override function draw(load:Float):Void {
 		sprite.graphics.lineStyle(4.0, 0x666666, 1.0);
 		var endpoint = Vec2.fromPolar(16, body.rotation);
 		sprite.graphics.lineTo(endpoint.x, endpoint.y);

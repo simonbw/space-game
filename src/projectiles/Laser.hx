@@ -35,8 +35,8 @@ class Laser extends projectiles.Projectile {
 		body.velocity.set(velocity);
 	}
 
-	override function draw():Void {
-		sprite.graphics.lineStyle(0, 0xFFFF00, 0.5);
+	override function draw(lod:Float):Void {
+		sprite.graphics.lineStyle(0, 0xFFFF00, util.MyMath.limit(Math.sqrt(lod)));
 		var l = SPEED * 0.8 / Main.stage.frameRate;
 		sprite.graphics.lineTo(-direction.x  * l, -direction.y * l);
 	}
