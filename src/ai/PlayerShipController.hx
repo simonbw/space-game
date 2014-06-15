@@ -5,31 +5,40 @@ import util.MyMath;
 
 import nape.geom.Vec2;
 
+/**
+ * Controls firing ship engines.
+ */
 class PlayerShipController extends Entity implements Updatable {
 	static inline var SHIELD_MODES = 10;
 	var ship:Ship;
 	var stabilize:Bool;
 	var shieldMode:Int;
 
+
 	public function new(ship:Ship) {
 		super();
 		this.ship = ship;
 		stabilize = false;
 		shieldMode = SHIELD_MODES;
+
+		// toggle stabilize on keypress
 		IO.addKeyDownCallback(IO.K_STABILIZE, function():Void {
 			stabilize = !stabilize;
 		});
 
+		// increase shield on keypress
 		IO.addKeyDownCallback(IO.K_SHIELD_UP, function():Void {
 			shieldMode = util.MyMath.minInt(shieldMode + 1, SHIELD_MODES);
 			ship.energyManager.multipliers.set(EnergyType.SHIELD, shieldMode / SHIELD_MODES);
 		});
 
+		// decrease shield on keypress
 		IO.addKeyDownCallback(IO.K_SHIELD_DOWN, function():Void {
 			shieldMode = util.MyMath.maxInt(shieldMode - 1, 0);
 			ship.energyManager.multipliers.set(EnergyType.SHIELD, shieldMode / SHIELD_MODES);
 		});
 
+		// self destruct button
 		IO.addKeyDownCallback(IO.K_MISSILE, function():Void {
 			ship.explode();
 		});
@@ -53,22 +62,22 @@ class PlayerShipController extends Entity implements Updatable {
 		}
 
 		if (IO.keys[IO.K_UP]) {
-			ship.thrust(1.0, FORWARD);
+			ship.balancedThrust(1.0, FORWARD);
 			thrusting = true;
 		}
 
 		if (IO.keys[IO.K_DOWN]) {
-			ship.thrust(1.0, BACKWARD);
+			ship.balancedThrust(1.0, BACKWARD);
 			thrusting = true;
 		}
 
 		if (IO.keys[IO.K_STRAFE_RIGHT]) {
-			ship.thrust(1.0, RIGHT);
+			ship.balancedThrust(1.0, RIGHT);
 			thrusting = true;
 		}
 
 		if (IO.keys[IO.K_STRAFE_LEFT]) {
-			ship.thrust(1.0, LEFT);
+			ship.balancedThrust(1.0, LEFT);
 			thrusting = true;
 		}
 
@@ -95,6 +104,5 @@ class PlayerShipController extends Entity implements Updatable {
 		if (IO.keys[IO.K_LASER]) {
 			ship.fireLasers();
 		}
-
 	}
 }

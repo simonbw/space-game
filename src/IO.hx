@@ -12,8 +12,8 @@ class IO {
     static public inline var K_STRAFE_RIGHT = 69;   // E
     static public inline var K_STRAFE_LEFT = 81;    // Q
 
-    static public inline var K_SHIELD_DOWN = 84;      // T
-    static public inline var K_SHIELD_UP = 89;    // Y
+    static public inline var K_SHIELD_DOWN = 84;    // T
+    static public inline var K_SHIELD_UP = 89;      // Y
     static public inline var K_STABILIZE = 67;      // C
     static public inline var K_KILL_ROTATION = 16;  // shift
     static public inline var K_MISSILE = 17;        // ctrl

@@ -3,9 +3,9 @@ import flash.display.Sprite;
 import flash.display.Shape;
 
 /**
+ * Manages pooling of objects.
  */
-class Pool
-{
+class Pool {
 	static var spritePool = new Array<Sprite>();
 	static var shapePool = new Array<Shape>();
 	

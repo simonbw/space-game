@@ -9,6 +9,7 @@ import flash.Lib.getTimer;
  * Class for profiling and displaying debug information.
  */
 class Profiler {
+	
 	/** Maximum characters in a line */
 	static inline var MAX_LOG_CHAR = 180;
 	/** Maximum log messages */

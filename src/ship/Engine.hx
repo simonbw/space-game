@@ -50,9 +50,17 @@ class Engine extends RectangularPart {
 			var d = Math.PI / 2 + ship.body.rotation + directionToRadian();
 			var thrust = _throttle * timestep * power * THRUST_MULTIPLIER;
 			var impulse = Vec2.get(Math.cos(d) * thrust, Math.sin(d) * thrust, true);
-			var impulsePoint = shape.worldCOM;
+			var impulsePoint = getWorldImpulsePoint();
 			ship.body.applyImpulse(impulse, impulsePoint);
 		}
+	}
+
+	public function getLocalImpulsePoint():Vec2 {
+		return shape.localCOM;
+	}
+
+	public function getWorldImpulsePoint():Vec2 {
+		return shape.worldCOM;
 	}
 
 	override public function draw(g:flash.display.Graphics, lod:Float):Void {

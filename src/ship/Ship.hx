@@ -29,7 +29,11 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	/** True if the ship needs to be realigned because its local COM has changed **/
 	public var needToRealign:Bool;
 	/** All the engines on the ship **/
-	var engines:Array<Engine>;
+	public var engines:Array<Engine>;
+	/** All the engines on the ship sorted by X position **/
+	public var enginesX:Array<Engine>;
+	/** All the engines on the ship sorted by Y position **/
+	public var enginesY:Array<Engine>;
 	/** All the reactors on the ship **/
 	var reactors:Array<Reactor>;
 	/** All the shield generators on the ship **/
@@ -71,6 +75,8 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		dirtyParts = new Array<ShipPart>();
 		partMap = new util.CoordinateMap<ShipPart>();
 		engines = new Array<Engine>();
+		enginesX = new Array<Engine>();
+		enginesY = new Array<Engine>();
 		reactors = new Array<Reactor>();
 		shieldGenerators = new Array<ShieldGenerator>();
 		body = new Body();
@@ -131,7 +137,20 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 			}
 		}
 		if (Std.is(part, Engine)) {
-			engines.push(cast(part, Engine));
+			var e = cast(part, Engine);
+			engines.push(e);
+
+			// add to right location. Should be O(log(n))
+			var i = 0;
+			while (i < enginesX.length && enginesX[i].gridPosition.x <= x) {
+				i++;
+			}
+			enginesX.insert(i, e);
+			i = 0;
+			while (i < enginesY.length && enginesY[i].gridPosition.y <= y) {
+				i++;
+			}
+			enginesY.insert(i, e);
 		}
 		if (Std.is(part, Reactor)) {
 			reactors.push(cast(part, Reactor));
@@ -142,6 +161,10 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		dirtyParts.push(part);
 	}
 
+	/**
+	 * Add a part to the list of parts that need to be updated.
+	 * @param part
+	 */
 	public function addUpdatePart(part:ShipPart):Void {
 		// check if already here
 		for (p in updateParts) {
@@ -153,6 +176,10 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		updateParts.push(part);
 	}
 
+	/**
+	 * Remove a part from the list of parts that need to be updated.
+	 * @param  part
+	 */
 	public function removeUpdatePart(part:ShipPart):Void {
 		updateParts.remove(part);
 	}
@@ -176,7 +203,10 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 			partMap.remove(p.x, p.y);
 		}
 		if (Std.is(part, ship.Engine)) {
-			engines.remove(cast(part, ship.Engine));
+			var e = cast(part, ship.Engine);
+			engines.remove(e);
+			enginesX.remove(e);
+			enginesY.remove(e);
 		}
 		if (Std.is(part, Reactor)) {
 			reactors.remove(cast(part, Reactor));
@@ -256,7 +286,8 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 				var impulse = out1.sub(out2);
 				if (impulse.length != 0) {
 					impulse.normalise().muleq(200);
-}				impulse.add(Vec2.get(util.Random.normal(0, 100), util.Random.normal(0, 100), true));
+				}
+				impulse.add(Vec2.get(util.Random.normal(0, 100), util.Random.normal(0, 100), true));
 				body.applyImpulse(impulse);
 				other.body.applyImpulse(impulse.mul(-1, true));				
 				impulse.dispose();
@@ -331,6 +362,10 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		}
 	}
 
+	/**
+	 * Self destruct the ship.
+	 * @return [description]
+	 */
 	public function explode():Void {
 		for (part in parts) {
 			part.connectedParts.clear(true);
@@ -347,6 +382,12 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		return true;
 	}
 
+	/**
+	 * [requestEnergy description]
+	 * @param  amount     [description]
+	 * @param  energyType [description]
+	 * @return            [description]
+	 */
 	public function requestEnergy(amount:Float, energyType:EnergyType):Float {
 		var result = energyManager.requestEnergy(amount, energyType);
 		energy -= result;
@@ -354,11 +395,21 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		return result;
 	}
 
+	/**
+	 * [giveEnergy description]
+	 * @param  amount [description]
+	 * @return        [description]
+	 */
 	public function giveEnergy(amount:Float):Void {
 		energyManager.giveEnergy(amount);
 		energy += amount;
 	}
 
+	/**
+	 * [requestShield description]
+	 * @param  amount [description]
+	 * @return        [description]
+	 */
 	public function requestShield(amount:Float):Float {
 		var result = Math.min(amount, shield);
 		shield -= result;
@@ -373,9 +424,9 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		amount = Math.min(Math.max(0, amount), 1.0);
 		var center = body.localCOM;
 		for (engine in engines) {
-			if (!engine.maneuverable) {
-				continue;
-			}
+			// if (!engine.maneuverable) {
+			// 	continue;
+			// }
 			if (engine.direction == RIGHT && engine.center.y < center.y - drawOffset.y - 1) {
 				engine.throttle = (Math.max(engine.throttle, amount));
 			} else if (engine.direction == LEFT && engine.center.y > center.y - drawOffset.y + 1) {
@@ -421,6 +472,73 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		for (engine in engines) {
 			if (engine.direction == direction) {
 				engine.throttle = (Math.max(engine.throttle, amount));
+			}
+		}
+	}
+
+	/**
+	 * Thrust in a given direction. Makes sure net force is only in that direction.
+	 * @param	amount
+	 * @param	direction
+	 */
+	public function balancedThrust(amount:Float, direction:Direction):Void {
+		amount = Math.min(Math.max(0, amount), 1.0);
+
+		var balance = 0.0;
+
+		var vert = direction == FORWARD || direction == BACKWARD;
+		for (engine in engines) {
+			if (engine.direction == direction) {
+				var impulsePoint = engine.getLocalImpulsePoint();
+				balance += (vert ? impulsePoint.x : impulsePoint.y) * engine.power;
+				engine.throttle = amount;
+			}
+		}
+
+		var sortedEngines = vert ? enginesX : enginesY;
+		var tolerance = 0.00001;
+		var i;
+		if (balance > tolerance) {
+			i = sortedEngines.length - 1;
+			while ((i >= 0) && (balance > tolerance)) {
+				var engine = sortedEngines[i];
+				if (engine.direction == direction) {
+					// reduce thrust
+					var impulsePoint = engine.getLocalImpulsePoint();
+					var b = (vert ? impulsePoint.x : impulsePoint.y) * engine.power;
+
+					if (b > 0) {
+						if (b < balance) {
+							balance -= b;
+							engine.throttle = 0;
+						} else {
+							engine.throttle = (1 - balance / b) * amount;
+							balance = 0;
+						}
+					}
+				}
+				i--;
+			}
+		} else if (balance < -tolerance) {
+			i = 0;
+			while ((i < sortedEngines.length) && (balance < -tolerance)) {
+				// reduce thrust
+				var engine = sortedEngines[i];
+				if (engine.direction == direction) {
+					var impulsePoint = engine.getLocalImpulsePoint();
+					var b = (vert ? impulsePoint.x : impulsePoint.y) * engine.power;
+
+					if (b < 0) {
+						if (b > balance) {
+							balance -= b;
+							engine.throttle = 0;
+						} else {
+							engine.throttle = (1 - balance / b) * amount;
+							balance = 0;
+						}
+					}
+				}
+				i++;
 			}
 		}
 	}
@@ -473,12 +591,20 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		}
 	}
 
+	/**
+	 * [clearEngines description]
+	 * @return [description]
+	 */
 	public function clearEngines():Void {
 		for (engine in engines) {
 			engine.throttle = (0.0);
 		}
 	}
 
+	/**
+	 * [fireLasers description]
+	 * @return [description]
+	 */
 	public function fireLasers() {
 		for (part in parts) {
 			if (Std.is(part, Weapon)) {
@@ -487,6 +613,10 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		}
 	}
 
+	/**
+	 * [makeImage description]
+	 * @return [description]
+	 */
 	public function makeImage():Void {
 		if (image != null) {
 			image.dispose();
@@ -520,6 +650,12 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		imageOffset.setxy(-(minX - buffer) * GRID_SIZE - buffer, -(minY - buffer) * GRID_SIZE);
 	}
 
+	/**
+	 * [render description]
+	 * @param  surface [description]
+	 * @param  camera  [description]
+	 * @return         [description]
+	 */
 	public function render(surface:BitmapData, camera:Camera):Void {
 		// if (image == null) {
 		// 	makeImage();
@@ -551,6 +687,10 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		surface.draw(sprite, m, null, null, null, true);
 	}
 
+	/**
+	 * [dispose description]
+	 * @return [description]
+	 */
 	override public function dispose():Void {
 		super.dispose();
 		body.space = null;
@@ -562,6 +702,10 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		reactors = null;
 	}
 
+	/**
+	 * [serialize description]
+	 * @return [description]
+	 */
 	public function serialize():String {
 		var s = "";
 		for (part in parts) {
