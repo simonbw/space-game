@@ -87,7 +87,7 @@ class Projectile extends Entity implements Renderable implements Updatable imple
 		return !doNotHit.contains(other);
 	}
 
-	function draw():Void {
+	function draw(load:Float):Void {
 		var g = sprite.graphics;
 		g.beginFill(0xFF0000);
 		g.drawCircle(0, 0, 2);
@@ -97,8 +97,8 @@ class Projectile extends Entity implements Renderable implements Updatable imple
 
 	public function render(surface:flash.display.BitmapData, camera:Camera):Void {
 		if (!disposed) {
-			if (needToDraw) {
-				draw();
+			if (needToDraw || true) {
+				draw(camera.zoom);
 			}
 			var m = new flash.geom.Matrix();
 			m.translate(body.position.x, body.position.y);

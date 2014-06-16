@@ -37,7 +37,7 @@ class Input extends Entity implements Updatable {
 	public function update(timestep:Float):Void {
 		turn = (IO.keys[K_TURN_LEFT] ? -1 : 0) + (IO.keys[K_TURN_LEFT] ? 1 : 0);
 		xAxis = (IO.keys[K_STRAFE_LEFT] ? -1 : 0) + (IO.keys[K_STRAFE_RIGHT] ? 1 : 0);
-		yAxis = (IO.keys[K_FORWARD] ? -1 : 0) + (IO.keys[K_BACKWARD] ? 1 : 0);
+		yAxis = (IO.keys[K_FORWARD] ? 1 : 0) + (IO.keys[K_BACKWARD] ? -1 : 0);
 
 		if (IO.gamepadEnabled()) {
 			var axes = IO.getGamepadAxes();
@@ -45,9 +45,9 @@ class Input extends Entity implements Updatable {
 			yAxis += -Math.pow(MyMath.threshold(axes[1], 0.04), 3);
 			turn += Math.pow(MyMath.threshold(axes[2], 0.04), 3);
 			// limit in case buttons and keyboard are used
-			xAxis = MyMath.limit(xAxis);
-			yAxis = MyMath.limit(yAxis);
-			turn = MyMath.limit(turn);
+			xAxis = MyMath.limit(xAxis, -1, 1);
+			yAxis = MyMath.limit(yAxis, -1, 1);
+			turn = MyMath.limit(turn, -1, 1);
 		} 
  	}
 
