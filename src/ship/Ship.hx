@@ -447,9 +447,9 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 		amount = Math.min(Math.max(0, amount), 1.0);
 		var center = body.localCOM;
 		for (engine in engines) {
-			if (!engine.maneuverable) {
-				continue;
-			}
+			// if (!engine.maneuverable) {
+			// 	continue;
+			// }
 			if (engine.direction == RIGHT && engine.center.y > center.y - drawOffset.y + 1) {
 				engine.throttle = (Math.max(engine.throttle, amount));
 			} else if (engine.direction == LEFT && engine.center.y < center.y - drawOffset.y - 1) {

@@ -20,6 +20,10 @@ class PlayerShipController extends Entity implements Updatable {
 		this.ship = ship;
 		stabilize = false;
 		shieldMode = SHIELD_MODES;
+	}
+
+	override public function init(game:Game):Void {
+		super.init(game);
 
 		// toggle stabilize on keypress
 		IO.addKeyDownCallback(IO.K_STABILIZE, function():Void {
@@ -42,6 +46,7 @@ class PlayerShipController extends Entity implements Updatable {
 		IO.addKeyDownCallback(IO.K_MISSILE, function():Void {
 			ship.explode();
 		});
+
 	}
 
 	public function update(timestep:Float):Void {
@@ -52,34 +57,53 @@ class PlayerShipController extends Entity implements Updatable {
 		var thrusting = false;
 		var turning = false;
 		ship.clearEngines();
-		if (IO.keys[IO.K_TURN_LEFT]) {
-			ship.turn( -1.0);
-			turning = true;
+
+		
+		if (game.input.xAxis > 0) {
+			ship.balancedThrust(game.input.xAxis, RIGHT);
 		}
-		if (IO.keys[IO.K_TURN_RIGHT]) {
-			ship.turn(1.0);
-			turning = true;
+		if (game.input.xAxis < 0) {
+			ship.balancedThrust(-game.input.xAxis, LEFT);
+		}
+		if (game.input.yAxis > 0) {
+			ship.balancedThrust(game.input.yAxis, FORWARD);
+		}
+		if (game.input.yAxis < 0) {
+			ship.balancedThrust(-game.input.yAxis, BACKWARD);
 		}
 
-		if (IO.keys[IO.K_UP]) {
-			ship.balancedThrust(1.0, FORWARD);
-			thrusting = true;
+		if (Math.abs(game.input.turn) > 0) {
+			ship.turn(game.input.turn);
 		}
 
-		if (IO.keys[IO.K_DOWN]) {
-			ship.balancedThrust(1.0, BACKWARD);
-			thrusting = true;
-		}
+		// if (IO.keys[IO.K_TURN_LEFT]) {
+		// 	ship.turn( -1.0);
+		// 	turning = true;
+		// }
+		// if (IO.keys[IO.K_TURN_RIGHT]) {
+		// 	ship.turn(1.0);
+		// 	turning = true;
+		// }
 
-		if (IO.keys[IO.K_STRAFE_RIGHT]) {
-			ship.balancedThrust(1.0, RIGHT);
-			thrusting = true;
-		}
+		// if (IO.keys[IO.K_UP]) {
+		// 	ship.balancedThrust(1.0, FORWARD);
+		// 	thrusting = true;
+		// }
 
-		if (IO.keys[IO.K_STRAFE_LEFT]) {
-			ship.balancedThrust(1.0, LEFT);
-			thrusting = true;
-		}
+		// if (IO.keys[IO.K_DOWN]) {
+		// 	ship.balancedThrust(1.0, BACKWARD);
+		// 	thrusting = true;
+		// }
+
+		// if (IO.keys[IO.K_STRAFE_RIGHT]) {
+		// 	ship.balancedThrust(1.0, RIGHT);
+		// 	thrusting = true;
+		// }
+
+		// if (IO.keys[IO.K_STRAFE_LEFT]) {
+		// 	ship.balancedThrust(1.0, LEFT);
+		// 	thrusting = true;
+		// }
 
 		if (stabilize && !IO.keys[IO.K_KILL_ROTATION]) {
 			var direction = Vec2.fromPolar(1, ship.body.rotation + Math.PI / 2);

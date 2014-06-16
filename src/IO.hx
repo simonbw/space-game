@@ -1,5 +1,7 @@
 import flash.geom.Point;
 import flash.ui.Mouse;
+import flash.ui.GameInput;
+import flash.external.ExternalInterface;
 
 /**
  * Static class for managing input.
@@ -84,6 +86,40 @@ class IO {
         }
     }
 
+    public static function gamepadEnabled():Bool {
+        if (ExternalInterface.available) {
+            try {
+                if (ExternalInterface.call('gamepadEnabled')) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static function getGamepadButtons():Array<Float> {
+        if (ExternalInterface.available) {
+            try {
+                var buttons:Iterable<Dynamic> = ExternalInterface.call('getGamepadButtons');
+                return [for(button in buttons) button.value];
+            } catch (e:Dynamic) {
+                // do nothing
+            }
+        }
+        return null;
+    }
+
+    public static function getGamepadAxes():Array<Float> {
+        if (ExternalInterface.available) {
+            try {
+                return ExternalInterface.call('getGamepadAxes');
+            } catch (e:Dynamic) {
+                // do nothing
+            }
+        }
+        return null;
+    }
+
     /**
      * Update the mouse coordinates.
      * @param  x screen x
@@ -140,4 +176,5 @@ class IO {
     static function onKeyUp(e:flash.events.KeyboardEvent):Void {
     	keys[e.keyCode] = false;
     }
+
 }

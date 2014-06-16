@@ -72,6 +72,18 @@ class MyMath {
 	}
 
 	/**
+	 * Requires a value to be a certain distance from center, otherwise returns center.
+	 * @param  a         Value to affect
+	 * @param  threshold minimum difference from center
+	 * @param  center    
+	 * @return           
+	 */
+	static public inline function threshold(a:Float, threshold:Float = 0.01, center:Float = 0):Float {
+		// return a;
+		return ((a > center + threshold) || (a < center - threshold)) ? a : center;
+	}
+
+	/**
 	 * Returns the greater of two Ints.
 	 * @param	a
 	 * @param	b

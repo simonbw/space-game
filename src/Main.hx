@@ -17,6 +17,7 @@ class Main {
 			trace(error.name + " " + error.message + " " + error.errorID);
 		}
 		ui.Cursor.init();
+		IO.addKeyDownCallback(IO.K_RESET, reset);
 		reset();
 	}
 
@@ -34,7 +35,6 @@ class Main {
 		} catch (error:Dynamic) {
 			trace("error: " + error);
 		}
-		IO.addKeyDownCallback(IO.K_RESET, reset);
 	}
 
 	/**

@@ -1,4 +1,3 @@
-import ai.StabilizeShipController;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.Sprite;
@@ -7,14 +6,17 @@ import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.Lib;
 
+import flash.external.ExternalInterface;
 import nape.geom.Vec2;
 import nape.space.Space;
 
 import ai.PlayerShipController;
+import ai.StabilizeShipController;
 import obstacles.Asteroid;
 import ship.PrebuiltShips;
 import ship.Ship;
 import util.MyMath;
+import util.Input;
 import util.Profiler;
 import util.Random;
 
@@ -33,17 +35,16 @@ class Game extends Sprite {
 	var bitmap: Bitmap;
 	/** The main rendering layer */
 	var surface: BitmapData;
-
 	public var space: Space;
-
+	var camera:Camera;
 	var entities:Array<Entity>;
-	var updatables:Array<Updatable>;
-	var updatables2:Array<Updatable2>;
 	var entitiesToRemove:Array<Entity>;
 	var ship:Ship;
 	var shipController:PlayerShipController;
 	var stars:effects.Stars;
-	var camera:Camera;
+	var updatables2:Array<Updatable2>;
+	var updatables:Array<Updatable>;
+	public var input:Input;
 
 	/**
 	 * Create a new Game.
@@ -73,6 +74,8 @@ class Game extends Sprite {
 		space.worldAngularDrag = 0;
 		stars = new effects.Stars();
 		addEntity(stars);
+		input = new Input();
+		addEntity(input);
 		camera = new Camera();
 
 		// initialize modules
