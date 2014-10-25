@@ -8,7 +8,7 @@ import projectiles.Laser;
 
 class LaserCannon extends RectangularPart implements Weapon {
 	
-	static inline var INTERVAL = 0.05;
+	static inline var INTERVAL = 0.15;
 	static inline var ENERGY_USE = 8.0;
 	
 	var cooldown:Float;
