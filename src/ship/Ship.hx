@@ -574,15 +574,15 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 			var adotv = a.dot(v);
 			var bdotv = b.dot(v);
 			if (adotv > 0.01) {
-				thrust(Math.min(0.9, adotv * multiplier), RIGHT);
+				balancedThrust(Math.min(0.9, adotv * multiplier), RIGHT);
 			} else if (a.dot(v) < -0.01) {
-				thrust(Math.min(0.9, -adotv * multiplier), LEFT);
+				balancedThrust(Math.min(0.9, -adotv * multiplier), LEFT);
 			}
 
 			if (bdotv > 0.01) {
-				thrust(Math.min(0.9, bdotv * multiplier), BACKWARD);
+				balancedThrust(Math.min(0.9, bdotv * multiplier), BACKWARD);
 			} else if (b.dot(v) < -0.01) {
-				thrust(Math.min(0.9, -bdotv * multiplier), FORWARD);
+				balancedThrust(Math.min(0.9, -bdotv * multiplier), FORWARD);
 			}
 
 			a.dispose();
@@ -592,8 +592,7 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	}
 
 	/**
-	 * [clearEngines description]
-	 * @return [description]
+	 * Set throttle on all engines to 0.
 	 */
 	public function clearEngines():Void {
 		for (engine in engines) {
@@ -602,12 +601,22 @@ class Ship extends Entity implements Renderable implements Updatable implements 
 	}
 
 	/**
-	 * [fireLasers description]
-	 * @return [description]
+	 * Fires all lasers
 	 */
-	public function fireLasers() {
+	public function fireLasers():Void {
 		for (part in parts) {
-			if (Std.is(part, Weapon)) {
+			if (Std.is(part, LaserCannon)) {
+				cast(part, Weapon).fire();
+			}
+		}
+	}
+
+	/**
+	 * Fires all missiles
+	 */
+	public function fireMissiles():Void {
+		for (part in parts) {
+			if (Std.is(part, MissileLauncher)) {
 				cast(part, Weapon).fire();
 			}
 		}

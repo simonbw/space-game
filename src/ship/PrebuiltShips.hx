@@ -77,10 +77,10 @@ class PrebuiltShips {
 		ship.addPart(new Engine(false), -2, 15, BACKWARD);
 		ship.addPart(new Engine(false), 0, 15, BACKWARD);
 		ship.addPart(new Engine(false), 2, 15, BACKWARD);
-		ship.addPart(new LaserCannon(), -1, 15, FORWARD);
-		ship.addPart(new LaserCannon(), 1, 15, FORWARD);
-		ship.addPart(new LaserCannon(), -3, 15, FORWARD);
-		ship.addPart(new LaserCannon(), 3, 15, FORWARD);
+		ship.addPart(new MissileLauncher(), -1, 15, FORWARD);
+		ship.addPart(new MissileLauncher(), 1, 15, FORWARD);
+		ship.addPart(new MissileLauncher(), -3, 15, FORWARD);
+		ship.addPart(new MissileLauncher(), 3, 15, FORWARD);
 
 		for (i in -3...4) {
 			ship.addPart(new Engine(false, 24), i, -7, FORWARD);

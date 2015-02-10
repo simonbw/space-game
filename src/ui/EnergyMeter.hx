@@ -8,13 +8,14 @@ import ship.EnergyType;
 
 class EnergyMeter extends Entity implements Renderable {
 
-	var sprite:Sprite;	
-	var ship:Ship;
 	public var renderDepth:Int;
+	
+	var ship:Ship;
+	var sprite:Sprite;	
 
 	public function new(ship:Ship = null):Void {
-		renderDepth = -1;
 		super();
+		renderDepth = -1;
 		if (ship != null) {
 			setShip(ship);
 		}

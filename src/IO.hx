@@ -97,13 +97,11 @@ class IO {
         return false;
     }
 
-    public static function getGamepadButtons():Array<Float> {
+    public static function getGamepadButtons():Array<{pressed:Bool, value:Float}> {
         if (ExternalInterface.available) {
             try {
                 var buttons:Iterable<Dynamic> = ExternalInterface.call('getGamepadButtons');
-                return [for(button in buttons) button.value];
-            } catch (e:Dynamic) {
-                // do nothing
+                return [for(button in buttons) {pressed: button.pressed, value:button.value}];
             }
         }
         return null;

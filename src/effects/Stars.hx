@@ -33,7 +33,8 @@ class Stars extends Entity implements Renderable {
 		m.translate(camera.width() / 2, camera.height() / 2);
 		for (point in points) {
 			var p = m.transformPoint(point);
-			surface.setPixel(MyMath.modInt(Std.int(p.x), surface.width), MyMath.modInt(Std.int(p.y), surface.height), 0xFFFFFF);
+			// surface.setPixel(MyMath.modInt(Std.int(p.x), surface.width), MyMath.modInt(Std.int(p.y), surface.height), 0xFFFFFF);
+			surface.setPixel(Std.int(p.x), Std.int(p.y), 0xFFFFFF);
 		}
 		surface.unlock();
 	}

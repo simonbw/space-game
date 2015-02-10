@@ -15,7 +15,7 @@ class Camera extends Entity {
 	public function new() {
 		super();
 		position = Vec2.get(0,0);
-		zoom = 0.6;
+		zoom = 0.4;
 		angle = 0.0;
 	}
 

@@ -42,11 +42,6 @@ class PlayerShipController extends Entity implements Updatable {
 			ship.energyManager.multipliers.set(EnergyType.SHIELD, shieldMode / SHIELD_MODES);
 		});
 
-		// self destruct button
-		IO.addKeyDownCallback(IO.K_MISSILE, function():Void {
-			ship.explode();
-		});
-
 	}
 
 	public function update(timestep:Float):Void {
@@ -76,6 +71,22 @@ class PlayerShipController extends Entity implements Updatable {
 			ship.turn(game.input.turn);
 		}
 
+		if (game.input.stabilize) {
+			if (Math.abs(game.input.xAxis) + Math.abs(game.input.yAxis) < 0.1) {
+				ship.stabilizeLinear();
+			}
+			if (Math.abs(game.input.turn) < 0.1) {
+				ship.stabilizeRotation();
+			}
+		}
+		
+		if (game.input.lasers) {
+			ship.fireLasers();
+		}
+		
+		if (game.input.missiles) {
+			ship.fireMissiles();
+		}
 		// if (IO.keys[IO.K_TURN_LEFT]) {
 		// 	ship.turn( -1.0);
 		// 	turning = true;
@@ -104,29 +115,27 @@ class PlayerShipController extends Entity implements Updatable {
 		// 	ship.balancedThrust(1.0, LEFT);
 		// 	thrusting = true;
 		// }
-
-		if (stabilize && !IO.keys[IO.K_KILL_ROTATION]) {
-			var direction = Vec2.fromPolar(1, ship.body.rotation + Math.PI / 2);
-			direction.muleq(MyMath.max(direction.dot(ship.body.velocity), 0)); // don't go backwards
-			ship.stabilizeLinear(direction);
-			direction.dispose();
-		}
 		
-		if (stabilize && !turning) {
-			ship.stabilizeRotation();
-		}
-		
-		if ((IO.keys[IO.K_KILL_ROTATION])) {
-			if (!turning) {
-				ship.stabilizeRotation();
-			}
-			if (!thrusting) {
-				ship.stabilizeLinear();
-			}
-		}
 
-		if (IO.keys[IO.K_LASER]) {
-			ship.fireLasers();
-		}
+		// if (stabilize && !IO.keys[IO.K_KILL_ROTATION]) {
+		// 	var direction = Vec2.fromPolar(1, ship.body.rotation + Math.PI / 2);
+		// 	direction.muleq(MyMath.max(direction.dot(ship.body.velocity), 0)); // don't go backwards
+		// 	ship.stabilizeLinear(direction);
+		// 	direction.dispose();
+		// }
+		
+		// if (stabilize && !turning) {
+		// 	ship.stabilizeRotation();
+		// }
+		
+		// if ((IO.keys[IO.K_KILL_ROTATION])) {
+		// 	if (!turning) {
+		// 		ship.stabilizeRotation();
+		// 	}
+		// 	if (!thrusting) {
+		// 		ship.stabilizeLinear();
+		// 	}
+		// }
+
 	}
 }

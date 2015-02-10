@@ -15,8 +15,10 @@ import ai.StabilizeShipController;
 import obstacles.Asteroid;
 import ship.PrebuiltShips;
 import ship.Ship;
-import util.MyMath;
+import ui.EnergyMeter;
+import ui.Radar;
 import util.Input;
+import util.MyMath;
 import util.Profiler;
 import util.Random;
 
@@ -27,24 +29,35 @@ class Game extends Sprite {
 	/** The maximum allowed duration of a single time step */
 	static inline var MAX_TIMESTEP = 1 / 15.0;
 
+	/** List of all entities */
+	public var entities:Array<Entity>;
+	/** Input mapper */
+	public var input:Input;
+	/** Console to print information */
 	public var profiler: Profiler;
-
-	var following: Bool;
+	/** Physics space */
+	public var space: Space;
 
 	/** The bitmap object that gets drawn to the screen */
 	var bitmap: Bitmap;
-	/** The main rendering layer */
-	var surface: BitmapData;
-	public var space: Space;
+	/** Main camera */
 	var camera:Camera;
-	var entities:Array<Entity>;
+	/** List of all entities ready to be removed */
 	var entitiesToRemove:Array<Entity>;
+	/** Whether or not the camera is following the ship */
+	var following: Bool;
+	/** List of all renderable entities */
+	var renderables:Array<Renderable>;
 	var ship:Ship;
 	var shipController:PlayerShipController;
+	/** Background effect */
 	var stars:effects.Stars;
-	var updatables2:Array<Updatable2>;
+	/** The main rendering layer */
+	var surface: BitmapData;
+	/** List of all updatable entities */
 	var updatables:Array<Updatable>;
-	public var input:Input;
+	/** List of all updatable2 entities */
+	var updatables2:Array<Updatable2>;
 
 	/**
 	 * Create a new Game.
@@ -68,6 +81,7 @@ class Game extends Sprite {
 		entitiesToRemove = new Array<Entity>();
 		updatables = new Array<Updatable>();
 		updatables2 = new Array<Updatable2>();
+		renderables = new Array<Renderable>();
 
 		space = new Space();
 		space.worldLinearDrag = 0;
@@ -105,7 +119,8 @@ class Game extends Sprite {
 			PrebuiltShips.makeCruiser(ship);
 		}
 		// Main.log(ship.serialize());
-		addEntity(new ui.EnergyMeter(ship));
+		addEntity(new EnergyMeter(ship));
+		addEntity(new Radar(ship));
 
 		var station = new ship.SpaceStation(Vec2.get(1000, 500));
 		PrebuiltShips.makeTradingStation(station);
@@ -143,7 +158,6 @@ class Game extends Sprite {
 
 	public function toggleFullscreen(): Void {
 		Main.log("toggling fullscreen");
-
 		try {
 			if (Main.stage.displayState == StageDisplayState.NORMAL) {
 				Main.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
@@ -186,6 +200,20 @@ class Game extends Sprite {
 			}
 			if (Std.is(entity, Updatable2)) {
 				updatables2.push(cast(entity, Updatable2));
+			}
+			if (Std.is(entity, Renderable)) {
+				var r = cast(entity, Renderable);
+
+				// insertion sort to add renderable in right order
+				// TODO: should do this with a tree
+				var i = 0;
+				for (r2 in renderables) {
+					if (r2.renderDepth < r.renderDepth) {
+						break;
+					}
+					i++;
+				}
+				renderables.insert(i, r);
 			}
 		} catch (error: Dynamic) {
 			trace("Failed to add entity:" + entity + error);
@@ -261,12 +289,12 @@ class Game extends Sprite {
 
 		// Camera Control should be done elsewhere
 		if (following) {
-			camera.smoothCenter(ship.body.position, 0.5);
+			camera.smoothCenter(ship.body.position, 1.0);
+			camera.angle = Math.PI - ship.body.rotation;
 		}
 		
 		SoundManager.setEarPosition(camera.position.copy());
 
-		//camera.angle = Math.PI - ship.body.rotation;
 		if (IO.keys[IO.K_ZOOM_IN]) {
 			camera.zoom *= 1.01;
 		}
@@ -289,10 +317,10 @@ class Game extends Sprite {
 	public function render(e: Event = null): Void {
 		try {
 			surface.fillRect(surface.rect, 0x000000);
-			for (entity in entities) {
-				if (Std.is(entity, Renderable) && !entity.disposed) {
+			for (entity in renderables) { // TODO: loop through only objects on screen.
+				if (!entity.disposed) {
 					try {
-						cast(entity, Renderable).render(surface, camera);
+						entity.render(surface, camera);
 					} catch (error: Dynamic) {
 						Main.log("Render Failed:" + entity + " " + error);
 					}
@@ -304,6 +332,9 @@ class Game extends Sprite {
 		profiler.render(surface);
 	}
 
+	/**
+	 * Dispose of all entities and null links for GC.
+	 */
 	public function dispose(): Void {
 		flash.Lib.current.removeEventListener(Event.ENTER_FRAME, update);
 		flash.Lib.current.removeChild(this);
