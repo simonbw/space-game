@@ -2,12 +2,21 @@
 	"folders": [{
 		"follow_symlinks": true,
 		"path": "."
-		}],
+	}],
 
-		"settings": {
-			"tab_size": 2,
-			"translate_tabs_to_spaces": false,
-			"detect_indentation": false,
-			"use_tab_stops": true
-		}
+	"build_systems": [{
+		"name": "Haxe",
+		"working_dir": "$project_path",
+		"shell_cmd": "haxe build.hxml",
+		"selector": "source.haxe",
+		"shell": true
+	}],
+
+	"settings": {
+		"detect_indentation": false,
+		"tab_size": 2,
+		"translate_tabs_to_spaces": false,
+		"use_tab_stops": true,
+		"word_wrap": true
 	}
+}

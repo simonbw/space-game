@@ -142,7 +142,7 @@ class Game extends Sprite {
 					PrebuiltShips.makeXWing(ship2);
 				} else {
 					PrebuiltShips.makeCruiser(ship2);
-				}
+				}		
 				addEntity(new StabilizeShipController(ship2));
 			} catch (error: Dynamic) {
 				Main.log(error);

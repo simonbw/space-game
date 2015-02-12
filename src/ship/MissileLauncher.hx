@@ -5,11 +5,14 @@ import nape.phys.Material;
 
 import projectiles.Missile;
 
-class MissileLauncher extends RectangularPart implements Weapon{
-	
+class MissileLauncher extends RectangularPart implements Weapon {
+	/** Seconds between shots */
 	static inline var INTERVAL = 2.0;
+	/** Energy per second while recharging */
 	static inline var ENERGY_USE = 2.0;
-	
+	/** Impulse when fired */
+	static inline var RECOIL = 2000;
+
 	var cooldown:Float;
 
 	public function new() {
@@ -32,12 +35,14 @@ class MissileLauncher extends RectangularPart implements Weapon{
 
 	public function fire():Bool {
 		if (cooldown <= 0) {
-			cooldown += INTERVAL;
+			cooldown += INTERVAL * (maxHealth / health);
 			var pos = ship.body.localPointToWorld(toShipCoords(Vec2.get(0, 40, true).addeq(ship.drawOffset)));
 			var dir = ship.body.localVectorToWorld(rotateVec(Vec2.get(0, 1, true)));
 			var missile = new Missile(pos, dir, ship.body.velocity);
 
-			SoundManager.playSoundAt("missile_launch", pos.copy());
+			ship.body.applyImpulse(dir.mul(-1 * RECOIL, true), pos);
+
+			SoundManager.playSoundAt("missile_launch", pos);
 			
 			// pos.dispose();
 			dir.dispose();
