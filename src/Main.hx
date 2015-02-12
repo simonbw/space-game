@@ -18,6 +18,7 @@ class Main {
 		}
 		ui.Cursor.init();
 		reset();
+    IO.addKeyDownCallback(IO.K_RESET, reset);
 	}
 
 	static public function reset():Void {
@@ -34,7 +35,6 @@ class Main {
 		} catch (error:Dynamic) {
 			trace("error: " + error);
 		}
-		IO.addKeyDownCallback(IO.K_RESET, reset);
 	}
 
 	/**

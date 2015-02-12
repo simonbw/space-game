@@ -5,33 +5,33 @@ import flash.external.ExternalInterface;
 /**
  * Mapping raw input data to actual game controls.
  */
-class Input extends Entity implements Updatable {
+ class Input extends Entity implements Updatable {
 
 	// key bindings
 	static public inline var K_FORWARD = 87;        // W
-    static public inline var K_BACKWARD = 83;       // S
-    static public inline var K_TURN_LEFT = 65;      // A
-    static public inline var K_TURN_RIGHT = 68;     // D
-    static public inline var K_STRAFE_RIGHT = 69;   // E
-    static public inline var K_STRAFE_LEFT = 81;    // Q
+	static public inline var K_BACKWARD = 83;       // S
+	static public inline var K_TURN_LEFT = 65;      // A
+	static public inline var K_TURN_RIGHT = 68;     // D
+	static public inline var K_STRAFE_RIGHT = 69;   // E
+	static public inline var K_STRAFE_LEFT = 81;    // Q
 
-    static public inline var K_SHIELD_DOWN = 84;    // T
-    static public inline var K_SHIELD_UP = 89;      // Y
-    static public inline var K_STABILIZE = 16;      // C
-    static public inline var K_MISSILE = 20;        // caps lock
-    static public inline var K_LASER = 32;          // space
-    static public inline var K_ASTEROID = 66;       // B
+	static public inline var K_SHIELD_DOWN = 84;    // T
+	static public inline var K_SHIELD_UP = 89;      // Y
+	static public inline var K_STABILIZE = 16;      // C
+	static public inline var K_MISSILE = 20;        // caps lock
+	static public inline var K_LASER = 32;          // space
+	static public inline var K_ASTEROID = 66;       // B
 
-    static public inline var K_ZOOM_IN = 187;       // +
-    static public inline var K_ZOOM_OUT = 189;      // -
-	static public inline var K_CAMERA_LOCK = 70;	// F
-    static public inline var K_FULLSCREEN = 71;     // G
-	static public inline var K_RESET = 82;		    // R
+	static public inline var K_ZOOM_IN = 187;       // +
+	static public inline var K_ZOOM_OUT = 189;      // -
+	static public inline var K_CAMERA_LOCK = 70;    // F
+	static public inline var K_FULLSCREEN = 71;     // G
+	static public inline var K_RESET = 82;          // R
 
 	// controller bindings
-	static public inline var B_LASERS = 7;			// Right Trigger
-	static public inline var B_MISSILES = 6;		// Left Trigger
-	static public inline var B_STABILIZE = 5;		// Right Bumper
+	static public inline var B_LASERS = 7;          // Right Trigger
+	static public inline var B_MISSILES = 6;        // Left Trigger
+	static public inline var B_STABILIZE = 5;       // Right Bumper
 
 	public var xAxis:Float;
 	public var yAxis:Float;
@@ -70,6 +70,5 @@ class Input extends Entity implements Updatable {
 			missiles = missiles || buttons[B_MISSILES].pressed;
 			stabilize = stabilize || buttons[B_STABILIZE].pressed;
 		}
- 	}
-
+	}
 }

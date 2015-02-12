@@ -290,7 +290,7 @@ class Game extends Sprite {
 		// Camera Control should be done elsewhere
 		if (following) {
 			camera.smoothCenter(ship.body.position, 1.0);
-			camera.angle = Math.PI - ship.body.rotation;
+			// camera.angle = Math.PI - ship.body.rotation;
 		}
 		
 		SoundManager.setEarPosition(camera.position.copy());

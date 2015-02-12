@@ -1,7 +1,4 @@
 
-
-
-
 class Explosion extends Entity implements Updatable implements Renderable {
 	public var renderDepth:Int;
 	public var lifespan:Float;
