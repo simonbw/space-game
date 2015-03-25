@@ -1,14 +1,15 @@
 {
 	"folders": [{
 		"follow_symlinks": true,
-		"path": "."
+		"path": ".",
+    "folder_exclude_patterns": ["node_modules"]
 	}],
 
 	"build_systems": [{
 		"name": "Haxe",
 		"working_dir": "$project_path",
 		"shell_cmd": "gulp",
-		// "selector": "source.coffee",
+		"selector": "source.coffee",
 		"shell": true
 	}],
 

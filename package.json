@@ -1,0 +1,19 @@
+{
+  "name": "space-game",
+  "version": "0.0.0",
+  "description": "",
+  "author": "Simon Baumgardt-Wellander",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simonbw/space-game.git"
+  },
+  "dependencies": {
+    "browserify": "^9.0.3",
+    "coffeeify": "~1.0.0",
+    "gulp": "~3.8.11",
+    "matter-js": "^0.8.0",
+    "pixi.js": "^3.0.0-rc4",
+    "vinyl-source-stream": "~1.0.0",
+    "watchify": "~2.4.0"
+  }
+}
