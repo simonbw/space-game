@@ -1,8 +1,8 @@
-Entity = require "Entity"
-p2 = require "p2"
-Pixi = require "pixi.js"
-Hull = require "ship/Hull"
-Thruster = require "ship/Thruster"
+Entity = require 'Entity'
+p2 = require 'p2'
+Pixi = require 'pixi.js'
+Hull = require 'ship/Hull'
+Thruster = require 'ship/Thruster'
 
 # A space ship
 class Ship extends Entity

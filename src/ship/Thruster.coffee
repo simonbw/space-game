@@ -1,8 +1,8 @@
-Part = require "ship/Part"
+Part = require 'ship/Part'
 
 # Provides thrust
 class Thruster extends Part
-  @type = type = new Part.Type(1, 1, 0x666666)
+  @type = type = new Part.Type('Thruster', 1, 1, 0x666666)
 
   constructor: (x, y, @direction=0) ->
     super(x, y, type)

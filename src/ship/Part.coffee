@@ -1,5 +1,5 @@
-p2 = require "p2"
-Pixi = require "pixi.js"
+p2 = require 'p2'
+Pixi = require 'pixi.js'
 
 # Base class for all ship parts
 class Part
@@ -22,11 +22,14 @@ class Part
   @property 'height',
     get: ->
       return @type.height
+  
+  toString: () =>
+    return "<#{@type} at (#{@x},#{@y})>"
 
 
 # Contains data about all parts of the same type
 class Part.Type
-  constructor: (@width=1, @height=1, @color=0xBBBBBB, @maxHealth=100) ->
+  constructor: (@name, @width=1, @height=1, @color=0xBBBBBB, @maxHealth=100) ->
     @mass = @width * @height
 
   makeShape: () =>
@@ -38,6 +41,9 @@ class Part.Type
     sprite.drawRect(0.05, 0.05, @width - 0.1, @height - 0.1)
     sprite.endFill()
     return sprite
+
+  toString: () =>
+    return @name
 
 
 # Base class for ship parts with direction

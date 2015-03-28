@@ -1,4 +1,4 @@
-Entity = require "Entity"
+Entity = require 'Entity'
 
 # Utility class that logs the framerate every 30 frames
 class FPSCounter extends Entity

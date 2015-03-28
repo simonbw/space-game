@@ -1,7 +1,7 @@
-Part = require "ship/Part"
+Part = require 'ship/Part'
 
 class Hull extends Part
-  @type = type = new Part.Type(1, 1, 0xBBBBBB, 300)
+  @type = type = new Part.Type('Hull', 1, 1, 0xBBBBBB, 300)
   
   constructor: (x, y) ->
     super(x, y, type)

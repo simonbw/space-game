@@ -1,5 +1,5 @@
-Pixi = require "pixi.js"
-Camera = require "Camera"
+Pixi = require 'pixi.js'
+Camera = require 'Camera'
 
 # The base renderer. Handles layers and camera movement.
 class GameRenderer
@@ -7,20 +7,20 @@ class GameRenderer
   # Create a new GameRenderer
   constructor: ->
     [w, h] = [window.innerWidth, window.innerHeight]
-    @pixiRenderer = Pixi.autoDetectRenderer(w, h, {antialias: true})
-    # @pixiRenderer.antiAlias = true
+    @pixiRenderer = Pixi.autoDetectRenderer(w, h, {antialias: true, })
     document.body.appendChild(@pixiRenderer.view)
     @stage = new Pixi.Container()
     @camera = new Camera(this)
-    
+
     @layerInfos = {}
+    @layerInfos['menu'] = { scroll: 0 }
     @layerInfos['hud'] = { scroll: 0 }
     @layerInfos['world_overlay'] = { scroll: 1 }
     @layerInfos['world_front'] = { scroll: 1 }
     @layerInfos['world'] = { scroll: 1 }
     @layerInfos['world_back'] = { scroll: 1 }
 
-    order = ['hud', 'world_overlay', 'world_front', 'world', 'world_back']
+    order = ['menu', 'hud', 'world_overlay', 'world_front', 'world', 'world_back']
     for name, i in order
       layerInfo = @layerInfos[name]
       layerInfo.name = name
