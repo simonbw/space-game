@@ -1,10 +1,10 @@
-Pixi = require "pixi.js"
+Pixi = require 'pixi.js'
 Matrix = Pixi.Matrix
 Point = Pixi.Point
 
 # Controls the viewport
 class Camera
-  constructor: (@renderer, @x = 0, @y = 0, @z = 10.0, @angle = 0) ->
+  constructor: (@renderer, @x = 0, @y = 0, @z = 30.0, @angle = 0) ->
     @following = null
 
   # Make the camera center on this thing every frame
@@ -21,29 +21,25 @@ class Camera
     return [@renderer.pixiRenderer.width, @renderer.pixiRenderer.height]
 
   # Convert screen coordinates to world coordinates
-  toWorld: (x, y) =>
+  toWorld: ([x, y], depth = 1.0) =>
     [w, h] = @getViewportSize()
-    if not x?
-      y = x.y
-      x = x.x
     p = new Point(x, y)
-    return @getMatrix().apply(p, p)
+    p = @getMatrix(depth).applyInverse(p, p)
+    return [p.x, p.y]
 
   # Convert world coordinates to screen coordinates
-  toScreen: (x, y) =>
+  toScreen: ([x, y], depth = 1.0) =>
     [w, h] = @getViewportSize()
-    if not x?
-      y = x.y
-      x = x.x
     p = new Point(x, y)
-    return @getMatrix().applyInverse(p, p)
+    p = @getMatrix(depth).apply(p, p)
+    return [p.x, p.y]
 
-  # Creates a transformation matrix to go from screen space to world space.
-  getMatrix: (scale = 1.0) =>
+  # Creates a transformation matrix to go from screen world space to screen space.
+  getMatrix: (depth = 1.0) =>
     [w, h] = @getViewportSize()
     m = new Matrix()
-    m.translate(-@x, -@y)
-    m.scale(@z * scale, @z * scale)
+    m.translate(-@x * depth, -@y * depth)
+    m.scale(@z * depth, @z * depth)
     m.rotate(@angle)
     m.translate(w / 2, h / 2)
     return m
@@ -53,13 +49,11 @@ class Camera
     layer = layerInfo.layer
     [w, h] = @getViewportSize()
 
-    p = @toWorld(0, 0)
-
-    layer.x = p.x
-    layer.y = p.y
+    # [layer.x, layer.y] = [-@x + w / 2, -@y + h / 2]
+    [layer.x, layer.y] = @toScreen([0, 0])
 
     layer.rotation = @angle
     layer.scale.x = @z
-    layer.scale.y = -@z
+    layer.scale.y = @z
 
 module.exports = Camera
