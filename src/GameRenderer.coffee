@@ -43,6 +43,6 @@ class GameRenderer
 
   # Remove a child from a specific layer.
   remove: (sprite, layer='world') =>
-    @layers[layer.toLowerCase()].removeChild(sprite)
+    @layerInfos[layer.toLowerCase()].layer.removeChild(sprite)
 
 module.exports = GameRenderer

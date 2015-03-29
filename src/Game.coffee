@@ -44,12 +44,14 @@ class Game
     if entity.afterTick? then @entities.afterTick.push(entity)
     if entity.sprite? then @renderer.add(entity.sprite, entity.layer)
     if entity.body? then @world.addBody(entity.body)
-    if entity.onClick? then @io.on('click', entity.onClick)
-    if entity.onMouseDown? then @io.on('mousedown', entity.onMouseDown)
-    if entity.onMouseUp? then @io.on('mousedown', entity.onMouseUp)
-    if entity.onRightClick? then @io.on('rightclick', entity.onRightClick)
-    if entity.onRightDown? then @io.on('rightdown', entity.onRightDown)
-    if entity.onRightUp? then @io.on('rightdown', entity.onRightUp)
+    
+    if entity.onClick? then @io.on(IO.CLICK, entity.onClick)
+    if entity.onMouseDown? then @io.on(IO.MOUSE_DOWN, entity.onMouseDown)
+    if entity.onMouseUp? then @io.on(IO.MOUSE_UP, entity.onMouseUp)
+    if entity.onRightClick? then @io.on(IO.RIGHT_CLICK, entity.onRightClick)
+    if entity.onRightDown? then @io.on(IO.RIGHT_DOWN, entity.onRightDown)
+    if entity.onRightUp? then @io.on(IO.RIGHT_UP, entity.onRightUp)
+    if entity.onKeyDown? then @io.on(IO.KEY_DOWN, entity.onKeyDown)
 
     if entity.afterAdded? then entity.afterAdded(this)
 
@@ -75,12 +77,13 @@ class Game
       if entity.body?
         @world.removeBody(entity.body)
 
-      if entity.onClick? then @io.off('click', entity.onClick)
-      if entity.onMouseDown? then @io.off('mousedown', entity.onMouseDown)
-      if entity.onMouseUp? then @io.off('mousedown', entity.onMouseUp)
-      if entity.onRightClick? then @io.off('rightclick', entity.onRightClick)
-      if entity.onRightDown? then @io.off('rightdown', entity.onRightDown)
-      if entity.onRightUp? then @io.off('rightdown', entity.onRightUp)
+      if entity.onClick? then @io.off(IO.CLICK, entity.onClick)
+      if entity.onMouseDown? then @io.off(IO.MOUSE_DOWN, entity.onMouseDown)
+      if entity.onMouseUp? then @io.off(IO.MOUSE_UP, entity.onMouseUp)
+      if entity.onRightClick? then @io.off(IO.RIGHT_CLICK, entity.onRightClick)
+      if entity.onRightDown? then @io.off(IO.RIGHT_DOWN, entity.onRightDown)
+      if entity.onRightUp? then @io.off(IO.RIGHT_UP, entity.onRightUp)
+      if entity.onKeyDown? then @io.off(IO.KEY_DOWN, entity.onKeyDown)
       
       if entity.destroyed?
         entity.destroyed(this)

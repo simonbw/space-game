@@ -1,14 +1,16 @@
+Blueprint = require 'ship/Blueprint'
 Entity = require 'Entity'
+Hull = require 'ship/Hull'
 p2 = require 'p2'
 Pixi = require 'pixi.js'
-Hull = require 'ship/Hull'
 Thruster = require 'ship/Thruster'
 
 # A space ship
 class Ship extends Entity
   BASE_MASS = 0.1
 
-  constructor: (x = 0, y = 0) ->
+  constructor: (@blueprint, x = 0, y = 0) ->
+    @blueprint ?= new Blueprint
     @sprite = new Pixi.Graphics()
     @layer = 'world'
     @parts = []
@@ -24,15 +26,8 @@ class Ship extends Entity
       # angle: Math.PI
     })
 
-    @addPart(new Hull(2, 1))
-    @addPart(new Thruster(2, -1))
-    @addPart(new Hull(2, 0))
-    @addPart(new Hull(1, 0))
-    @addPart(new Hull(0, 0))
-    @addPart(new Hull(-1, 0))
-    @addPart(new Hull(-2, 0))
-    @addPart(new Hull(-2, 1))
-    @addPart(new Thruster(-2, -1))
+    for part in @blueprint.parts
+      @addPart(part.clone())
 
   render: () =>
     @sprite.x = @body.position[0] + @offset[0]
@@ -45,6 +40,7 @@ class Ship extends Entity
 
   # Add a Part to this ship
   addPart: (part) =>
+    console.log "Ship added #{part}"
     @parts.push(part)
     if part.tick?
       @tickableParts.push(part)
@@ -93,7 +89,7 @@ class Ship extends Entity
     [x1, y1] = center
     cosTheta = Math.cos(@body.angle)
     sinTheta = Math.sin(@body.angle)
-    x2 = x1 * cosTheta - y * cosTheta
+    x2 = x1 * cosTheta - y * sinTheta
     y2 = x1 * sinTheta + y1 * cosTheta
     @body.position[0] += x2
     @body.position[1] += y2
@@ -103,6 +99,8 @@ class Ship extends Entity
 
     @body.updateMassProperties()
     @body.updateBoundingRadius()
+
+    console.log "recentered, (#{center}), (#{x2}, #{y2})"
 
   # Convert grid coordinates to local physics coordinates
   gridToLocal: (point) =>

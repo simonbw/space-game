@@ -7,8 +7,8 @@ class Part
     @shape = @type.makeShape()
     @shape.owner = this
     @sprite = @type.makeSprite()
-    @sprite.x = @x - @width / 2
-    @sprite.y = @y - @height / 2
+    @sprite.x = @x
+    @sprite.y = @y
     @health = @type.maxHealth
  
   @property 'mass',
@@ -22,7 +22,14 @@ class Part
   @property 'height',
     get: ->
       return @type.height
+
+  @property 'maxHealth',
+    get: ->
+      return @type.maxHealth
   
+  clone: () =>
+    return new Part(@x, @y, @type)
+
   toString: () =>
     return "<#{@type} at (#{@x},#{@y})>"
 
@@ -38,17 +45,12 @@ class Part.Type
   makeSprite: () =>
     sprite = new Pixi.Graphics()
     sprite.beginFill(@color)
-    sprite.drawRect(0.05, 0.05, @width - 0.1, @height - 0.1)
+    sprite.drawRect(-0.5 * @width, -0.5 * @height, @width, @height)
     sprite.endFill()
     return sprite
 
   toString: () =>
     return @name
 
-
-# Base class for ship parts with direction
-class Part.Directional
-  constructor: (x, y, type, @direction=0) ->
-    super(x, y, type)
 
 module.exports = Part

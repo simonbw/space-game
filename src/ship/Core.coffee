@@ -7,4 +7,7 @@ class Core extends Part
   constructor: (x=0, y=0) ->
     super(x, y, type)
 
+  clone: () =>
+    return new Core(@x, @y)
+
 module.exports = Core

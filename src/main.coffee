@@ -7,6 +7,7 @@ Game = require 'Game'
 Ship = require 'ship/Ship'
 Blueprint = require 'ship/Blueprint'
 BlueprintEditor = require 'BlueprintEditor'
+Hull = require 'ship/Hull'
 FPSCounter = require 'util/FPSCounter'
 
 window.onload = ->
@@ -20,5 +21,8 @@ window.onload = ->
   # ship = new Ship()
   # game.addEntity(ship)
 
-  blueprint = new Blueprint()
-  game.addEntity(new BlueprintEditor(blueprint))
+  callback = (bp) ->
+    ship = new Ship(bp)
+    game.addEntity(ship)
+
+  game.addEntity(new BlueprintEditor(new Blueprint, callback))
