@@ -13,8 +13,8 @@ class Camera
 
   tick: =>
     if @following?
-      @x = @following.x
-      @y = @following.y
+      [@x, @y] = @following.position
+      # console.log [@x, @y]
 
   # Returns [width, height] of the viewport
   getViewportSize: =>
@@ -46,14 +46,12 @@ class Camera
 
   # Update the properties of a renderer layer to match this camera
   updateLayer: (layerInfo) =>
-    layer = layerInfo.layer
-    [w, h] = @getViewportSize()
-
-    # [layer.x, layer.y] = [-@x + w / 2, -@y + h / 2]
-    [layer.x, layer.y] = @toScreen([0, 0])
-
-    layer.rotation = @angle
-    layer.scale.x = @z
-    layer.scale.y = @z
+    scroll = layerInfo.scroll
+    if scroll != 0
+      layer = layerInfo.layer
+      [w, h] = @getViewportSize()
+      [layer.x, layer.y] = @toScreen([0, 0])
+      layer.rotation = @angle
+      layer.scale.set(@z, @z)
 
 module.exports = Camera

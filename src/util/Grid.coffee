@@ -5,17 +5,17 @@ class Grid
     @data = {}
 
   # Set a value at a location
-  set: (x, y, value) =>
+  set: ([x, y], value) =>
     @data[x] ?= {}
     @data[x][y] = value
 
   # Get a value at a location or undefined.
-  get: (x, y) =>
+  get: ([x, y]) =>
     @data[x] ?= {}
     return @data[x][y]
 
   # Delete the value at a location
-  remove: (x, y) =>
+  remove: ([x, y]) =>
     @data[x] ?= {}
     delete @data[x][y]
     

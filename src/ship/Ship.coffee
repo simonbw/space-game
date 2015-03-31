@@ -3,35 +3,48 @@ Entity = require 'Entity'
 Hull = require 'ship/Hull'
 p2 = require 'p2'
 Pixi = require 'pixi.js'
+ThrustBalancer = require 'ship/ThrustBalancer'
 Thruster = require 'ship/Thruster'
+Util = require 'util/Util'
 
 # A space ship
 class Ship extends Entity
   BASE_MASS = 0.1
 
   constructor: (@blueprint, x = 0, y = 0) ->
-    @blueprint ?= new Blueprint
+    @blueprint ?= new Blueprint()
     @sprite = new Pixi.Graphics()
     @layer = 'world'
     @parts = []
     # TODO: Parts Grid - part locations
     # TODO: Part connections
     @tickableParts = []
-    @thrustBalancer = new ThrustBalancer()
+    @thrustBalancer = new ThrustBalancer(this)
 
-    @offset = [0, 0] # offset of all the shapes
+    # local vector from center of mass to center of grid
+    @offset = [0, 0]
+
     @body = new p2.Body({
       position: [x, y]
       mass: BASE_MASS
-      # angle: Math.PI
+      angularDamping: 0.01
+      damping: 0.0
     })
 
     for part in @blueprint.parts
       @addPart(part.clone())
 
+  @property 'position',
+    get: ->
+      return @body.position
+  
   render: () =>
-    @sprite.x = @body.position[0] + @offset[0]
-    @sprite.y = @body.position[1] + @offset[1]
+    @sprite.clear()
+    @sprite.beginFill(0x00FFFF)
+    @sprite.drawCircle(-@offset[0], -@offset[1], 0.1)
+    @sprite.endFill()
+
+    [@sprite.x, @sprite.y] = @gridToWorld([0, 0])
     @sprite.rotation = @body.angle
 
   tick: () =>
@@ -40,7 +53,6 @@ class Ship extends Entity
 
   # Add a Part to this ship
   addPart: (part) =>
-    console.log "Ship added #{part}"
     @parts.push(part)
     if part.tick?
       @tickableParts.push(part)
@@ -55,7 +67,10 @@ class Ship extends Entity
       shapePosition = [part.x + @offset[0], part.y + @offset[1]]
       @body.addShape(part.shape, shapePosition, angle)
       @body.mass += part.mass
-      @recenter() # TODO: don't redo the whole calculation
+      @recenter()
+
+    if part.type.thruster
+      @thrustBalancer.addThruster(part)
 
   removePart: (part) =>
     @parts.splice(@parts.indexOf(part), 1)
@@ -65,42 +80,21 @@ class Ship extends Entity
       @sprite.removeChild(part.sprite)
     if part.shape?
       @body.removeShape(part.shape)
+    if part.type.thruster
+      @thrustBalancer.removeThruster(part)
     @body.mass -= part.mass
-    @recenter() # TODO: don't redo the whole calculation
+    @recenter()
 
   # Recalculate the center of mass
   recenter: =>
-    # do something to offset
-    center = [0, 0] # the local center of mass
-    
-    totalMass = @body.mass - BASE_MASS
-    for shape, i in @body.shapes
-      mass = shape.owner.mass
-      [x, y] = @body.shapeOffsets[i]
-      center[0] += x * mass / totalMass
-      center[1] += y * mass / totalMass
-
-    for shape, j in @body.shapes
-      # console.log center
-      [a, b] = center
-      @body.shapeOffsets[j][0] += -1 * a
-      @body.shapeOffsets[j][1] += -1 * b
-
-    [x1, y1] = center
-    cosTheta = Math.cos(@body.angle)
-    sinTheta = Math.sin(@body.angle)
-    x2 = x1 * cosTheta - y * sinTheta
-    y2 = x1 * sinTheta + y1 * cosTheta
-    @body.position[0] += x2
-    @body.position[1] += y2
-
-    @offset[0] -= center[0]
-    @offset[1] -= center[1]
-
-    @body.updateMassProperties()
-    @body.updateBoundingRadius()
-
-    console.log "recentered, (#{center}), (#{x2}, #{y2})"
+    before = [@body.position[0], @body.position[1]]
+    @body.adjustCenterOfMass()
+    dx = @body.position[0] - before[0]
+    dy = @body.position[1] - before[1]
+    beforeLocal = @worldToLocal(before)
+    @offset[0] += beforeLocal[0]
+    @offset[1] += beforeLocal[1]
+    console.log "recentered: #{beforeLocal[0]}, #{beforeLocal[1]}"
 
   # Convert grid coordinates to local physics coordinates
   gridToLocal: (point) =>
@@ -112,25 +106,34 @@ class Ship extends Entity
     @body.toWorldFrame(world, point)
     return world
 
+  # Convert world coordinates to local physics coordinates
+  worldToLocal: (point) =>
+    local = [0, 0]
+    @body.toLocalFrame(local, point)
+    return local
+
   # Convert ship grid coordinates to world coordinates
   gridToWorld: (point) =>
     return @localToWorld(@gridToLocal(point))
 
-# Controls the thrusters
-class ThrustBalancer
-  constructor: () ->
-    @thrusters = []
+  # Return the velocity of the ship at a world point
+  velocityAtWorldPoint: (point) =>
+    # base linear velocity
+    [xl, yl] = @body.velocity
 
-  addThruster: (thruster) =>
-    @thrusters.add(thruster)
+    # relative position
+    x = point[0] - @body.position[0]
+    y = point[1] - @body.position[1]
 
-  removeThruster: (thruster) =>
-    @thrusters.splice(@thrusters.indexOf(thruster), 1)
+    # relative angle
+    theta = Math.atan2(y, x) + Math.PI / 2
 
-  balance: (forward=0, strafe=0, angle=0) =>
-    for thruster in @thrusters
-      thruster.setThrust(0)
+    # tangential velocity
+    r = Math.sqrt(x * x + y * y)
+    tangentialSpeed = @body.angularVelocity * r
+    xt = Math.cos(theta) * tangentialSpeed
+    yt = Math.sin(theta) * tangentialSpeed
 
-
+    return [xl + xt, yl + yt]
 
 module.exports = Ship

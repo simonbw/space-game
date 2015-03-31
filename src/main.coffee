@@ -3,12 +3,16 @@
 Function::property = (prop, desc) ->
   Object.defineProperty this.prototype, prop, desc
 
-Game = require 'Game'
-Ship = require 'ship/Ship'
 Blueprint = require 'ship/Blueprint'
 BlueprintEditor = require 'BlueprintEditor'
-Hull = require 'ship/Hull'
 FPSCounter = require 'util/FPSCounter'
+Game = require 'Game'
+Hull = require 'ship/Hull'
+Person = require 'Person'
+PlayerShipController = require 'PlayerShipController'
+PlayerPersonController = require 'PlayerPersonController'
+Ship = require 'ship/Ship'
+ShipHud = require 'ShipHud'
 
 window.onload = ->
   console.log "loaded"
@@ -22,7 +26,17 @@ window.onload = ->
   # game.addEntity(ship)
 
   callback = (bp) ->
-    ship = new Ship(bp)
+    game.camera.z = 20
+    window.ship = new Ship(bp)
+    person = new Person()
+    person.board(ship)
+    # controller = new PlayerPersonController(person)
+    controller = new PlayerShipController(ship)
+    hud = new ShipHud(ship)
     game.addEntity(ship)
+    game.addEntity(person)
+    game.addEntity(controller)
+    game.addEntity(hud)
+    game.camera.follow(ship)
 
   game.addEntity(new BlueprintEditor(new Blueprint, callback))

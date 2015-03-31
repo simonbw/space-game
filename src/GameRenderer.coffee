@@ -7,7 +7,7 @@ class GameRenderer
   # Create a new GameRenderer
   constructor: ->
     [w, h] = [window.innerWidth, window.innerHeight]
-    @pixiRenderer = Pixi.autoDetectRenderer(w, h, {antialias: true, })
+    @pixiRenderer = Pixi.autoDetectRenderer(w, h, {antialias: false})
     document.body.appendChild(@pixiRenderer.view)
     @stage = new Pixi.Container()
     @camera = new Camera(this)

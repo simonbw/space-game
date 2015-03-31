@@ -1,4 +1,5 @@
 
+# Manages 
 class IO
   @LMB = LMB = 0
   @RMB = RMB = 2
@@ -16,6 +17,7 @@ class IO
   @MOUSE_DOWN = MOUSE_DOWN = 'mousedown'
   @MOUSE_MOVE = MOUSE_MOVE = 'mousemove'
   @KEY_DOWN = KEY_DOWN = 'keydown'
+  @KEY_UP = KEY_UP = 'keyup'
 
   constructor: (@view) ->
     @view.onclick = @click
@@ -24,10 +26,15 @@ class IO
     @view.onmousemove = @mousemove
     @view.onmousemove = @mousemove
     document.onkeydown = @keydown
+    document.onkeyup = @keyup
     @view.oncontextmenu = (e) =>
       e.preventDefault()
       @click(e)
       false
+
+    @keys = []
+    for i in [0..256]
+      @keys.push(false)
 
     @mousePosition = [0, 0]
 
@@ -40,6 +47,9 @@ class IO
     @callbacks[MOUSE_DOWN] = []
     @callbacks[MOUSE_MOVE] = []
     @callbacks[KEY_DOWN] = []
+    @callbacks[KEY_UP] = []
+
+    @buttons = [false, false, false, false, false ,false]
 
   # Add an event handler
   on: (e, callback) =>
@@ -70,6 +80,7 @@ class IO
   # Call all mousedown handlers
   mousedown: (e) =>
     @mousePosition = [e.clientX, e.clientY]
+    @buttons[e.button] = true
     switch e.button
       when LMB
         for callback in @callbacks[MOUSE_UP]
@@ -81,6 +92,7 @@ class IO
   # Call all mouseup handlers
   mouseup: (e) =>
     @mousePosition = [e.clientX, e.clientY]
+    @buttons[e.button] = false
     switch e.button
       when LMB
         for callback in @callbacks[MOUSE_DOWN]
@@ -89,9 +101,21 @@ class IO
         for callback in @callbacks[RIGHT_DOWN]
           callback(@mousePosition)
 
+  # Handle key down
   keydown: (e) =>
-    for callback in @callbacks[KEY_DOWN]
-      callback(e.which)
+    key = e.which
+    wasPressed = @keys[key]
+    @keys[key] = true
+    if not wasPressed
+      for callback in @callbacks[KEY_DOWN]
+        callback(key)
+
+  # Handle key up
+  keyup: (e) =>
+    key = e.which
+    @keys[key] = false
+    for callback in @callbacks[KEY_UP]
+      callback(key)
 
 
 module.exports = IO

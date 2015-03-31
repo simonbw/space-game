@@ -16,24 +16,21 @@ class Blueprint extends Entity
 
   # Add a Part to this blueprint
   addPart: (part) =>
-    console.log "Adding part #{part}"
     @parts.push(part)
     angle = if part.direction? then Math.PI / 2 * part.direction else 0
     if part.sprite?
       @sprite.addChild(part.sprite)
-      @sprite.rotation = angle
 
-    @partGrid.set(part.x, part.y, part)
+    @partGrid.set([part.x, part.y], part)
     return part
   
   # Take a part off this blueprint
   removePart: (part) =>
-    console.log "Removing part #{part}"
     @parts.splice(@parts.indexOf(part), 1)
     if part.sprite?
       @sprite.removeChild(part.sprite)
     
-    @partGrid.remove(part.x, part.y)
+    @partGrid.remove([part.x, part.y])
 
     return part
 
