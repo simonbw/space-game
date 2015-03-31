@@ -1,5 +1,6 @@
 Blueprint = require 'ship/Blueprint'
 Entity = require 'Entity'
+Grid = require 'util/Grid'
 Hull = require 'ship/Hull'
 p2 = require 'p2'
 Pixi = require 'pixi.js'
@@ -16,7 +17,7 @@ class Ship extends Entity
     @sprite = new Pixi.Graphics()
     @layer = 'world'
     @parts = []
-    # TODO: Parts Grid - part locations
+    @partGrid = new Grid()
     # TODO: Part connections
     @tickableParts = []
     @thrustBalancer = new ThrustBalancer(this)
@@ -54,6 +55,7 @@ class Ship extends Entity
   # Add a Part to this ship
   addPart: (part) =>
     @parts.push(part)
+    @partGrid.set([part.x, part.y], part)
     if part.tick?
       @tickableParts.push(part)
     
@@ -74,6 +76,7 @@ class Ship extends Entity
 
   removePart: (part) =>
     @parts.splice(@parts.indexOf(part), 1)
+    @partGrid.remove([part.x, part.y])
     if part.tick?
       @tickableParts.splice(@tickableParts.indexOf(part), 1)
     if part.sprite?
@@ -94,11 +97,14 @@ class Ship extends Entity
     beforeLocal = @worldToLocal(before)
     @offset[0] += beforeLocal[0]
     @offset[1] += beforeLocal[1]
-    console.log "recentered: #{beforeLocal[0]}, #{beforeLocal[1]}"
 
   # Convert grid coordinates to local physics coordinates
   gridToLocal: (point) =>
     return [point[0] + @offset[0], point[1] + @offset[1]]
+
+  # Convert local physics coordinates to grid coordinates 
+  localToGrid: (point) =>
+    return [point[0] - @offset[0], point[1] - @offset[1]]
 
   # Convert local physics coordinates to world coordinates
   localToWorld: (point) =>
@@ -115,6 +121,24 @@ class Ship extends Entity
   # Convert ship grid coordinates to world coordinates
   gridToWorld: (point) =>
     return @localToWorld(@gridToLocal(point))
+
+  # Convert world coordinates to ship grid coordinates
+  worldToGrid: (point) =>
+    return @localToGrid(@worldToLocal(point))
+
+  # Return the part at a grid point or undefined
+  partAtGrid: ([x, y]) =>
+    x = Math.round(x)
+    y = Math.round(y)
+    return @partGrid.get([x, y])
+
+  # Return the part at a local point or undefined
+  partAtLocal: (point) =>
+    return @partAtGrid(@localToGrid(point))
+    
+  # Return the part at a world point or undefined
+  partAtWorld: (point) =>
+    return @partAtGrid(@worldToGrid(point))
 
   # Return the velocity of the ship at a world point
   velocityAtWorldPoint: (point) =>

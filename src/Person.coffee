@@ -7,8 +7,9 @@ Pixi = require 'pixi.js'
 class Person extends Entity
   RADIUS = 0.1
   WALK_FORCE = 5
-  JETPACK_FORCE = 0.3
-  MAXIMUM_FRICTION = 10
+  WALK_FRICTION = 0.4
+  JETPACK_FORCE = 0.4
+  MAXIMUM_FRICTION = 1.0
 
   constructor: (x=0, y=0, ship=null) ->
     @body = new p2.Body({
@@ -41,29 +42,45 @@ class Person extends Entity
       @shipPosition = null
 
   move: ([x, y]) =>
-    speed = if @ship? then WALK_FORCE else JETPACK_FORCE
-    @body.force[0] += x * speed
-    @body.force[1] += y * speed
+    part = @getPart()
+    speed = if part? then WALK_FORCE else JETPACK_FORCE
+    [fx, fy] = [x * speed, y * speed]
+    @body.force[0] += fx
+    @body.force[1] += fy
+    if part?
+      @ship.body.applyForce([-fx, -fy], @position)
 
   render: () =>
     [@sprite.x, @sprite.y] = @body.position
 
+  getPart: () =>
+    if not ship? then return undefined
+    return @ship.partAtWorld(@position)
+
   tick: () =>
-    if @ship?
+    part = @getPart()
+    if part?
       shipVelocity = @ship.velocityAtWorldPoint(@position)
 
-      dx = shipVelocity[0] - @body.velocity[0]
-      dy = shipVelocity[1] - @body.velocity[1]
+      fx = shipVelocity[0] - @body.velocity[0]
+      fy = shipVelocity[1] - @body.velocity[1]
 
-      dx *= 0.5
-      dy *= 0.5
+      friction = WALK_FRICTION
+      fx *= friction
+      fy *= friction
 
-      magnitude = Math.sqrt(dx * dx + dy * dy)
+      magnitude = Math.sqrt(fx * fx + fy * fy)
       if magnitude > MAXIMUM_FRICTION
-        dx *= MAXIMUM_FRICTION / magnitude
-        dy *= MAXIMUM_FRICTION / magnitude
+        fx *= MAXIMUM_FRICTION / magnitude
+        fy *= MAXIMUM_FRICTION / magnitude
 
-      @body.force[0] += dx / @body.mass
-      @body.force[1] += dy / @body.mass
+      fx /= @body.mass
+      fy /= @body.mass
+
+      @body.force[0] += fx
+      @body.force[1] += fy
+
+      # Equal and opposite force on the ship
+      @ship.body.applyForce([-fx, -fy], @position)
 
 module.exports = Person

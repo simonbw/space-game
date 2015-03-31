@@ -21,10 +21,8 @@ class Part
   makeShape: () =>
     shape = new p2.Rectangle(@width, @height)
     if @type.interior
-      console.log "interior part"
       shape.collisionGroup = CollisionGroups.SHIP_INTERIOR
     else
-      console.log "exterior part"
       shape.collisionGroup = CollisionGroups.SHIP_EXTERIOR
     shape.collisionMask = CollisionGroups.ALL
     return shape
