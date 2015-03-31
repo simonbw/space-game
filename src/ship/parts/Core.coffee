@@ -1,4 +1,4 @@
-Part = require 'ship/Part'
+Part = require 'ship/parts/Part'
 
 # The core of every ship. This should never be destroyed.
 class Core extends Part

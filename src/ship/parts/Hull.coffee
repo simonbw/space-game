@@ -1,4 +1,4 @@
-Part = require 'ship/Part'
+Part = require 'ship/parts/Part'
 
 # Basic building block
 class Hull extends Part

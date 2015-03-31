@@ -1,11 +1,11 @@
 Blueprint = require 'ship/Blueprint'
 Entity = require 'Entity'
 Grid = require 'util/Grid'
-Hull = require 'ship/Hull'
+Hull = require 'ship/parts/Hull'
 p2 = require 'p2'
 Pixi = require 'pixi.js'
 ThrustBalancer = require 'ship/ThrustBalancer'
-Thruster = require 'ship/Thruster'
+Thruster = require 'ship/parts/Thruster'
 Util = require 'util/Util'
 
 # A space ship

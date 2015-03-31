@@ -1,4 +1,4 @@
-Core = require 'ship/Core'
+Core = require 'ship/parts/Core'
 Entity = require 'Entity'
 Grid = require 'util/Grid'
 Pixi = require 'pixi.js'

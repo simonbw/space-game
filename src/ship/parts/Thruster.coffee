@@ -1,4 +1,4 @@
-Part = require 'ship/Part'
+Part = require 'ship/parts/Part'
 
 type = new Part.Type('Thruster', 1, 1, 0x666666)
 type.directional = true
