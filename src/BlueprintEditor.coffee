@@ -1,10 +1,10 @@
-Core = require 'ship/Core'
+Core = require 'ship/parts/Core'
 Entity = require 'Entity'
-Hull = require 'ship/Hull'
-Interior = require 'ship/Interior'
+Hull = require 'ship/parts/Hull'
+Interior = require 'ship/parts/Interior'
 IO = require 'IO'
 Pixi = require 'pixi.js'
-Thruster = require 'ship/Thruster'
+Thruster = require 'ship/parts/Thruster'
 Util = require 'util/Util'
 
 class PartLabel extends Entity

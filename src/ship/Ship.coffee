@@ -4,6 +4,7 @@ Grid = require 'util/Grid'
 Hull = require 'ship/parts/Hull'
 p2 = require 'p2'
 Pixi = require 'pixi.js'
+RoomManager = require 'ship/RoomManager'
 ThrustBalancer = require 'ship/ThrustBalancer'
 Thruster = require 'ship/parts/Thruster'
 Util = require 'util/Util'
@@ -21,6 +22,7 @@ class Ship extends Entity
     # TODO: Part connections
     @tickableParts = []
     @thrustBalancer = new ThrustBalancer(this)
+    @roomManager = new RoomManager(this)
 
     # local vector from center of mass to center of grid
     @offset = [0, 0]
@@ -71,12 +73,15 @@ class Ship extends Entity
       @body.mass += part.mass
       @recenter()
 
+    @roomManager.partAdded(part)
+
     if part.type.thruster
       @thrustBalancer.addThruster(part)
 
   removePart: (part) =>
     @parts.splice(@parts.indexOf(part), 1)
     @partGrid.remove([part.x, part.y])
+    @roomManager.partRemoved(part)
     if part.tick?
       @tickableParts.splice(@tickableParts.indexOf(part), 1)
     if part.sprite?
@@ -102,7 +107,7 @@ class Ship extends Entity
   gridToLocal: (point) =>
     return [point[0] + @offset[0], point[1] + @offset[1]]
 
-  # Convert local physics coordinates to grid coordinates 
+  # Convert local physics coordinates to grid coordinates
   localToGrid: (point) =>
     return [point[0] - @offset[0], point[1] - @offset[1]]
 

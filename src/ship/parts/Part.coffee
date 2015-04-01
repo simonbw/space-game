@@ -1,10 +1,12 @@
+CollisionGroups = require 'CollisionGroups'
 p2 = require 'p2'
 Pixi = require 'pixi.js'
-CollisionGroups = require 'CollisionGroups'
 
+partCount = 0
 # Base class for all ship parts
 class Part
   constructor: (@x, @y, @type) ->
+    @partId = partCount++
     @shape = @makeShape()
     @shape.owner = this
     @sprite = @makeSprite()
@@ -13,11 +15,15 @@ class Part
     @health = @maxHealth
 
   # Expose fields from the type
-  ['mass', 'width', 'height', 'maxHealth'].forEach (field) ->
+  ['mass', 'width', 'height', 'maxHealth', 'interior'].forEach (field) ->
     Part.property field,
       get: ->
         return @type[field]
-  
+
+  @property 'position',
+    get: ->
+      return [@x, @y]
+      
   makeShape: () =>
     shape = new p2.Rectangle(@width, @height)
     if @type.interior
@@ -33,6 +39,18 @@ class Part
     sprite.drawRect(-0.5 * @width, -0.5 * @height, @width, @height)
     sprite.endFill()
     return sprite
+
+  getAdjacentPoints: () =>
+    return [[@x + 1, @y], [@x, @y + 1], [@x - 1, @y], [@x, @y - 1]]
+
+  # 
+  getAdjacentParts: (ship, withNull=false) =>
+    parts = []
+    for point in @getAdjacentPoints()
+      part = ship.partAtGrid(point)
+      if withNull or part?
+        parts.push(part)
+    return parts
 
   clone: () =>
     return new Part(@x, @y, @type)

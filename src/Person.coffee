@@ -43,11 +43,12 @@ class Person extends Entity
 
   move: ([x, y]) =>
     part = @getPart()
-    speed = if part? then WALK_FORCE else JETPACK_FORCE
+    floor = @getFloor()
+    speed = if floor then WALK_FORCE else JETPACK_FORCE
     [fx, fy] = [x * speed, y * speed]
     @body.force[0] += fx
     @body.force[1] += fy
-    if part?
+    if floor
       @ship.body.applyForce([-fx, -fy], @position)
 
   render: () =>
@@ -57,9 +58,12 @@ class Person extends Entity
     if not ship? then return undefined
     return @ship.partAtWorld(@position)
 
-  tick: () =>
+  getFloor: () =>
     part = @getPart()
-    if part?
+    return part? and part.room? and part.room.sealed
+
+  tick: () =>
+    if @getFloor()
       shipVelocity = @ship.velocityAtWorldPoint(@position)
 
       fx = shipVelocity[0] - @body.velocity[0]

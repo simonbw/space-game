@@ -11,7 +11,8 @@ class Grid
 
   # Get a value at a location or undefined.
   get: ([x, y]) =>
-    @data[x] ?= {}
+    if not @data.hasOwnProperty(x)
+      return undefined
     return @data[x][y]
 
   # Delete the value at a location

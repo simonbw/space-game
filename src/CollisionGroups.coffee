@@ -12,6 +12,4 @@ class CollisionGroups
   @ALL = group [0...16]...
   @OBSTACLES = @ALL ^ @SHIP_INTERIOR
 
-console.log CollisionGroups.OBSTACLES
-
 module.exports = CollisionGroups

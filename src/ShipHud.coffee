@@ -12,9 +12,6 @@ class ShipHud extends Entity
     })
     @sprite.addChild(@text)
 
-  added: () =>
-    console.log 'added'
-
   # Make the string to be displayed by the hud
   makeText: () =>
     velocity = @ship.body.velocity
