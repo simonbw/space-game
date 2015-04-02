@@ -2,48 +2,72 @@ CollisionGroups = require 'CollisionGroups'
 p2 = require 'p2'
 Pixi = require 'pixi.js'
 
+# A count of all parts created ever
 partCount = 0
+
 # Base class for all ship parts
 class Part
-  constructor: (@x, @y, @type) ->
+
+  # Default Properties
+  color: 0xFFFFFF
+  directional: false
+  height: 1
+  interior: false
+  mass: 1
+  maxHealth: 100
+  name: 'Ship Part'
+  width: 1
+
+  constructor: (@position) ->
     @partId = partCount++
     @shape = @makeShape()
     @shape.owner = this
     @sprite = @makeSprite()
-    @sprite.x = @x
-    @sprite.y = @y
+    [@sprite.x, @sprite.y] = @position
     @health = @maxHealth
 
-  # Expose fields from the type
-  ['mass', 'width', 'height', 'maxHealth', 'interior'].forEach (field) ->
-    Part.property field,
-      get: ->
-        return @type[field]
-
-  @property 'position',
+  # Grid position of this part
+  @property 'x',
     get: ->
-      return [@x, @y]
-      
+      return @position[0]
+    set: (val) ->
+      @position[0] = val
+
+  # Grid position of this part
+  @property 'y',
+    get: ->
+      return @position[1]
+    set: (val) ->
+      @position[1] = val
+  
+  # Create the physics shape
   makeShape: () =>
     shape = new p2.Rectangle(@width, @height)
-    if @type.interior
+    if @interior
       shape.collisionGroup = CollisionGroups.SHIP_INTERIOR
     else
       shape.collisionGroup = CollisionGroups.SHIP_EXTERIOR
     shape.collisionMask = CollisionGroups.ALL
     return shape
 
+  # Create the sprite
   makeSprite: () =>
     sprite = new Pixi.Graphics()
-    sprite.beginFill(@type.color)
+    sprite.beginFill(@color)
     sprite.drawRect(-0.5 * @width, -0.5 * @height, @width, @height)
     sprite.endFill()
+    if @directional
+      sprite.rotation = (@direction + 2) * Math.PI / 2
     return sprite
 
+  # Return a list of grid points that are adjacent to this part.
   getAdjacentPoints: () =>
     return [[@x + 1, @y], [@x, @y + 1], [@x - 1, @y], [@x, @y - 1]]
 
+  # Return an array of adjacent parts
   # 
+  # @param ship [Ship]
+  # @param withNull [Boolean]
   getAdjacentParts: (ship, withNull=false) =>
     parts = []
     for point in @getAdjacentPoints()
@@ -52,21 +76,13 @@ class Part
         parts.push(part)
     return parts
 
+  # Return a copy of this part
   clone: () =>
-    return new Part(@x, @y, @type)
+    return new @constructor(@position)
 
+  # A nice string of this part
   toString: () =>
-    return "<#{@type} at (#{@x},#{@y})>"
-
-
-# Contains data about all parts of the same type
-# TODO: Refactor this so that a separate Type class is not needed.
-class Part.Type
-  constructor: (@name, @width=1, @height=1, @color=0xBBBBBB, @maxHealth=100) ->
-    @mass = @width * @height
-
-  toString: () =>
-    return @name
+    return "<#{@name} at (#{@position})>"
 
 
 module.exports = Part

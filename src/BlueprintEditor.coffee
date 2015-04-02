@@ -1,4 +1,5 @@
 Core = require 'ship/parts/Core'
+Door = require 'ship/parts/Door'
 Entity = require 'Entity'
 Hull = require 'ship/parts/Hull'
 Interior = require 'ship/parts/Interior'
@@ -41,7 +42,7 @@ class BlueprintEditor extends Entity
     @partLabel = new PartLabel()
 
     @direction = 0
-    @partClasses = [Hull, Thruster, Interior]
+    @partClasses = [Hull, Thruster, Interior, Door]
     @partIndex = 0
     @nextPart(0)
 
@@ -57,7 +58,7 @@ class BlueprintEditor extends Entity
     squrePos = @getHoverSquare()
     hoverPart = @blueprint.partGrid.get(squrePos)
     if not hoverPart?
-      @selector.beginFill(@Part.type.color)
+      @selector.beginFill(@Part.prototype.color)
       @selector.drawRect(-0.5, -0.5, 1, 1)
       @selector.endFill()
     
@@ -72,7 +73,7 @@ class BlueprintEditor extends Entity
     @selector.lineStyle(0.05, color)
     @selector.drawRect(-1, -1, 1, 1)
 
-    if @Part.type.directional
+    if @Part.prototype.directional
       @selector.lineStyle(0.05, 0xFFFFFF, 0.5)
       @selector.moveTo(-0.5, -0.5) # for some reason this has to have this offset
       angle = (@direction + 3) * Math.PI / 2
@@ -88,10 +89,10 @@ class BlueprintEditor extends Entity
 
   # Add parts on click
   onClick: (mousePosition) =>
-    [x, y] = @getHoverSquare()
-    if not @blueprint.partGrid.get([x, y])?
-      args = [x, y]
-      if @Part.type.directional
+    pos = @getHoverSquare()
+    if not @blueprint.partGrid.get(pos)?
+      args = [pos]
+      if @Part.prototype.directional
         args.push(@direction)
       part = new @Part(args...)
       @blueprint.addPart(part)
@@ -99,14 +100,14 @@ class BlueprintEditor extends Entity
   # Remove parts on right click
   onRightClick: (mousePosition) =>
     part = @blueprint.partGrid.get(@getHoverSquare())
-    if part? and part.type isnt Core.type
+    if part? and not (part instanceof Core)
       @blueprint.removePart(part)
 
   # Select the next part.
   nextPart: (i=1) =>
     @partIndex = Util.mod(@partIndex + i, @partClasses.length)
     @Part = @partClasses[@partIndex]
-    @partLabel.sprite.text = @Part.type.name
+    @partLabel.sprite.text = @Part.prototype.name
 
   # Rotate the current direction
   rotate: (i=1) =>

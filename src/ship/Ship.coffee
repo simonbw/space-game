@@ -51,6 +51,7 @@ class Ship extends Entity
     @sprite.rotation = @body.angle
 
   tick: () =>
+    @roomManager.tick()
     for part in @tickableParts
       part.tick(this)
 
@@ -75,7 +76,7 @@ class Ship extends Entity
 
     @roomManager.partAdded(part)
 
-    if part.type.thruster
+    if part.thruster
       @thrustBalancer.addThruster(part)
 
   removePart: (part) =>
@@ -88,7 +89,7 @@ class Ship extends Entity
       @sprite.removeChild(part.sprite)
     if part.shape?
       @body.removeShape(part.shape)
-    if part.type.thruster
+    if part.thruster
       @thrustBalancer.removeThruster(part)
     @body.mass -= part.mass
     @recenter()

@@ -12,7 +12,8 @@ Person = require 'Person'
 PlayerShipController = require 'PlayerShipController'
 PlayerPersonController = require 'PlayerPersonController'
 Ship = require 'ship/Ship'
-ShipHud = require 'ShipHud'
+ShipHud = require 'hud/ShipHud'
+PersonHud = require 'hud/PersonHud'
 
 window.onload = ->
   console.log "loaded"
@@ -26,17 +27,17 @@ window.onload = ->
   # game.addEntity(ship)
 
   callback = (bp) ->
-    game.camera.z = 20
+    game.camera.z = 30
     window.ship = new Ship(bp)
-    person = new Person()
+    person = new Person([0, 1])
     person.board(ship)
-    controller = new PlayerPersonController(person)
-    # controller = new PlayerShipController(ship)
-    hud = new ShipHud(ship)
+    # controller = new PlayerPersonController(person)
+    controller = new PlayerShipController(ship)
+    game.addEntity(new ShipHud(ship))
+    game.addEntity(new PersonHud(person))
     game.addEntity(ship)
     game.addEntity(person)
     game.addEntity(controller)
-    game.addEntity(hud)
     game.camera.follow(ship)
 
   game.addEntity(new BlueprintEditor(new Blueprint, callback))

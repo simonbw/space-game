@@ -11,7 +11,7 @@ class Person extends Entity
   JETPACK_FORCE = 0.4
   MAXIMUM_FRICTION = 1.0
 
-  constructor: (x=0, y=0, ship=null) ->
+  constructor: ([x, y]=[0,0], ship=null) ->
     @body = new p2.Body({
       position: [x, y]
       mass: 0.1
@@ -58,9 +58,15 @@ class Person extends Entity
     if not ship? then return undefined
     return @ship.partAtWorld(@position)
 
-  getFloor: () =>
+  getRoom: () =>
     part = @getPart()
-    return part? and part.room? and part.room.sealed
+    if part?
+      return part.room
+    return undefined
+    
+  getFloor: () =>
+    room = @getRoom()
+    return room? and room.sealed
 
   tick: () =>
     if @getFloor()

@@ -2,13 +2,9 @@ Part = require "ship/parts/Part"
 
 # Basic interior block
 class Interior extends Part
-  @type = type = new Part.Type('Interior', 1, 1, 0xDDDDDD, 80)
-  type.interior = true
-
-  constructor: (x, y) ->
-    super(x, y, type)
-
-  clone: () =>
-    return new Interior(@x, @y)
+  color: 0xFAFAFA
+  maxHealth: 80
+  name: 'Interior'
+  interior: true
 
 module.exports = Interior

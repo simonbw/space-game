@@ -1,45 +1,72 @@
 Entity = require 'Entity'
+Util = require 'util/Util'
+
+roomCount = 0
 
 class Room
   constructor: (@manager) ->
+    @roomId = roomCount++
     @parts = new Set()
-    @pressure = 0.0
-    @dirtySeal = true
-    @_seaeled = false
+    @totalAir = 0
+    @airCapacity = 0
+    @dirty = true
+    @_holes = new Set()
+    @doors = []
+
+  tick: () =>
+    @giveAir(0.01)
+    if not @sealed
+      @giveAir(@holes.size * -0.01)
 
   addPart: (part) =>
     if not part?
       throw new Error("Bad Part: #{part}")
     @parts.add(part)
     part.room = this
-    @dirtySeal = true
+    @dirty = true
+    @airCapacity += 1
 
   # TODO: Possibly splits room
   removePart: (part) =>
     @parts.delete(part)
-    part.room = null
-    @dirtySeal = true
+    if part.room == this
+      part.room = null
+    @dirty = true
+    @airCapacity -= 1
 
   hasPart: (part) =>
     return @parts.has(part)
 
+  @property 'pressure',
+    get: ->
+      return (@totalAir / @airCapacity) || 0
+
   # True if the room is air tight
   @property 'sealed',
     get: ->
-      if @dirtySeal
-        @_sealed = @calulateSealed()
-      return @_sealed
+      return @holes.size == 0
   
-  # join this room with another, keeping this room
-  join: (other) =>
-    self = this
-    # TODO: calculate oxygen and stuff
-    @dirtySeal = true
-    other.parts.forEach (part) ->
-      self.addPart(part)
+  # The set of grid positions where holes are
+  @property 'holes',
+    get: ->
+      if @dirty
+        @_holes = @findHoles()
+      return @_holes
 
-  # Figure out if the room is sealed
-  calulateSealed: () =>
+  # join this room with another, keeping this room, destroying the other
+  join: (other) =>
+    if other == this
+      throw new Error("Joining room #{@roomId} with itself")
+    iter = other.parts.values()
+    next = iter.next()
+    while not next.done
+      part = next.value
+      @addPart(part)
+      next = iter.next()
+    @giveAir(other.totalAir)
+
+  findHoles: () =>
+    holes = new Set()
     iter = @parts.values()
     next = iter.next()
     while not next.done
@@ -47,9 +74,13 @@ class Room
       for pos in part.getAdjacentPoints()
         adjacentPart = @manager.ship.partAtGrid(pos)
         if not adjacentPart?
-          return false
+          holes.add(pos)
       next = iter.next()
-    return true
+    return holes
+
+  giveAir: (amount) =>
+    @totalAir += amount
+    @totalAir = Util.clamp(@totalAir, 0, @airCapacity)
 
   destroy: () =>
     iter = @parts.values()
@@ -72,27 +103,32 @@ class RoomManager extends Entity
 
   # Called when any part is added
   partAdded: (part) =>
-    if part.type.interior
+    if part.interior
       @parts.push(part)
       @partSet.add(part)
 
       adjacentRooms = @getAdjacentRooms(part)
-      console.log "#{adjacentRooms}"
 
       if adjacentRooms.length == 0
+        console.log "part makes new room"
         room = new Room(this)
         room.addPart(part)
         @rooms.push(room)
       else if adjacentRooms.length == 1
+        console.log "part added to room #{adjacentRooms[0].roomId}"
         adjacentRooms[0].addPart(part)
       else
+        ids = adjacentRooms.map (r) ->
+          return r.roomId
+        console.log "part joins rooms #{ids}"
         room = adjacentRooms.pop()
+        room.addPart(part)
         for otherRoom in adjacentRooms
           room.join(otherRoom)
           @rooms.splice(@rooms.indexOf(otherRoom), 1)
 
     for room in @getAdjacentRooms(part)
-      room.dirtySeal = true
+      room.dirty = true
 
   # Called when any part is added
   partRemoved: (part) =>
@@ -102,20 +138,25 @@ class RoomManager extends Entity
       @calculateRooms() # TODO: Don't be dumb
     
     for room in @getAdjacentRooms(part)
-      room.dirtySeal = true
+      room.dirty = true
 
+  tick: () =>
+    for room in @rooms
+      room.tick()
+
+  # Return all the rooms adjacent to a part
   getAdjacentRooms: (part) =>
-    adjacentRooms = []
+    adjacentRooms = new Set()
     for p in part.getAdjacentParts(@ship)
-      for room in @rooms
-        if room.hasPart(p)
-          adjacentRooms.push(room)
-          continue
-    return adjacentRooms
+      if @partSet.has(p)
+        for room in @rooms
+          if room.hasPart(p)
+            adjacentRooms.add(room)
+    return Util.setToArray(adjacentRooms)
 
   # Calculate which rooms exist
-  # TODO: Don't be dumb
   calculateRooms: () =>
+    console.log "Calculating Rooms"
     while @rooms.length
       @rooms.pop().destroy()
 
@@ -134,7 +175,6 @@ class RoomManager extends Entity
         for adjacentPart in currentPart.getAdjacentParts(@ship)
           if remaining.has(adjacentPart)
             queue.push(adjacentPart)
-    console.log "calculateRooms: #{@rooms}"
 
 
 module.exports = RoomManager

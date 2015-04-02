@@ -7,9 +7,10 @@ class ShipHud extends Entity
     @sprite = new Pixi.Container()
     @layer = 'hud'
     @text = new Pixi.Text('', {
-      font: '20px Arial'
+      font: '14px Arial'
       fill: '#FFFFFF'
     })
+    @text.y = 18
     @sprite.addChild(@text)
 
   # Make the string to be displayed by the hud

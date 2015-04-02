@@ -12,7 +12,7 @@ class Blueprint extends Entity
     @layer = 'world'
     @parts = []
     @partGrid = new Grid()
-    @core = @addPart(new Core())
+    @core = @addPart(new Core([0, 0]))
 
   # Add a Part to this blueprint
   addPart: (part) =>

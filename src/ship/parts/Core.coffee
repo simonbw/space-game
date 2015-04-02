@@ -2,12 +2,12 @@ Part = require 'ship/parts/Part'
 
 # The core of every ship. This should never be destroyed.
 class Core extends Part
-  @type = type = new Part.Type('Core', 1, 1, 0x55AAFF, 1000)
-  
-  constructor: (x=0, y=0) ->
-    super(x, y, type)
+  color: 0x55AAFF
+  maxHealth: 1000
+  name: 'Core'
 
-  clone: () =>
-    return new Core(@x, @y)
+  constructor: (pos=null) ->
+    pos ?= [0, 0]
+    super(pos)
 
 module.exports = Core

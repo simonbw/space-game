@@ -2,7 +2,8 @@
 	"folders": [{
 		"follow_symlinks": true,
 		"path": ".",
-    "folder_exclude_patterns": ["node_modules"]
+    "folder_exclude_patterns": ["node_modules"],
+    "file_exclude_patterns": ["bin/main.js"]
 	}],
 
 	"build_systems": [{
