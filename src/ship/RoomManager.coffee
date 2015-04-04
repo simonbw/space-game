@@ -1,9 +1,14 @@
+Door = require 'ship/parts/Door'
 Entity = require 'Entity'
 Util = require 'util/Util'
 
 roomCount = 0
 
+# Represents on contiguous set of interior pieces
+# Controls air
 class Room
+  FLOW_CONSTANT = 0.1
+
   constructor: (@manager) ->
     @roomId = roomCount++
     @parts = new Set()
@@ -11,13 +16,29 @@ class Room
     @airCapacity = 0
     @dirty = true
     @_holes = new Set()
-    @doors = []
+    @_doors = new Set()
 
+  # Update calculations for air and stuff
   tick: () =>
     @giveAir(0.01)
-    if not @sealed
-      @giveAir(@holes.size * -0.01)
+    
+    @holes.forEach (hole) =>
+      @giveAir(-FLOW_CONSTANT)
 
+    @doors.forEach (door) =>
+      if door.isOpen
+        adjacentRooms = door.getAdjacentRooms(@manager.ship)
+        adjacentRooms.forEach (otherRoom) =>
+          if otherRoom?
+            pressureDifference = @pressure - otherRoom.pressure
+            if pressureDifference > 0
+              flowRate = -pressureDifference * FLOW_CONSTANT
+              change = @giveAir(flowRate)
+              otherRoom.giveAir(-change)
+          else
+            @giveAir(-FLOW_CONSTANT)
+
+  # Include a part in this room
   addPart: (part) =>
     if not part?
       throw new Error("Bad Part: #{part}")
@@ -34,6 +55,7 @@ class Room
     @dirty = true
     @airCapacity -= 1
 
+  # True if the part is part of this room
   hasPart: (part) =>
     return @parts.has(part)
 
@@ -45,13 +67,44 @@ class Room
   @property 'sealed',
     get: ->
       return @holes.size == 0
+
+  # All the doors that are connected to this room
+  @property 'doors',
+    get: ->
+      if @dirty
+        @findHoles()
+      return @_doors
   
   # The set of grid positions where holes are
   @property 'holes',
     get: ->
       if @dirty
-        @_holes = @findHoles()
+        @findHoles()
       return @_holes
+
+  # Recalculate the positions of all the holes
+  findHoles: () =>
+    @_holes.clear()
+    # TODO: Figure out cleaner set iteration
+    iter = @parts.values()
+    next = iter.next()
+    while not next.done
+      part = next.value
+      for pos in part.getAdjacentPoints()
+        adjacentPart = @manager.ship.partAtGrid(pos)
+        if not adjacentPart?
+          @_holes.add(pos)
+        else if adjacentPart instanceof Door
+          @_doors.add(adjacentPart)
+      next = iter.next()
+
+  # Add an amount of air into the room (can be negative)
+  # Returns the amount of air actually added
+  giveAir: (amount) =>
+    old = @totalAir
+    @totalAir += amount
+    @totalAir = Util.clamp(@totalAir, 0, @airCapacity)
+    return @totalAir - old
 
   # join this room with another, keeping this room, destroying the other
   join: (other) =>
@@ -65,23 +118,7 @@ class Room
       next = iter.next()
     @giveAir(other.totalAir)
 
-  findHoles: () =>
-    holes = new Set()
-    iter = @parts.values()
-    next = iter.next()
-    while not next.done
-      part = next.value
-      for pos in part.getAdjacentPoints()
-        adjacentPart = @manager.ship.partAtGrid(pos)
-        if not adjacentPart?
-          holes.add(pos)
-      next = iter.next()
-    return holes
-
-  giveAir: (amount) =>
-    @totalAir += amount
-    @totalAir = Util.clamp(@totalAir, 0, @airCapacity)
-
+  # 
   destroy: () =>
     iter = @parts.values()
     next = iter.next()
@@ -91,9 +128,12 @@ class Room
       next = iter.next()
     @parts.clear()
 
+  # 
   toString: () =>
     return "<Room size: #{@parts.size} #{@sealed}>"
 
+
+# Keeps track of rooms on a ship
 class RoomManager extends Entity
   constructor: (@ship) ->
     @parts = []
@@ -110,17 +150,14 @@ class RoomManager extends Entity
       adjacentRooms = @getAdjacentRooms(part)
 
       if adjacentRooms.length == 0
-        console.log "part makes new room"
         room = new Room(this)
         room.addPart(part)
         @rooms.push(room)
       else if adjacentRooms.length == 1
-        console.log "part added to room #{adjacentRooms[0].roomId}"
         adjacentRooms[0].addPart(part)
       else
         ids = adjacentRooms.map (r) ->
           return r.roomId
-        console.log "part joins rooms #{ids}"
         room = adjacentRooms.pop()
         room.addPart(part)
         for otherRoom in adjacentRooms

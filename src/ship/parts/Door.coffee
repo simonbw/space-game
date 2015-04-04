@@ -11,16 +11,25 @@ class Door extends Part
     @isOpen = false
 
   open: () =>
-    console.log "opening"
     @sprite.alpha = 0.1
     @isOpen = true
     @shape.collisionGroup = CollisionGroups.SHIP_INTERIOR
 
   close: () =>
-    console.log "closing"
     @sprite.alpha = 1.0
     @isOpen = false
     @shape.collisionGroup = CollisionGroups.SHIP_EXTERIOR
+
+  # Returns a set of rooms this door is attached to.
+  # Null means its attached to outer space
+  getAdjacentRooms: (ship) =>
+    result = new Set()
+    for part in @getAdjacentParts(ship, true)
+      if not part?
+        result.add(null)
+      else if part.room?
+        result.add(part.room)
+    return result
 
   tick: () =>
     if Math.random() < 0.01

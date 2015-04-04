@@ -5,7 +5,7 @@ Pixi = require 'pixi.js'
 
 # A person
 class Person extends Entity
-  RADIUS = 0.1
+  RADIUS = 0.3
   WALK_FORCE = 5
   WALK_FRICTION = 0.4
   JETPACK_FORCE = 0.4
