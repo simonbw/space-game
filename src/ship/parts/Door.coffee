@@ -1,7 +1,10 @@
 CollisionGroups = require 'CollisionGroups'
-Part = require 'ship/parts/Part'
+p2 = require 'p2'
+InteractivePart = require 'ship/parts/InteractivePart'
 
-class Door extends Part
+TIME = 60 * 2
+
+class Door extends InteractivePart
   color: 0x999999
   maxHealth: 250
   name: 'Door'
@@ -9,12 +12,23 @@ class Door extends Part
   constructor: (pos) ->
     super(pos)
     @isOpen = false
+    @timer = 0
 
-  open: () =>
+  # Called when a person interacts with this
+  interact: (person) =>
+    if @isOpen
+      @close()
+    else
+      @open(TIME)
+
+  # Open the door
+  open: (time=-1) =>
     @sprite.alpha = 0.1
     @isOpen = true
     @shape.collisionGroup = CollisionGroups.SHIP_INTERIOR
+    @timer = time
 
+  # Close the door
   close: () =>
     @sprite.alpha = 1.0
     @isOpen = false
@@ -32,7 +46,9 @@ class Door extends Part
     return result
 
   tick: () =>
-    if Math.random() < 0.01
-      if @isOpen then @close() else @open()
+    if @timer > 0
+      @timer--
+      if @timer == 0
+        @close()
 
 module.exports = Door

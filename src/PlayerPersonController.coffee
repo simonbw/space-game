@@ -6,6 +6,7 @@ class PlayerPersonController extends Entity
   K_LEFT = 65 # a
   K_RIGHT = 68 # d
   K_WALK = 16 # shift
+  K_INTERACT = 69 # e
   
   constructor: (@person) ->
 
@@ -15,5 +16,9 @@ class PlayerPersonController extends Entity
     y = -(@game.io.keys[K_FORWARD] - @game.io.keys[K_BACKWARD]) * modifier
     @person.move([x, y])
 
+  onKeyDown: (key) =>
+    switch key
+      when K_INTERACT
+        @person.interact()
 
 module.exports = PlayerPersonController

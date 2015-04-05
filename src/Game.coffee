@@ -18,6 +18,9 @@ class Game
     @world = new p2.World({
       gravity: [0, 0]
     })
+    @world.on('beginContact', @beginContact)
+    @world.on('endContact', @endContact)
+    @world.on('impact', @endContact)
     @io = new IO(@renderer.pixiRenderer.view)
 
   # Begin everything
@@ -109,5 +112,38 @@ class Game
     @cleanupEntities()
     for entity in @entities.render
       entity.render()
+
+  # Handle collision begin between things.
+  # Fired during narrowphase.
+  beginContact: (e) =>
+    if e.bodyA.beginContact?
+      e.bodyA.beginContact(e.bodyB)
+    if e.bodyB.beginContact?
+      e.bodyB.beginContact(e.bodyA)
+
+    if e.shapeA.beginContact?
+      e.shapeA.beginContact(e.shapeB)
+    if e.shapeB.beginContact?
+      e.shapeB.beginContact(e.shapeA)
+
+  # Handle collision end between things.
+  # Fired after narrowphase.
+  endContact: (e) =>
+    if e.bodyA.endContact?
+      e.bodyA.endContact(e.bodyB)
+    if e.bodyB.endContact?
+      e.bodyB.endContact(e.bodyA)
+
+    if e.shapeA.endContact?
+      e.shapeA.endContact(e.shapeB)
+    if e.shapeB.endContact?
+      e.shapeB.endContact(e.shapeA)
+
+  # Handle impact (called after physics is done)
+  impact: (e) =>
+    if e.bodyA.impact?
+      e.bodyA.impact(e.bodyB)
+    if e.bodyB.impact?
+      e.bodyB.impact(e.bodyA)
 
 module.exports = Game

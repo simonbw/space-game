@@ -6,10 +6,15 @@ group = (groups...) ->
   return mask
 
 class CollisionGroups
+  @ALL = group [0...16]...
+
+  # GROUPS - classification of stuff
   @SHIP_EXTERIOR = group 0
   @SHIP_INTERIOR = group 1
-  @PERSON = group 2
-  @ALL = group [0...16]...
-  @OBSTACLES = @ALL ^ @SHIP_INTERIOR
+  @SHIP_SENSOR = group 2
+  @PERSON = group 3
+
+  # MASKS - what stuff runs into
+  @PERSON_MASK = @SHIP_EXTERIOR | @SHIP_SENSOR | @PERSON
 
 module.exports = CollisionGroups

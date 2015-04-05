@@ -20,10 +20,12 @@ class Part
 
   constructor: (@position) ->
     @partId = partCount++
-    @shape = @makeShape()
-    @shape.owner = this
-    @sprite = @makeSprite()
-    [@sprite.x, @sprite.y] = @position
+    if @makeShape?
+      @shape = @makeShape()
+      @shape.owner = this
+    if @makeSprite?
+      @sprite = @makeSprite()
+      [@sprite.x, @sprite.y] = @position
     @health = @maxHealth
 
   # Grid position of this part

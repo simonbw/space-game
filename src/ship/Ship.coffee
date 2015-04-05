@@ -68,11 +68,16 @@ class Ship extends Entity
       @sprite.addChild(part.sprite)
       @sprite.rotation = angle
     
-    if part.shape?
+    @body.mass += part.mass
+    
+    if part.shape? or part.sensor?
       shapePosition = [part.x + @offset[0], part.y + @offset[1]]
-      @body.addShape(part.shape, shapePosition, angle)
-      @body.mass += part.mass
+      if part.shape?
+        @body.addShape(part.shape, shapePosition, angle)
+      if part.sensor?
+        @body.addShape(part.sensor, shapePosition, angle)
       @recenter()
+
 
     @roomManager.partAdded(part)
 
@@ -89,6 +94,8 @@ class Ship extends Entity
       @sprite.removeChild(part.sprite)
     if part.shape?
       @body.removeShape(part.shape)
+    if part.sensor?
+      @body.removeShape(part.sensor)
     if part.thruster
       @thrustBalancer.removeThruster(part)
     @body.mass -= part.mass
