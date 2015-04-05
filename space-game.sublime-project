@@ -7,11 +7,11 @@
 	}],
 
 	"build_systems": [{
-		"name": "Haxe",
+		"name": "Gulp",
 		"working_dir": "$project_path",
 		"shell_cmd": "gulp",
 		"selector": "source.coffee",
-		"shell": true
+		"shell": false
 	}],
 
 	"settings": {

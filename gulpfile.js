@@ -52,6 +52,8 @@ gulp.task('watch', function() {
   var b = watchify(getBundler());
   b.on('update', function() {
     publish(b);
+  }).on('error', function(e) {
+    console.log('Watch Error', e);
   });
   publish(b);
 });
