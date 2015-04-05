@@ -1,2 +1,4 @@
-push_to_midgard.sh
+node_modules/
+
 *.sublime-workspace
+push_to_midgard.sh
