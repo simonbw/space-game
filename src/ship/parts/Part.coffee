@@ -67,16 +67,19 @@ class Part
     return [[@x + 1, @y], [@x, @y + 1], [@x - 1, @y], [@x, @y - 1]]
 
   # Return an array of adjacent parts
-  # 
-  # @param ship [Ship]
   # @param withNull [Boolean]
-  getAdjacentParts: (ship, withNull=false) =>
+  getAdjacentParts: (withNull=false) =>
     parts = []
     for point in @getAdjacentPoints()
-      part = ship.partAtGrid(point)
+      part = @ship.partAtGrid(point)
       if withNull or part?
         parts.push(part)
     return parts
+
+  getPressure: () =>
+    if @room?
+      return @room.pressure
+    return 0
 
   # Return a copy of this part
   clone: () =>

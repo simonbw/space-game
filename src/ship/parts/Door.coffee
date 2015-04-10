@@ -1,6 +1,8 @@
 CollisionGroups = require 'CollisionGroups'
 p2 = require 'p2'
+Pixi = require 'pixi.js'
 InteractivePart = require 'ship/parts/InteractivePart'
+Interior = require 'ship/parts/Interior'
 
 TIME = 60 * 2
 
@@ -21,28 +23,51 @@ class Door extends InteractivePart
     else
       @open(TIME)
 
+  makeSprite: () =>
+    sprite = new Pixi.Container()
+    sprite.floor = new Pixi.Graphics()
+    sprite.addChild(sprite.floor)
+    sprite.door = new Pixi.Graphics()
+    sprite.addChild(sprite.door)
+    sprite.floor.beginFill(Interior.prototype.color)
+    sprite.floor.drawRect(-0.5 * @width, -0.5 * @height, @width, @height)
+    sprite.floor.endFill()
+    sprite.door.beginFill(@color)
+    sprite.door.drawRect(-0.5 * @width, -0.5 * @height, @width, @height)
+    sprite.door.endFill()
+    return sprite
+
   # Open the door
   open: (time=-1) =>
-    @sprite.alpha = 0.1
+    @sprite.door.visible = false
     @isOpen = true
     @shape.collisionGroup = CollisionGroups.SHIP_INTERIOR
     @timer = time
 
   # Close the door
   close: () =>
-    @sprite.alpha = 1.0
+    @sprite.door.visible = true
     @isOpen = false
     @shape.collisionGroup = CollisionGroups.SHIP_EXTERIOR
 
+  getPressure: () =>
+    totalPressure = 0
+    totalRooms = 0
+    for room in @getAdjacentRooms()
+      totalRooms++
+      if room?
+        totalPressure += room.pressure
+    return (totalPressure / totalRooms) || 0
+
   # Returns a set of rooms this door is attached to.
   # Null means its attached to outer space
-  getAdjacentRooms: (ship) =>
-    result = new Set()
-    for part in @getAdjacentParts(ship, true)
+  getAdjacentRooms: () =>
+    result = []
+    for part in @getAdjacentParts(true)
       if not part?
-        result.add(null)
+        result.push(null)
       else if part.room?
-        result.add(part.room)
+        result.push(part.room)
     return result
 
   tick: () =>

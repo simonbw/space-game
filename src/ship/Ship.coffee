@@ -58,6 +58,7 @@ class Ship extends Entity
   # Add a Part to this ship
   addPart: (part) =>
     @parts.push(part)
+    part.ship = this
     @partGrid.set([part.x, part.y], part)
     if part.tick?
       @tickableParts.push(part)
@@ -77,7 +78,6 @@ class Ship extends Entity
       if part.sensor?
         @body.addShape(part.sensor, shapePosition, angle)
       @recenter()
-
 
     @roomManager.partAdded(part)
 
@@ -100,6 +100,7 @@ class Ship extends Entity
       @thrustBalancer.removeThruster(part)
     @body.mass -= part.mass
     @recenter()
+    part.ship = null
 
   # Recalculate the center of mass
   recenter: =>

@@ -14,15 +14,8 @@ class PersonHud extends Entity
 
   # Make the string to be displayed by the hud
   makeText: () =>
-    room = @person.getRoom()
-    if room?
-      pressure = if room? then room.pressure else 0
-      return "
-        Pressure: #{Math.round(pressure * 100)}%,
-        Sealed: #{room.sealed}
-        id: #{room.roomId}"
-    else
-      return "Space"
+    return "pressure: #{Math.round(100 * @person.getPressure())}"
+    
 
   render: =>
     @text.text = @makeText()
