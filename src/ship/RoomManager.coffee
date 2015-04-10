@@ -27,7 +27,7 @@ class Room
 
     @doors.forEach (door) =>
       if door.isOpen
-        adjacentRooms = door.getAdjacentRooms(@manager.ship)
+        adjacentRooms = door.getAdjacentRooms()
         adjacentRooms.forEach (otherRoom) =>
           if otherRoom?
             pressureDifference = @pressure - otherRoom.pressure
@@ -174,7 +174,7 @@ class RoomManager extends Entity
 
       @calculateRooms() # TODO: Don't be dumb
     
-    for room in @getAdjacentRooms(part)
+    for room in @getAdjacentRooms()
       room.dirty = true
 
   tick: () =>
@@ -184,7 +184,7 @@ class RoomManager extends Entity
   # Return all the rooms adjacent to a part
   getAdjacentRooms: (part) =>
     adjacentRooms = new Set()
-    for p in part.getAdjacentParts(@ship)
+    for p in part.getAdjacentParts()
       if @partSet.has(p)
         for room in @rooms
           if room.hasPart(p)
@@ -209,7 +209,7 @@ class RoomManager extends Entity
         currentPart = queue.pop()
         room.addPart(currentPart)
         remaining.delete(currentPart)
-        for adjacentPart in currentPart.getAdjacentParts(@ship)
+        for adjacentPart in currentPart.getAdjacentParts()
           if remaining.has(adjacentPart)
             queue.push(adjacentPart)
 

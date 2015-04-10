@@ -12,9 +12,15 @@ class PlayerPersonController extends Entity
 
   beforeTick: () =>
     modifier = if @game.io.keys[K_WALK] then 0.4 else 1
-    x = (@game.io.keys[K_RIGHT] - @game.io.keys[K_LEFT]) * modifier
-    y = -(@game.io.keys[K_FORWARD] - @game.io.keys[K_BACKWARD]) * modifier
-    @person.move([x, y])
+    x = (@game.io.keys[K_RIGHT] - @game.io.keys[K_LEFT])
+    y = -(@game.io.keys[K_FORWARD] - @game.io.keys[K_BACKWARD])
+
+    length = Math.sqrt(x * x + y * y)
+    if length > 1
+      x /= length
+      y /= length
+        
+    @person.move([x * modifier, y * modifier])
 
   onKeyDown: (key) =>
     switch key

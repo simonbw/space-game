@@ -62,12 +62,12 @@ class Person extends Entity
 
   move: ([x, y]) =>
     part = @getPart()
-    floor = @getFloor()
-    speed = if floor then WALK_FORCE else JETPACK_FORCE
+    pressure = @getPressure()
+    speed = if (pressure > 0.4) then WALK_FORCE * pressure else JETPACK_FORCE
     [fx, fy] = [x * speed, y * speed]
     @body.force[0] += fx
     @body.force[1] += fy
-    if floor
+    if pressure
       @ship.body.applyForce([-fx, -fy], @position)
 
   render: () =>
@@ -83,22 +83,27 @@ class Person extends Entity
       return part.room
     return undefined
     
-  getFloor: () =>
-    room = @getRoom()
-    return room? and room.sealed
+  getPressure: () =>
+    part = @getPart()
+    if part?
+      return part.getPressure()
+    return 0
 
   beginContact: (otherShape) =>
     if otherShape.sensor and otherShape.owner? and otherShape.owner.interactive
-      console.log "new interaction, #{otherShape.owner}"
       @interactions.add(otherShape.owner)
+      if otherShape.owner.beginInteraction?
+        otherShape.owner.beginInteraction(this)
 
   endContact: (otherShape) =>
     if otherShape.sensor and otherShape.owner? and otherShape.owner.interactive
-      console.log "lost interaction, #{otherShape.owner}"
       @interactions.delete(otherShape.owner)
+      if otherShape.owner.beginInteraction?
+        otherShape.owner.beginInteraction(this)
 
   tick: () =>
-    if @getFloor()
+    pressure = @getPressure()
+    if pressure > 0.4
       shipVelocity = @ship.velocityAtWorldPoint(@position)
 
       fx = shipVelocity[0] - @body.velocity[0]
