@@ -1,20 +1,63 @@
+Entity = require 'Entity'
 Pixi = require 'pixi.js'
-Matrix = Pixi.Matrix
 Point = Pixi.Point
 
+Matrix = Pixi.Matrix
+
 # Controls the viewport
-class Camera
-  constructor: (@renderer, @x = 0, @y = 0, @z = 30.0, @angle = 0) ->
-    @following = null
+class Camera extends Entity
+  constructor: (@renderer, @position = null, @z = 30.0, @angle = 0) ->
+    @position ?= [0, 0]
+    @velocity = [0, 0]
+  
+  # Easy access to position[0]
+  @property 'x',
+    get: () ->
+      return @position[0]
+    set: (value) ->
+      @position[0] = value
 
-  # Make the camera center on this thing every frame
-  follow: (thing) =>
-    @following = thing
+  # Easy access to position[1]
+  @property 'y',
+    get: ->
+      return @position[1]
+    set: (value) ->
+      @position[1] = value
 
-  tick: =>
-    if @following?
-      [@x, @y] = @following.position
-      # console.log [@x, @y]
+  # Easy access to velocity[0]
+  @property 'vx',
+    get: ->
+      return @velocity[0]
+    set: (value) ->
+      @velocity[0] = value
+
+  # Easy access to velocity[1]
+  @property 'vy',
+    get: ->
+      return @velocity[1]
+    set: (value) ->
+      @velocity[1] = value
+
+  render: () =>
+    @x += @vx * @game.timestep
+    @y += @vy * @game.timestep
+
+  # Center the camera on a position
+  center: ([x, y]) =>
+    @x = x
+    @y = y
+
+  # Move the camera toward being centered on a position, with a target velocity
+  smoothCenter: ([x, y], [vx, vy], smooth = 0.9) =>
+    # TODO: make velocity transition smooth
+    dx = (x - @x) * @game.framerate
+    dy = (y - @y) * @game.framerate
+    @vx = vx + (1 - smooth) * dx
+    @vy = vy + (1 - smooth) * dy
+
+  # Set the camera 
+  smoothZoom: (z, smooth = 0.9) =>
+    @z = smooth * @z + (1 - smooth) * z
 
   # Returns [width, height] of the viewport
   getViewportSize: =>
@@ -49,7 +92,6 @@ class Camera
     scroll = layerInfo.scroll
     if scroll != 0
       layer = layerInfo.layer
-      [w, h] = @getViewportSize()
       [layer.x, layer.y] = @toScreen([0, 0])
       layer.rotation = @angle
       layer.scale.set(@z, @z)

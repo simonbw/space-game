@@ -31,7 +31,6 @@ class GameRenderer
 
   # Render the current frame.
   render: (engine) =>
-    @camera.tick() # TODO: Should this be somewhere else?
     for name, info of @layerInfos
       @camera.updateLayer(info)
     

@@ -12,11 +12,15 @@ class InteractivePart extends Part
     @sensor.owner = this
 
   makeSensor: () =>
-    shape = new p2.Rectangle(@width + 0.5, @height + 0.5)
+    [w, h] = @getSensorSize()
+    shape = new p2.Rectangle(w, h)
     shape.sensor = true
     shape.collisionGroup = CollisionGroups.SHIP_SENSOR
     shape.collisionMask = CollisionGroups.PERSON
     return shape
+
+  getSensorSize: () =>
+    return [@width + 0.5, @height + 0.5]
 
   interact: (person) =>
     console.log "interacted"

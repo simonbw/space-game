@@ -193,7 +193,6 @@ class RoomManager extends Entity
 
   # Calculate which rooms exist
   calculateRooms: () =>
-    console.log "Calculating Rooms"
     while @rooms.length
       @rooms.pop().destroy()
 

@@ -23,18 +23,25 @@ class Game
     @world.on('impact', @endContact)
     @io = new IO(@renderer.pixiRenderer.view)
 
+    @framerate = 60
+
+  @property 'timestep',
+    get: ->
+      return 1 / @framerate
+
   # Begin everything
   start: =>
+    @addEntity(@camera)
     console.log "Game Started"
     window.requestAnimationFrame(@loop)
   
   loop: () =>
     window.requestAnimationFrame(@loop)
     @tick()
-    @world.step(1 / 60)
+    @world.step(@timestep)
+    @afterTick()
     @render()
     @renderer.render()
-    @afterTick()
 
   # Add an entity to the game
   addEntity: (entity) =>
@@ -57,10 +64,12 @@ class Game
     if entity.onKeyDown? then @io.on(IO.KEY_DOWN, entity.onKeyDown)
 
     if entity.afterAdded? then entity.afterAdded(this)
+    return entity
 
   # Slates an entity for removal
   removeEntity: (entity) =>
     @entities.toRemove.push(entity)
+    return entity
   
   # Actually removes references to the entities slated for removal
   cleanupEntities: =>
@@ -101,7 +110,7 @@ class Game
     for entity in @entities.tick
       entity.tick()
 
-  # Called after everything
+  # Called after physics
   afterTick: =>
     @cleanupEntities()
     for entity in @entities.afterTick

@@ -17,6 +17,7 @@ class Person extends Entity
     @sprite = @makeSprite()
     @interactions = new Set()
     @board(ship)
+    @chair = null
 
   @property 'position',
     get: ->
@@ -28,7 +29,7 @@ class Person extends Entity
       position: pos
       mass: 0.1
       angularDamping: 0.01
-      damping: 0
+      damping: 0.0
     })
     body.owner = this
     shape = new p2.Circle(RADIUS)
@@ -49,7 +50,6 @@ class Person extends Entity
 
   # Interact with all the parts in range
   interact: () =>
-    console.log "person interact"
     @interactions.forEach (part) =>
       part.interact(this)
 
@@ -61,14 +61,15 @@ class Person extends Entity
       @shipPosition = null
 
   move: ([x, y]) =>
-    part = @getPart()
-    pressure = @getPressure()
-    speed = if (pressure > 0.4) then WALK_FORCE * pressure else JETPACK_FORCE
-    [fx, fy] = [x * speed, y * speed]
-    @body.force[0] += fx
-    @body.force[1] += fy
-    if pressure
-      @ship.body.applyForce([-fx, -fy], @position)
+    if not @chair?
+      part = @getPart()
+      pressure = @getPressure()
+      speed = if (pressure > 0.4) then WALK_FORCE * pressure else JETPACK_FORCE
+      [fx, fy] = [x * speed, y * speed]
+      @body.force[0] += fx
+      @body.force[1] += fy
+      if pressure
+        @ship.body.applyForce([-fx, -fy], @position)
 
   render: () =>
     [@sprite.x, @sprite.y] = @body.position
@@ -92,39 +93,51 @@ class Person extends Entity
   beginContact: (otherShape) =>
     if otherShape.sensor and otherShape.owner? and otherShape.owner.interactive
       @interactions.add(otherShape.owner)
-      if otherShape.owner.beginInteraction?
-        otherShape.owner.beginInteraction(this)
+      if otherShape.owner.personEnter?
+        otherShape.owner.personEnter(this)
 
   endContact: (otherShape) =>
     if otherShape.sensor and otherShape.owner? and otherShape.owner.interactive
       @interactions.delete(otherShape.owner)
-      if otherShape.owner.beginInteraction?
-        otherShape.owner.beginInteraction(this)
+      if otherShape.owner.personLeave?
+        otherShape.owner.personLeave(this)
+
+  enterChair: (chair) =>
+    @chair = chair
+
+  leaveChair: () =>
+    @chair = null
 
   tick: () =>
-    pressure = @getPressure()
-    if pressure > 0.4
-      shipVelocity = @ship.velocityAtWorldPoint(@position)
+    if not @chair
+      pressure = @getPressure()
+      if pressure > 0.4
+        shipVelocity = @ship.velocityAtWorldPoint(@position)
 
-      fx = shipVelocity[0] - @body.velocity[0]
-      fy = shipVelocity[1] - @body.velocity[1]
+        fx = shipVelocity[0] - @body.velocity[0]
+        fy = shipVelocity[1] - @body.velocity[1]
 
-      friction = WALK_FRICTION
-      fx *= friction
-      fy *= friction
+        friction = WALK_FRICTION
+        fx *= friction
+        fy *= friction
 
-      magnitude = Math.sqrt(fx * fx + fy * fy)
-      if magnitude > MAXIMUM_FRICTION
-        fx *= MAXIMUM_FRICTION / magnitude
-        fy *= MAXIMUM_FRICTION / magnitude
+        magnitude = Math.sqrt(fx * fx + fy * fy)
+        if magnitude > MAXIMUM_FRICTION
+          fx *= MAXIMUM_FRICTION / magnitude
+          fy *= MAXIMUM_FRICTION / magnitude
 
-      fx /= @body.mass
-      fy /= @body.mass
+        fx /= @body.mass
+        fy /= @body.mass
 
-      @body.force[0] += fx
-      @body.force[1] += fy
+        @body.force[0] += fx
+        @body.force[1] += fy
 
-      # Equal and opposite force on the ship
-      @ship.body.applyForce([-fx, -fy], @position)
+        # Equal and opposite force on the ship
+        @ship.body.applyForce([-fx, -fy], @position)
+
+  afterTick: () =>
+    if @chair
+      @body.position = @chair.getWorldPosition()
+      @body.velocity = @chair.getVelocity()
 
 module.exports = Person

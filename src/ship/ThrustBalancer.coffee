@@ -7,7 +7,6 @@ class ThrustBalancer
 
   # Add an engine to be controlled by this thrust balancer
   addThruster: (thruster) =>
-    console.log "thruster added: #{thruster.direction}"
     @thrusters.push(thruster)
 
   # Relinquish throttle control of an engine

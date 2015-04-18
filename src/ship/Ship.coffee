@@ -154,6 +154,12 @@ class Ship extends Entity
   partAtWorld: (point) =>
     return @partAtGrid(@worldToGrid(point))
 
+  velocityAtGridPoint: (point) =>
+    return @velocityAtWorldPoint(@gridToWorld(point))
+
+  velocityAtLocalPoint: (point) =>
+    return @velocityAtWorldPoint(@localToWorld(point))
+
   # Return the velocity of the ship at a world point
   velocityAtWorldPoint: (point) =>
     # base linear velocity

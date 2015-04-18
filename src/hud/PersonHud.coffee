@@ -14,7 +14,12 @@ class PersonHud extends Entity
 
   # Make the string to be displayed by the hud
   makeText: () =>
-    return "pressure: #{Math.round(100 * @person.getPressure())}"
+    velocity = @person.body.velocity
+    xspeed = Math.round(velocity[0] * 10)
+    yspeed = Math.round(velocity[1] * 10)
+
+    pressure = Math.round(100 * @person.getPressure())
+    return "pressure: #{pressure}, velocity: <#{xspeed}, #{yspeed}>"
     
 
   render: =>

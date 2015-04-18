@@ -76,10 +76,29 @@ class Part
         parts.push(part)
     return parts
 
+  # Return the air pressure of the current part
+  # For parts without an interior, this is 0.
   getPressure: () =>
     if @room?
       return @room.pressure
     return 0
+  
+  # Return the position of the part in local physics coordinates of the ship
+  getLocalPosition: () =>
+    if @ship?
+      return @ship.gridToLocal(@position)
+    return null
+
+  # Return the position of the part in world physics coordinates
+  getWorldPosition: () =>
+    if @ship
+      return @ship.gridToWorld(@position)
+    return null
+
+  getVelocity: () =>
+    if @ship
+      return @ship.velocityAtGridPoint(@position)
+    return null
 
   # Return a copy of this part
   clone: () =>

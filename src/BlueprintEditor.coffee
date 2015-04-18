@@ -1,3 +1,4 @@
+Chair = require 'ship/parts/Chair'
 Core = require 'ship/parts/Core'
 Door = require 'ship/parts/Door'
 Entity = require 'Entity'
@@ -19,8 +20,8 @@ class PartLabel extends Entity
 # A screen to edit blueprints
 class BlueprintEditor extends Entity
   # KEYS
-  K_NEXT_PART = 81 # q
-  K_PREVIOUS_PART = 69 # e
+  K_PREVIOUS_PART = 81 # q
+  K_NEXT_PART = 69 # e
   K_ROTATE_LEFT = 65 # a
   K_ROTATE_RIGHT = 68 # d
   K_CLOSE = 32 # space
@@ -42,7 +43,7 @@ class BlueprintEditor extends Entity
     @partLabel = new PartLabel()
 
     @direction = 0
-    @partClasses = [Hull, Thruster, Interior, Door]
+    @partClasses = [Hull, Interior, Door, Chair, Thruster]
     @partIndex = 0
     @nextPart(0)
 

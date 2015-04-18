@@ -45,5 +45,7 @@ class PlayerShipController extends Entity
 
     @ship.thrustBalancer.balance(forward, side, turn)
 
+  onKeyDown: (key) =>
+    # do nothing
 
 module.exports = PlayerShipController
