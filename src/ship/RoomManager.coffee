@@ -17,13 +17,15 @@ class Room
     @dirty = true
     @_holes = new Set()
     @_doors = new Set()
+    @people = new Set()
 
   # Update calculations for air and stuff
   tick: () =>
     @giveAir(0.01)
     
     @holes.forEach (hole) =>
-      @giveAir(-FLOW_CONSTANT)
+      flow = @giveAir(-FLOW_CONSTANT)
+
 
     @doors.forEach (door) =>
       if door.isOpen
