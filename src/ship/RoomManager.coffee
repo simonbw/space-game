@@ -7,7 +7,8 @@ roomCount = 0
 # Represents on contiguous set of interior pieces
 # Controls air
 class Room
-  FLOW_CONSTANT = 0.1
+  FLOW_CONSTANT = 0.8
+  SUCTION = 10
 
   constructor: (@manager) ->
     @roomId = roomCount++
@@ -18,48 +19,6 @@ class Room
     @_holes = new Set()
     @_doors = new Set()
     @people = new Set()
-
-  # Update calculations for air and stuff
-  tick: () =>
-    @giveAir(0.01)
-    
-    @holes.forEach (hole) =>
-      flow = @giveAir(-FLOW_CONSTANT)
-
-
-    @doors.forEach (door) =>
-      if door.isOpen
-        adjacentRooms = door.getAdjacentRooms()
-        adjacentRooms.forEach (otherRoom) =>
-          if otherRoom?
-            pressureDifference = @pressure - otherRoom.pressure
-            if pressureDifference > 0
-              flowRate = -pressureDifference * FLOW_CONSTANT
-              change = @giveAir(flowRate)
-              otherRoom.giveAir(-change)
-          else
-            @giveAir(-FLOW_CONSTANT)
-
-  # Include a part in this room
-  addPart: (part) =>
-    if not part?
-      throw new Error("Bad Part: #{part}")
-    @parts.add(part)
-    part.room = this
-    @dirty = true
-    @airCapacity += 1
-
-  # TODO: Possibly splits room
-  removePart: (part) =>
-    @parts.delete(part)
-    if part.room == this
-      part.room = null
-    @dirty = true
-    @airCapacity -= 1
-
-  # True if the part is part of this room
-  hasPart: (part) =>
-    return @parts.has(part)
 
   @property 'pressure',
     get: ->
@@ -83,6 +42,67 @@ class Room
       if @dirty
         @findHoles()
       return @_holes
+
+  @property 'ship',
+    get: ->
+      return @manager.ship
+
+  # Update calculations for air and stuff
+  tick: () =>
+    @giveAir(0.01)
+    
+    # TODO: Refactor these two loops into one thing
+    @holes.forEach (hole) =>
+      flow = @giveAir(-FLOW_CONSTANT * @pressure)
+      @applySuction(hole, [0, 0], -flow)
+
+    @doors.forEach (door) =>
+      if door.isOpen
+        adjacentRooms = door.getAdjacentRooms()
+        adjacentRooms.forEach (otherRoom) =>
+          if otherRoom? # door to other room
+            pressureDifference = @pressure - otherRoom.pressure
+            if pressureDifference > 0
+              flowRate = -pressureDifference * FLOW_CONSTANT
+              change = @giveAir(flowRate)
+              otherRoom.giveAir(-change)
+              @applySuction(door.position, [0, 0], -change)
+          else # door to outside
+            flow = @giveAir(-FLOW_CONSTANT * @pressure)
+            @applySuction(door.position, [0, 0], -flow)
+
+  # Apply a suction force to everyone in the room
+  applySuction: (position, direction, flow) =>
+    position = @ship.gridToWorld(position)
+    @people.forEach (person) =>
+      dx = position[0] - person.x
+      dy = position[1] - person.y
+      l = Util.length(dx, dy)
+      dx = dx / l || 0
+      dy = dy / l || 0
+      person.body.force[0] += dx * flow * SUCTION / l
+      person.body.force[1] += dy * flow * SUCTION / l
+
+  # Include a part in this room
+  addPart: (part) =>
+    if not part?
+      throw new Error("Bad Part: #{part}")
+    @parts.add(part)
+    part.room = this
+    @dirty = true
+    @airCapacity += 1
+
+  # TODO: Possibly splits room
+  removePart: (part) =>
+    @parts.delete(part)
+    if part.room == this
+      part.room = null
+    @dirty = true
+    @airCapacity -= 1
+
+  # True if the part is part of this room
+  hasPart: (part) =>
+    return @parts.has(part)
 
   # Recalculate the positions of all the holes
   findHoles: () =>
@@ -132,7 +152,7 @@ class Room
 
   # 
   toString: () =>
-    return "<Room size: #{@parts.size} #{@sealed}>"
+    return "<Room size: #{@parts.size}>"
 
 
 # Keeps track of rooms on a ship

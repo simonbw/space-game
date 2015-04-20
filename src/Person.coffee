@@ -24,6 +24,18 @@ class Person extends Entity
     get: ->
       return @body.position
 
+  @property 'x',
+    get: ->
+      return @position[0]
+    set: (value) ->
+      @position[0] = value
+
+  @property 'y',
+    get: ->
+      return @position[1]
+    set: (value) ->
+      @position[0] = value
+      
   # Make the body for t
   makeBody: (pos) =>
     body = new p2.Body({
