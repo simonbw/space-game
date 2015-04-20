@@ -17,12 +17,25 @@ class Person extends Entity
     @sprite = @makeSprite()
     @interactions = new Set()
     @board(ship)
+    @room = null
     @chair = null
 
   @property 'position',
     get: ->
       return @body.position
 
+  @property 'x',
+    get: ->
+      return @position[0]
+    set: (value) ->
+      @position[0] = value
+
+  @property 'y',
+    get: ->
+      return @position[1]
+    set: (value) ->
+      @position[0] = value
+      
   # Make the body for t
   makeBody: (pos) =>
     body = new p2.Body({
@@ -77,12 +90,6 @@ class Person extends Entity
   getPart: () =>
     if not ship? then return undefined
     return @ship.partAtWorld(@position)
-
-  getRoom: () =>
-    part = @getPart()
-    if part?
-      return part.room
-    return undefined
     
   getPressure: () =>
     part = @getPart()
@@ -109,6 +116,15 @@ class Person extends Entity
     @chair = null
 
   tick: () =>
+    # Update Room
+    if @room?
+      @room.people.delete(this)
+    part = @getPart()
+    @room = if part? then part.room else null
+    if @room?
+      @room.people.add(this)
+
+    # Apply Friction
     if not @chair
       pressure = @getPressure()
       if pressure > 0.4

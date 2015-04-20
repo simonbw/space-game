@@ -2,7 +2,6 @@ group = (groups...) ->
   mask = 0
   for i in groups
     mask |= Math.pow(2, i)
-  console.log "mask: #{mask} for groups #{groups}"
   return mask
 
 class CollisionGroups
