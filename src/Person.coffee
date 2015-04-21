@@ -77,7 +77,7 @@ class Person extends Entity
     if not @chair?
       part = @getPart()
       pressure = @getPressure()
-      speed = if (pressure > 0.4) then WALK_FORCE * pressure else JETPACK_FORCE
+      speed = if (pressure > 0.4) then WALK_FORCE else JETPACK_FORCE
       [fx, fy] = [x * speed, y * speed]
       @body.force[0] += fx
       @body.force[1] += fy

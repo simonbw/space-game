@@ -7,8 +7,8 @@ roomCount = 0
 # Represents on contiguous set of interior pieces
 # Controls air
 class Room
-  FLOW_CONSTANT = 0.8
-  SUCTION = 10
+  FLOW_CONSTANT = 2.0
+  SUCTION = 15
 
   constructor: (@manager) ->
     @roomId = roomCount++
@@ -49,8 +49,6 @@ class Room
 
   # Update calculations for air and stuff
   tick: () =>
-    @giveAir(0.01)
-    
     # TODO: Refactor these two loops into one thing
     @holes.forEach (hole) =>
       flow = @giveAir(-FLOW_CONSTANT * @pressure)

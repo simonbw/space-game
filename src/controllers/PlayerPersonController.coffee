@@ -1,5 +1,4 @@
 Entity = require 'Entity'
-PlayerShipController = require 'controllers/PlayerShipController'
 Util = require 'util/Util'
 
 # Controls the player's character
