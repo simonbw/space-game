@@ -4,7 +4,7 @@ Pixi = require 'pixi.js'
 InteractivePart = require 'ship/parts/InteractivePart'
 Interior = require 'ship/parts/Interior'
 
-TIME = 60 * 10
+TIME = -1 #60 * 10
 
 class Door extends InteractivePart
   color: 0x999999

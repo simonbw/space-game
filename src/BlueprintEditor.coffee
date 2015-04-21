@@ -1,3 +1,4 @@
+AirVent = require 'ship/parts/AirVent'
 Chair = require 'ship/parts/Chair'
 Core = require 'ship/parts/Core'
 Door = require 'ship/parts/Door'
@@ -43,7 +44,7 @@ class BlueprintEditor extends Entity
     @partLabel = new PartLabel()
 
     @direction = 0
-    @partClasses = [Hull, Interior, Door, Chair, Thruster]
+    @partClasses = [Hull, Interior, AirVent, Door, Chair, Thruster]
     @partIndex = 0
     @nextPart(0)
 
