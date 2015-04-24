@@ -5,8 +5,10 @@ class IO
   @RMB = RMB = 2
   @MMB = MMB = 1
 
-  @ESCAPE = 27
-  @SPACE = 32
+  @ESCAPE = ESCAPE = 27
+  @SPACE = SPACE = 32
+  @ENTER = ENTER = 13
+  @TAB = TAB = 9
 
   @MOUSE_MOVE = MOUSE_MOVE = 'mousemove'
   @CLICK = CLICK = 'click'
@@ -100,6 +102,13 @@ class IO
       when RMB
         for callback in @callbacks[RIGHT_DOWN]
           callback(@mousePosition)
+  
+  shouldPreventDefault: (key) =>
+    if key is TAB
+      return true
+    if key is 83 # s for save
+      return true
+    return false
 
   # Handle key down
   keydown: (e) =>
@@ -109,6 +118,9 @@ class IO
     if not wasPressed
       for callback in @callbacks[KEY_DOWN]
         callback(key)
+    if @shouldPreventDefault(key)
+      e.preventDefault()
+      return false
 
   # Handle key up
   keyup: (e) =>
@@ -116,6 +128,9 @@ class IO
     @keys[key] = false
     for callback in @callbacks[KEY_UP]
       callback(key)
+    if @shouldPreventDefault(key)
+      e.preventDefault()
+      return false
 
 
 module.exports = IO

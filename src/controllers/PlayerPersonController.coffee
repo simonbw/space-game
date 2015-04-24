@@ -12,6 +12,7 @@ class PlayerPersonController extends Entity
   K_STABILIZE = 16 # shift
   K_WALK = 16 # shift
   K_INTERACT = 32 # space
+  K_NEXT_INTERACT = 9 # tab
   
   constructor: (@person) ->
     @shipController = null
@@ -53,5 +54,10 @@ class PlayerPersonController extends Entity
     switch key
       when K_INTERACT
         @person.interact()
+      when K_NEXT_INTERACT
+        if @game.io.keys[16]
+          @person.previousInteraction()
+        else
+          @person.nextInteraction()
 
 module.exports = PlayerPersonController

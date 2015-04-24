@@ -20,7 +20,7 @@ class GameRenderer
     @layerInfos['world'] = { scroll: 1 }
     @layerInfos['world_back'] = { scroll: 1 }
 
-    order = ['menu', 'hud', 'world_overlay', 'world_front', 'world', 'world_back']
+    order = ['world_back', 'world', 'world_front', 'world_overlay', 'hud', 'menu']
     for name, i in order
       layerInfo = @layerInfos[name]
       layerInfo.name = name

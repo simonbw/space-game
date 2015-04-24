@@ -3,6 +3,7 @@ Entity = require 'Entity'
 p2 = require 'p2'
 Part = require 'ship/parts/Part'
 Pixi = require 'pixi.js'
+Util = require 'util/Util'
 
 # A person
 class Person extends Entity
@@ -15,7 +16,7 @@ class Person extends Entity
   constructor: (pos=[0,0], ship=null) ->
     @body = @makeBody(pos)
     @sprite = @makeSprite()
-    @interactions = new Set()
+    @interactions = []
     @board(ship)
     @room = null
     @chair = null
@@ -61,17 +62,23 @@ class Person extends Entity
     sprite.endFill()
     return sprite
 
-  # Interact with all the parts in range
+  # Interact with the first part in the list
   interact: () =>
-    @interactions.forEach (part) =>
-      part.interact(this)
+    if @interactions.length > 0
+      @interactions[0].interact(this)
+
+  # Move the thing at the top of the interact list to the bottom
+  nextInteraction: () =>
+    if @interactions.length > 1
+      @interactions.push(@interactions.shift())
+
+  # Move the thing at bottom top of the interact list to the top
+  previosInteraction: () =>
+    if @interactions.length > 1
+      @interactions.unshift(@interactions.pop())   
 
   board: (ship) =>
     @ship = ship
-    if ship?
-      @shipPosition = @ship.worldToLocal(@body.position)
-    else
-      @shipPosition = null
 
   move: ([x, y]) =>
     if not @chair?
@@ -99,15 +106,15 @@ class Person extends Entity
 
   beginContact: (otherShape) =>
     if otherShape.sensor and otherShape.owner? and otherShape.owner.interactive
-      @interactions.add(otherShape.owner)
+      @interactions.push(otherShape.owner)
       if otherShape.owner.personEnter?
         otherShape.owner.personEnter(this)
 
   endContact: (otherShape) =>
     if otherShape.sensor and otherShape.owner? and otherShape.owner.interactive
-      @interactions.delete(otherShape.owner)
-      if otherShape.owner.personLeave?
-        otherShape.owner.personLeave(this)
+      @interactions.splice(@interactions.indexOf(otherShape.owner), 1)
+      if otherShape.owner.personExit?
+        otherShape.owner.personExit(this)
 
   enterChair: (chair) =>
     @chair = chair

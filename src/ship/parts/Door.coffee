@@ -15,6 +15,8 @@ class Door extends InteractivePart
     super(pos)
     @isOpen = false
     @timer = 0
+    @people = new Set()
+    @automatic = true
 
   # Called when a person interacts with this
   interact: (person) =>
@@ -22,6 +24,16 @@ class Door extends InteractivePart
       @close()
     else
       @open(TIME)
+
+  personEnter: (person) =>
+    @people.add(person)
+    if @automatic and not @isOpen
+      @open()
+
+  personExit: (person) =>
+    @people.delete(person)
+    if @automatic
+      @close()
 
   makeSprite: () =>
     sprite = new Pixi.Container()
@@ -46,9 +58,12 @@ class Door extends InteractivePart
 
   # Close the door
   close: () =>
-    @sprite.door.visible = true
-    @isOpen = false
-    @shape.collisionGroup = CollisionGroups.SHIP_EXTERIOR
+    if @people.size is 0
+      @sprite.door.visible = true
+      @isOpen = false
+      @shape.collisionGroup = CollisionGroups.SHIP_EXTERIOR
+    else
+      console.log "Cannot close, person in the way"
 
   getPressure: () =>
     totalPressure = 0

@@ -75,7 +75,7 @@ class Room
     @people.forEach (person) =>
       dx = position[0] - person.x
       dy = position[1] - person.y
-      l = Util.length(dx, dy)
+      l = Util.length([dx, dy])
       dx = dx / l || 0
       dy = dy / l || 0
       person.body.force[0] += dx * flow * SUCTION / l
