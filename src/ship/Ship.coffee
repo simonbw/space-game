@@ -4,6 +4,7 @@ Grid = require 'util/Grid'
 Hull = require 'ship/parts/Hull'
 p2 = require 'p2'
 Pixi = require 'pixi.js'
+PowerManager = require 'ship/PowerManager'
 RoomManager = require 'ship/RoomManager'
 ThrustBalancer = require 'ship/ThrustBalancer'
 Thruster = require 'ship/parts/Thruster'
@@ -23,6 +24,7 @@ class Ship extends Entity
     @tickableParts = []
     @thrustBalancer = new ThrustBalancer(this)
     @roomManager = new RoomManager(this)
+    @powerManager = new PowerManager(this)
 
     # local vector from center of mass to center of grid
     @offset = [0, 0]
@@ -52,8 +54,10 @@ class Ship extends Entity
 
   tick: () =>
     @roomManager.tick()
+    @powerManager.tick()
     for part in @tickableParts
       part.tick(this)
+    @powerManager.afterTick()
 
   # Add a Part to this ship
   addPart: (part) =>
@@ -80,6 +84,7 @@ class Ship extends Entity
       @recenter()
 
     @roomManager.partAdded(part)
+    @powerManager.partAdded(part)
 
     if part.thruster
       @thrustBalancer.addThruster(part)
