@@ -1,4 +1,4 @@
-Entity = require 'Entity'
+Entity = require 'core/Entity'
 Pixi = require 'pixi.js'
 
 # The hud drawn always

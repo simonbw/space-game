@@ -1,5 +1,5 @@
 CollisionGroups = require 'CollisionGroups'
-Entity = require 'Entity'
+Entity = require 'core/Entity'
 p2 = require 'p2'
 Part = require 'ship/parts/Part'
 Pixi = require 'pixi.js'

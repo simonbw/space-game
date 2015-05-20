@@ -1,5 +1,5 @@
 Pixi = require 'pixi.js'
-Camera = require 'Camera'
+Camera = require 'core/Camera'
 
 # The base renderer. Handles layers and camera movement.
 class GameRenderer

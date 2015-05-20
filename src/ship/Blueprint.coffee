@@ -1,5 +1,5 @@
 Core = require 'ship/parts/Core'
-Entity = require 'Entity'
+Entity = require 'core/Entity'
 Grid = require 'util/Grid'
 Pixi = require 'pixi.js'
 

@@ -1,5 +1,5 @@
 Door = require 'ship/parts/Door'
-Entity = require 'Entity'
+Entity = require 'core/Entity'
 Util = require 'util/Util'
 
 roomCount = 0
