@@ -81,10 +81,11 @@ class BlueprintEditor extends Entity
       angle = (@direction + 3) * Math.PI / 2
       @selector.lineTo(Math.cos(angle) * 0.5 - 0.5, Math.sin(angle) * 0.5 - 0.5)
 
-    if game.io.buttons[0]
+    # painting
+    if game.io.lmb
       @onClick()
 
-    if game.io.buttons[2]
+    if game.io.rmb
       @onRightClick()
 
     [@selector.x, @selector.y] = squrePos

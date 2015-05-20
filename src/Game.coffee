@@ -62,6 +62,8 @@ class Game
     if entity.onRightDown? then @io.on(IO.RIGHT_DOWN, entity.onRightDown)
     if entity.onRightUp? then @io.on(IO.RIGHT_UP, entity.onRightUp)
     if entity.onKeyDown? then @io.on(IO.KEY_DOWN, entity.onKeyDown)
+    if entity.onButtonDown? then @io.on(IO.BUTTON_DOWN, entity.onButtonDown)
+    if entity.onButtonUp? then @io.on(IO.BUTTON_UP, entity.onButtonUp)
 
     if entity.afterAdded? then entity.afterAdded(this)
     return entity
@@ -96,7 +98,9 @@ class Game
       if entity.onRightDown? then @io.off(IO.RIGHT_DOWN, entity.onRightDown)
       if entity.onRightUp? then @io.off(IO.RIGHT_UP, entity.onRightUp)
       if entity.onKeyDown? then @io.off(IO.KEY_DOWN, entity.onKeyDown)
-      
+      if entity.onButtonDown? then @io.off(IO.BUTTON_DOWN, entity.onButtonDown)
+      if entity.onButtonUp? then @io.off(IO.BUTTON_UP, entity.onButtonUp)
+
       if entity.destroyed?
         entity.destroyed(this)
       entity.game = null
