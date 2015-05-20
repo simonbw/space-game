@@ -10,6 +10,16 @@ class IO
   @ENTER = ENTER = 13
   @TAB = TAB = 9
 
+  @LEFT_X = 0
+  @LEFT_Y = 1
+  @RIGHT_X = 2
+  @RIGHT_Y = 3
+
+  @B_A = 0
+  @B_B = 1
+  @B_X = 2
+  @B_Y = 3
+
   @MOUSE_MOVE = MOUSE_MOVE = 'mousemove'
   @CLICK = CLICK = 'click'
   @RIGHT_CLICK = RIGHT_CLICK = 'rightclick'
@@ -20,6 +30,8 @@ class IO
   @MOUSE_MOVE = MOUSE_MOVE = 'mousemove'
   @KEY_DOWN = KEY_DOWN = 'keydown'
   @KEY_UP = KEY_UP = 'keyup'
+  @BUTTON_DOWN = BUTTON_DOWN = 'buttondown'
+  @BUTTON_UP = BUTTON_UP = 'buttonup'
 
   constructor: (@view) ->
     @view.onclick = @click
@@ -50,8 +62,41 @@ class IO
     @callbacks[MOUSE_MOVE] = []
     @callbacks[KEY_DOWN] = []
     @callbacks[KEY_UP] = []
+    @callbacks[BUTTON_DOWN] = []
+    @callbacks[BUTTON_UP] = []
 
-    @buttons = [false, false, false, false, false ,false]
+    @mouseButtons = [false, false, false, false, false ,false]
+
+    @lastButtons = []
+    setInterval(@handleGamepads, 1)
+
+  # Left Mouse Button
+  @property 'lmb',
+    get: ->
+      return @mouseButtons[LMB]
+
+  # Right Mouse Button
+  @property 'rmb',
+    get: ->
+      return @mouseButtons[RMB]
+
+  # Create events for gamepad button presses
+  handleGamepads: () =>
+    gamepad = navigator.getGamepads()[0]
+    if gamepad?
+      buttons = (button.pressed for button in gamepad.buttons)
+      for button, i in buttons
+        if button and !@lastButtons[i]
+          for callback in @callbacks[BUTTON_DOWN]
+            callback(i)
+        else if !button and @lastButtons[i]
+          for callback in @callbacks[BUTTON_UP]
+            callback(i)
+      
+      @lastButtons = buttons
+    else
+      @lastButtons = []
+
 
   # Add an event handler
   on: (e, callback) =>
@@ -82,7 +127,7 @@ class IO
   # Call all mousedown handlers
   mousedown: (e) =>
     @mousePosition = [e.clientX, e.clientY]
-    @buttons[e.button] = true
+    @mouseButtons[e.button] = true
     switch e.button
       when LMB
         for callback in @callbacks[MOUSE_UP]
@@ -94,7 +139,7 @@ class IO
   # Call all mouseup handlers
   mouseup: (e) =>
     @mousePosition = [e.clientX, e.clientY]
-    @buttons[e.button] = false
+    @mouseButtons[e.button] = false
     switch e.button
       when LMB
         for callback in @callbacks[MOUSE_DOWN]
@@ -132,5 +177,16 @@ class IO
       e.preventDefault()
       return false
 
+  getAxis: (axis) =>
+    gamepad = navigator.getGamepads()[0]
+    if gamepad?
+      return gamepad.axes[axis]
+    return 0
+
+  getButton: (button) =>
+    gamepad = navigator.getGamepads()[0]
+    if gamepad?
+      return gamepad.buttons[button]
+    return 0
 
 module.exports = IO

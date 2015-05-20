@@ -1,4 +1,5 @@
 Entity = require 'Entity'
+IO = require 'IO'
 Util = require 'util/Util'
 
 # Controls the player's character
@@ -13,7 +14,16 @@ class PlayerPersonController extends Entity
   K_WALK = 16 # shift
   K_INTERACT = 32 # space
   K_NEXT_INTERACT = 9 # tab
-  
+
+  A_MOVE_X = 0
+  A_MOVE_Y = 1
+  A_TURN = 2
+  A_AIM_X = 2
+  A_AIM_Y = 3
+
+  B_INTERACT = 0
+  B_NEXT_INTERACT = 1
+
   constructor: (@person) ->
     @shipController = null
 
@@ -41,14 +51,23 @@ class PlayerPersonController extends Entity
       @person.move([x * modifier, y * modifier])
 
   getSide: =>
-    return @game.io.keys[K_RIGHT] - @game.io.keys[K_LEFT]
+    return @game.io.keys[K_RIGHT] - @game.io.keys[K_LEFT] + @game.io.getAxis(A_MOVE_X)
 
   getForward: =>
-    return @game.io.keys[K_FORWARD] - @game.io.keys[K_BACKWARD]
+    return @game.io.keys[K_FORWARD] - @game.io.keys[K_BACKWARD] - @game.io.getAxis(A_MOVE_Y)
 
   getTurn: =>
-    return @game.io.keys[K_TURN_RIGHT] - @game.io.keys[K_TURN_LEFT]
+    return @game.io.keys[K_TURN_RIGHT] - @game.io.keys[K_TURN_LEFT] + @game.io.getAxis(A_TURN)
 
+  onButtonDown: (button) =>
+    switch button
+      when B_INTERACT
+        @person.interact()
+      when B_NEXT_INTERACT
+        if @game.io.keys[16]
+          @person.previousInteraction()
+        else
+          @person.nextInteraction()
 
   onKeyDown: (key) =>
     switch key
