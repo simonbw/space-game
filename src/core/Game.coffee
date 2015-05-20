@@ -1,5 +1,5 @@
-GameRenderer = require 'GameRenderer'
-IO = require 'IO'
+GameRenderer = require 'core/GameRenderer'
+IO = require 'core/IO'
 p2 = require 'p2'
 
 # Top Level control structure

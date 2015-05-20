@@ -10,7 +10,7 @@
 		"name": "Gulp",
 		"working_dir": "$project_path",
 		"shell_cmd": "gulp",
-		"selector": "source.coffee",
+		// "selector": "source.coffee",
 		"shell": false
 	}],
 

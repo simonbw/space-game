@@ -1,5 +1,5 @@
 Blueprint = require 'ship/Blueprint'
-Entity = require 'Entity'
+Entity = require 'core/Entity'
 Grid = require 'util/Grid'
 Hull = require 'ship/parts/Hull'
 p2 = require 'p2'

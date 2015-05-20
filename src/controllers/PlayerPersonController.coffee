@@ -1,5 +1,5 @@
-Entity = require 'Entity'
-IO = require 'IO'
+Entity = require 'core/Entity'
+IO = require 'core/IO'
 Util = require 'util/Util'
 
 # Controls the player's character
