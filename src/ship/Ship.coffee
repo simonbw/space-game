@@ -10,7 +10,14 @@ ThrustBalancer = require 'ship/ThrustBalancer'
 Thruster = require 'ship/parts/Thruster'
 Util = require 'util/Util'
 
-# A space ship
+# A space ship.
+#
+# The ship class is the top level of control for multiple systems.
+# First, it is a collection of ship parts.
+# It contains the body and sprite for simulating and rendering all these parts.
+# Second it manages power, through the PowerManger class.
+# It manages how air pressure flows through rooms with the RoomManager.
+# It manages control systems, i.e. thrust through the thrust manager.
 class Ship extends Entity
   BASE_MASS = 0.1
 
@@ -42,7 +49,7 @@ class Ship extends Entity
   @property 'position',
     get: ->
       return @body.position
-  
+
   render: () =>
     @sprite.clear()
     @sprite.beginFill(0x00FFFF)
@@ -66,15 +73,15 @@ class Ship extends Entity
     @partGrid.set([part.x, part.y], part)
     if part.tick?
       @tickableParts.push(part)
-    
+
     angle = if part.direction? then Math.PI / 2 * part.direction else 0
-    
+
     if part.sprite?
       @sprite.addChild(part.sprite)
       @sprite.rotation = angle
-    
+
     @body.mass += part.mass
-    
+
     if part.shape? or part.sensor?
       shapePosition = [part.x + @offset[0], part.y + @offset[1]]
       if part.shape?
@@ -111,8 +118,6 @@ class Ship extends Entity
   recenter: =>
     before = [@body.position[0], @body.position[1]]
     @body.adjustCenterOfMass()
-    dx = @body.position[0] - before[0]
-    dy = @body.position[1] - before[1]
     beforeLocal = @worldToLocal(before)
     @offset[0] += beforeLocal[0]
     @offset[1] += beforeLocal[1]
@@ -154,14 +159,16 @@ class Ship extends Entity
   # Return the part at a local point or undefined
   partAtLocal: (point) =>
     return @partAtGrid(@localToGrid(point))
-    
+
   # Return the part at a world point or undefined
   partAtWorld: (point) =>
     return @partAtGrid(@worldToGrid(point))
 
+  # Return the velocity of the ship at a grid location
   velocityAtGridPoint: (point) =>
     return @velocityAtWorldPoint(@gridToWorld(point))
 
+  # Return the velocity of the ship at a local point
   velocityAtLocalPoint: (point) =>
     return @velocityAtWorldPoint(@localToWorld(point))
 
