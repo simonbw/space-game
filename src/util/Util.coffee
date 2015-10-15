@@ -2,13 +2,7 @@
 
 Util = {
   setToArray: (s) ->
-    a = []
-    iter = s.values()
-    next = iter.next()
-    while not next.done
-      a.push(next.value)
-      next = iter.next()
-    return a
+    return Array.from(s)
 
   mod: (a, b) ->
     return ((a % b) + b) % b

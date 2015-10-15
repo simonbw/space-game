@@ -18,7 +18,9 @@ class ShipHud extends Entity
     velocity = @ship.body.velocity
     xspeed = Math.round(velocity[0])
     yspeed = Math.round(velocity[1])
-    return "Velocity: <#{xspeed}, #{yspeed}>"
+    energy = @ship.powerManager.energy
+    capacity = @ship.powerManager.capacity
+    return "Velocity: <#{xspeed}, #{yspeed}>\nEnergy: #{energy}/#{capacity}"
 
   render: =>
     @text.text = @makeText()
