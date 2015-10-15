@@ -6,6 +6,6 @@ class Generator extends Part
   color: 0x9999FF
   maxHealth: 200
   name: 'Generator'
-  power: 100
+  power: 5
 
 module.exports = Generator

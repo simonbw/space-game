@@ -4,11 +4,13 @@ Util = require 'util/Util'
 
 roomCount = 0
 
-# Represents on contiguous set of interior pieces
-# Controls air
+# Represents on contiguous set of interior pieces.
+#
+# Controls air pressure.
 class Room
-  FLOW_CONSTANT = 2.0
-  SUCTION = 15
+  FLOW_CONSTANT = 1.0 # Stuff breaks when this goes over 1.0.
+  SUCTION = 10
+  THRUST = 2000
 
   constructor: (@manager) ->
     @roomId = roomCount++
@@ -35,7 +37,7 @@ class Room
       if @dirty
         @findHoles()
       return @_doors
-  
+
   # The set of grid positions where holes are
   @property 'holes',
     get: ->
@@ -49,10 +51,33 @@ class Room
 
   # Update calculations for air and stuff
   tick: () =>
-    # TODO: Refactor these two loops into one thing
+# TODO: Balance flow between all holes. This need to happen in a lot of places. Lot's of math cleanup here.
+
     @holes.forEach (hole) =>
       flow = @giveAir(-FLOW_CONSTANT * @pressure)
-      @applySuction(hole, [0, 0], -flow)
+
+      if flow != 0
+        @applySuction(hole, [0, 0], -flow)
+
+        forceDirection = [0, 0]
+        if not @ship.partAtGrid([hole[0], hole[1] + 1])
+          forceDirection[1] += -1
+        if not @ship.partAtGrid([hole[0], hole[1] - 1])
+          forceDirection[1] += 1
+        if not @ship.partAtGrid([hole[0] + 1, hole[1]])
+          forceDirection[0] += -1
+        if not @ship.partAtGrid([hole[0] - 1, hole[1]])
+          forceDirection[0] += 1
+
+        magnitude = flow * flow * THRUST
+        angle = Math.atan2(forceDirection[1], forceDirection[0]) + @ship.body.angle
+        force = [Math.cos(angle) * magnitude, Math.sin(angle) * magnitude]
+
+        forcePoint = @ship.gridToWorld(hole)
+        @ship.body.applyForce(force, forcePoint)
+
+        console.log "flow #{flow}, applying force #{force} in direction #{forceDirection} at #{hole}"
+
 
     @doors.forEach (door) =>
       if door.isOpen
@@ -60,7 +85,7 @@ class Room
         adjacentRooms.forEach (otherRoom) =>
           if otherRoom? # door to other room
             pressureDifference = @pressure - otherRoom.pressure
-            if pressureDifference > 0
+            if pressureDifference > 0.001
               flowRate = -pressureDifference * FLOW_CONSTANT
               change = @giveAir(flowRate)
               otherRoom.giveAir(-change)
@@ -68,6 +93,26 @@ class Room
           else # door to outside
             flow = @giveAir(-FLOW_CONSTANT * @pressure)
             @applySuction(door.position, [0, 0], -flow)
+
+            # TODO: Don't repeat code
+            forceDirection = [0, 0]
+            if not @ship.partAtGrid([door.position[0], door.position[1] + 1])
+              forceDirection[1] += -1
+            if not @ship.partAtGrid([door.position[0], door.position[1] - 1])
+              forceDirection[1] += 1
+            if not @ship.partAtGrid([door.position[0] + 1, door.position[1]])
+              forceDirection[0] += -1
+            if not @ship.partAtGrid([door.position[0] - 1, door.position[1]])
+              forceDirection[0] += 1
+
+            magnitude = flow * flow * THRUST
+            angle = Math.atan2(forceDirection[1], forceDirection[0]) + @ship.body.angle
+            force = [Math.cos(angle) * magnitude, Math.sin(angle) * magnitude]
+
+            forcePoint = @ship.gridToWorld(door.position)
+            @ship.body.applyForce(force, forcePoint)
+
+            console.log "flow #{flow}, applying force #{force} in direction #{forceDirection} at #{door.position}"
 
   # Apply a suction force to everyone in the room
   applySuction: (position, direction, flow) =>
@@ -105,18 +150,14 @@ class Room
   # Recalculate the positions of all the holes
   findHoles: () =>
     @_holes.clear()
-    # TODO: Figure out cleaner set iteration
-    iter = @parts.values()
-    next = iter.next()
-    while not next.done
-      part = next.value
+
+    @parts.forEach (part) =>
       for pos in part.getAdjacentPoints()
-        adjacentPart = @manager.ship.partAtGrid(pos)
+        adjacentPart = @ship.partAtGrid(pos)
         if not adjacentPart?
           @_holes.add(pos)
         else if adjacentPart instanceof Door
           @_doors.add(adjacentPart)
-      next = iter.next()
 
   # Add an amount of air into the room (can be negative)
   # Returns the amount of air actually added
@@ -138,7 +179,7 @@ class Room
       next = iter.next()
     @giveAir(other.totalAir)
 
-  # 
+#
   destroy: () =>
     iter = @parts.values()
     next = iter.next()
@@ -148,7 +189,6 @@ class Room
       next = iter.next()
     @parts.clear()
 
-  # 
   toString: () =>
     return "<Room size: #{@parts.size}>"
 
@@ -176,8 +216,6 @@ class RoomManager extends Entity
       else if adjacentRooms.length == 1
         adjacentRooms[0].addPart(part)
       else
-        ids = adjacentRooms.map (r) ->
-          return r.roomId
         room = adjacentRooms.pop()
         room.addPart(part)
         for otherRoom in adjacentRooms
@@ -193,7 +231,7 @@ class RoomManager extends Entity
       @parts.splice(@parts.indexOf(part), 1)
 
       @calculateRooms() # TODO: Don't be dumb
-    
+
     for room in @getAdjacentRooms()
       room.dirty = true
 
