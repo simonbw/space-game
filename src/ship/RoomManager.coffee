@@ -76,10 +76,7 @@ class Room
         forcePoint = @ship.gridToWorld(hole)
         @ship.body.applyForce(force, forcePoint)
 
-        console.log "flow #{flow}, applying force #{force} in direction #{forceDirection} at #{hole}"
-
-
-    @doors.forEach (door) =>
+rasdf @doors.forEach (door) =>
       if door.isOpen
         adjacentRooms = door.getAdjacentRooms()
         adjacentRooms.forEach (otherRoom) =>
@@ -111,8 +108,6 @@ class Room
 
             forcePoint = @ship.gridToWorld(door.position)
             @ship.body.applyForce(force, forcePoint)
-
-            console.log "flow #{flow}, applying force #{force} in direction #{forceDirection} at #{door.position}"
 
   # Apply a suction force to everyone in the room
   applySuction: (position, direction, flow) =>
