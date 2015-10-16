@@ -76,7 +76,7 @@ class Room
         forcePoint = @ship.gridToWorld(hole)
         @ship.body.applyForce(force, forcePoint)
 
-rasdf @doors.forEach (door) =>
+    @doors.forEach (door) =>
       if door.isOpen
         adjacentRooms = door.getAdjacentRooms()
         adjacentRooms.forEach (otherRoom) =>

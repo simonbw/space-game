@@ -38,3 +38,4 @@ window.onload = ->
     game.addEntity(new CameraController(game.camera, person))
 
   game.addEntity(new BlueprintEditor(new Blueprint, callback))
+  game.addEntity(new FPSCounter)
