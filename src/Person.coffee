@@ -25,6 +25,12 @@ class Person extends Entity
     get: ->
       return @body.position
 
+  @property 'angle',
+    get: ->
+      return @body.angle
+    set: (val) ->
+      @body.angle = val
+
   @property 'x',
     get: ->
       return @position[0]
@@ -60,6 +66,10 @@ class Person extends Entity
     sprite.beginFill(0x00FF00)
     sprite.drawCircle(0, 0, RADIUS)
     sprite.endFill()
+
+    sprite.lineStyle(0.05, 0xFFFFFF)
+    sprite.moveTo(-0.5, -0.5)
+    sprite.lineTo(RADIUS - 0.5, -0.5)
     return sprite
 
   # Interact with the first part in the list
@@ -82,7 +92,6 @@ class Person extends Entity
 
   move: ([x, y]) =>
     if not @chair?
-      part = @getPart()
       pressure = @getPressure()
       speed = if (pressure > 0.4) then WALK_FORCE else JETPACK_FORCE
       [fx, fy] = [x * speed, y * speed]
@@ -91,8 +100,21 @@ class Person extends Entity
       if pressure
         @ship.body.applyForce([-fx, -fy], @position)
 
+  rotateTowards: (direction) =>
+    k = 4.0 # spring constant
+    m = @body.inertia
+    d = 0.55 # damping coefficient
+    c = 2 * Math.sqrt(m * k) * d
+    v = @body.angularVelocity
+    x = Util.angleDelta(@angle, direction)
+
+    @body.angularForce += k * x - c * v
+
+#    @angle += Util.clamp(diff, -0.1, 0.1)
+
   render: () =>
     [@sprite.x, @sprite.y] = @body.position
+    @sprite.rotation = @body.angle
 
   getPart: () =>
     if not ship? then return undefined

@@ -29,26 +29,40 @@ class PlayerPersonController extends Entity
 
   beforeTick: () =>
     if @person.chair?
-      forward = @getForward()
-      side = @getSide()
-      turn = @getTurn()
-      
-      if @game.io.keys[K_STABILIZE]
-        turn = Util.clamp(turn - @person.chair.ship.body.angularVelocity * 2)
-        # TODO: Linear Stabilization
-
-      @person.chair.ship.thrustBalancer.balance(forward, side, turn)
+      @controlShip()
     else
-      modifier = if @game.io.keys[K_WALK] then 0.4 else 1
-      x = @getSide() * modifier
-      y = -@getForward() * modifier
+      @controlPerson()
 
-      length = Math.sqrt(x * x + y * y)
-      if length > 1
-        x /= length
-        y /= length
-          
-      @person.move([x * modifier, y * modifier])
+# Send inputs for the ship the player is in
+  controlShip: () =>
+    forward = @getForward()
+    side = @getSide()
+    turn = @getTurn()
+
+    if @game.io.keys[K_STABILIZE]
+      turn = Util.clamp(turn - @person.chair.ship.body.angularVelocity * 2)
+    # TODO: Linear Stabilization
+
+    @person.chair.ship.thrustBalancer.balance(forward, side, turn)
+
+# Send inputs to control a person not a ship
+  controlPerson: () =>
+    modifier = if @game.io.keys[K_WALK] then 0.4 else 1
+    x = @getSide() * modifier
+    y = -@getForward() * modifier
+    length = Math.sqrt(x * x + y * y)
+    if length > 1
+      x /= length
+      y /= length
+
+    @person.move([x * modifier, y * modifier])
+
+    mouseWorldPosition = @game.camera.toWorld(@game.io.mousePosition)
+    [dx, dy] = [mouseWorldPosition[0] - @person.position[0], mouseWorldPosition[1] - @person.position[1]]
+
+    angle = Math.atan2(dy, dx)
+    @person.rotateTowards(angle)
+
 
   getSide: =>
     return @game.io.keys[K_RIGHT] - @game.io.keys[K_LEFT] + @game.io.getAxis(A_MOVE_X)

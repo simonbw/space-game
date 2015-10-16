@@ -242,7 +242,7 @@ class RoomManager extends Entity
         for room in @rooms
           if room.hasPart(p)
             adjacentRooms.add(room)
-    return Util.setToArray(adjacentRooms)
+    return Array.from(adjacentRooms)
 
   # Calculate which rooms exist
   calculateRooms: () =>

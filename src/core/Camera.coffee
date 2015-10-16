@@ -6,7 +6,7 @@ Matrix = Pixi.Matrix
 
 # Controls the viewport
 class Camera extends Entity
-  constructor: (@renderer, @position = null, @z = 30.0, @angle = 0) ->
+  constructor: (@renderer, @position = null, @z = 25.0, @angle = 0) ->
     @position ?= [0, 0]
     @velocity = [0, 0]
 

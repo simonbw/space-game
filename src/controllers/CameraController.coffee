@@ -16,7 +16,7 @@ class CameraController extends Entity
       pos = @person.position
       vel = @person.body.velocity
       @camera.smoothCenter(pos, vel)
-      @camera.smoothZoom(25)
+      @camera.smoothZoom(30)
 
 
 module.exports = CameraController
