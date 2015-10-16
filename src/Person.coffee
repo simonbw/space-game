@@ -36,7 +36,7 @@ class Person extends Entity
       return @position[1]
     set: (value) ->
       @position[0] = value
-      
+
   # Make the body for t
   makeBody: (pos) =>
     body = new p2.Body({
@@ -73,9 +73,9 @@ class Person extends Entity
       @interactions.push(@interactions.shift())
 
   # Move the thing at bottom top of the interact list to the top
-  previosInteraction: () =>
+  previousInteraction: () =>
     if @interactions.length > 1
-      @interactions.unshift(@interactions.pop())   
+      @interactions.unshift(@interactions.pop())
 
   board: (ship) =>
     @ship = ship
@@ -97,7 +97,7 @@ class Person extends Entity
   getPart: () =>
     if not ship? then return undefined
     return @ship.partAtWorld(@position)
-    
+
   getPressure: () =>
     part = @getPart()
     if part?
