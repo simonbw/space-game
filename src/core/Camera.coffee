@@ -9,7 +9,7 @@ class Camera extends Entity
   constructor: (@renderer, @position = null, @z = 30.0, @angle = 0) ->
     @position ?= [0, 0]
     @velocity = [0, 0]
-  
+
   # Easy access to position[0]
   @property 'x',
     get: () ->
@@ -55,13 +55,15 @@ class Camera extends Entity
     @vx = vx + (1 - smooth) * dx
     @vy = vy + (1 - smooth) * dy
 
-  # Set the camera 
+# Set the camera
   smoothZoom: (z, smooth = 0.9) =>
     @z = smooth * @z + (1 - smooth) * z
 
   # Returns [width, height] of the viewport
   getViewportSize: =>
-    return [@renderer.pixiRenderer.width, @renderer.pixiRenderer.height]
+    return [
+      @renderer.pixiRenderer.width / @renderer.pixiRenderer.resolution,
+      @renderer.pixiRenderer.height / @renderer.pixiRenderer.resolution]
 
   # Convert screen coordinates to world coordinates
   toWorld: ([x, y], depth = 1.0) =>

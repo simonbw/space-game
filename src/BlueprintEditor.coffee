@@ -55,7 +55,7 @@ class BlueprintEditor extends Entity
   # Return the grid coordinates of the square the mouse is over
   getHoverSquare: () =>
     return @game.camera.toWorld(@game.io.mousePosition).map(Math.round)
-  
+
   render: () =>
     @selector.clear()
     squrePos = @getHoverSquare()
@@ -64,7 +64,7 @@ class BlueprintEditor extends Entity
       @selector.beginFill(@Part.prototype.color)
       @selector.drawRect(-0.5, -0.5, 1, 1)
       @selector.endFill()
-    
+
     canAdd = !hoverPart
     if hoverPart?
       color = 0xFFFFFF
@@ -116,8 +116,8 @@ class BlueprintEditor extends Entity
   # Rotate the current direction
   rotate: (i=1) =>
     @direction = Util.mod(@direction + i, 4)
-  
-  # Handle key presses
+
+# Handle key presses
   onKeyDown: (key) =>
     switch key
       when K_CLOSE then @destroy()
@@ -130,7 +130,6 @@ class BlueprintEditor extends Entity
     @partLabel.destroy()
     if @onclose?
       @onclose(@blueprint)
-  
 
 
 module.exports = BlueprintEditor

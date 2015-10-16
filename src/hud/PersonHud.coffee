@@ -24,7 +24,7 @@ class PersonHud extends Entity
 
     pressure = Math.round(100 * @person.getPressure())
     return "pressure: #{pressure}, velocity: <#{xspeed}, #{yspeed}>"
-    
+
   render: =>
     @interactionList.person = @person
     @text.text = @makeText()
@@ -43,7 +43,6 @@ class InteractionListSprite extends Entity
     @texts = []
 
   makeTextBox: () =>
-    console.log "New new textbox #{@texts.length}"
     size = if @texts.length is 0 then 16 else 12
     text = new Pixi.Text('', {
       font: "#{size}px Arial"
@@ -52,6 +51,7 @@ class InteractionListSprite extends Entity
     text.y = @texts.length * HEIGHT
     @texts.push(text)
     @sprite.addChild(text)
+    console.log "New new textbox #{@texts.length}, #{text.resolution}"
 
   render: () =>
     # make sure there are the right number of text boxes
@@ -62,7 +62,7 @@ class InteractionListSprite extends Entity
 
     for part, i in @person.interactions
       @texts[i].text = "#{part.name}"
-    
+
     [x, y] = @game.camera.toScreen(@person.position)
     @sprite.x = x + 20
     @sprite.y = y - @texts.length * HEIGHT / 2
