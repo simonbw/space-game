@@ -1,5 +1,4 @@
-
-# Manages 
+# Manages
 class IO
   @LMB = LMB = 0
   @RMB = RMB = 2
@@ -34,6 +33,10 @@ class IO
   @BUTTON_UP = BUTTON_UP = 'buttonup'
 
   constructor: (@view) ->
+    @usingGamepad = false # True if the gamepad is the main input device
+    @mousePosition = [0, 0]
+    @mouseButtons = [false, false, false, false, false, false]
+
     @view.onclick = @click
     @view.onmousedown = @mousedown
     @view.onmouseup = @mouseup
@@ -50,8 +53,6 @@ class IO
     for i in [0..256]
       @keys.push(false)
 
-    @mousePosition = [0, 0]
-
     @callbacks = {}
     @callbacks[CLICK] = []
     @callbacks[RIGHT_CLICK] = []
@@ -65,9 +66,7 @@ class IO
     @callbacks[BUTTON_DOWN] = []
     @callbacks[BUTTON_UP] = []
 
-    @mouseButtons = [false, false, false, false, false ,false]
-
-    @lastButtons = []
+    @lastButtons = [] # buttons pressed last frame. Used for checking differences in state.
     setInterval(@handleGamepads, 1)
 
   # Left Mouse Button
@@ -87,12 +86,13 @@ class IO
       buttons = (button.pressed for button in gamepad.buttons)
       for button, i in buttons
         if button and !@lastButtons[i]
+          @usingGamepad = true
           for callback in @callbacks[BUTTON_DOWN]
             callback(i)
         else if !button and @lastButtons[i]
           for callback in @callbacks[BUTTON_UP]
             callback(i)
-      
+
       @lastButtons = buttons
     else
       @lastButtons = []
@@ -109,12 +109,14 @@ class IO
 
   # Update the position of the mouse
   mousemove: (e) =>
+    @usingGamepad = false
     @mousePosition = [e.clientX, e.clientY]
     for callback in @callbacks[MOUSE_MOVE]
       callback(@mousePosition)
 
   # Call all click handlers
   click: (e) =>
+    @usingGamepad = false
     @mousePosition = [e.clientX, e.clientY]
     switch e.button
       when LMB
@@ -126,6 +128,7 @@ class IO
 
   # Call all mousedown handlers
   mousedown: (e) =>
+    @usingGamepad = false
     @mousePosition = [e.clientX, e.clientY]
     @mouseButtons[e.button] = true
     switch e.button
@@ -138,6 +141,7 @@ class IO
 
   # Call all mouseup handlers
   mouseup: (e) =>
+    @usingGamepad = false
     @mousePosition = [e.clientX, e.clientY]
     @mouseButtons[e.button] = false
     switch e.button
@@ -147,7 +151,7 @@ class IO
       when RMB
         for callback in @callbacks[RIGHT_DOWN]
           callback(@mousePosition)
-  
+
   shouldPreventDefault: (key) =>
     if key is TAB
       return true
@@ -180,7 +184,10 @@ class IO
   getAxis: (axis) =>
     gamepad = navigator.getGamepads()[0]
     if gamepad?
-      return gamepad.axes[axis]
+      axis = gamepad.axes[axis]
+      if Math.abs(axis) > 0.1
+        @usingGamepad = true
+      return axis
     return 0
 
   getButton: (button) =>

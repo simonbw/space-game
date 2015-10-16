@@ -56,13 +56,15 @@ class PlayerPersonController extends Entity
       y /= length
 
     @person.move([x * modifier, y * modifier])
+    @person.rotateTowards(@getAimAngle())
 
-    mouseWorldPosition = @game.camera.toWorld(@game.io.mousePosition)
-    [dx, dy] = [mouseWorldPosition[0] - @person.position[0], mouseWorldPosition[1] - @person.position[1]]
-
-    angle = Math.atan2(dy, dx)
-    @person.rotateTowards(angle)
-
+  getAimAngle: () =>
+    if @game.io.usingGamepad
+      [dx, dy] = [@game.io.getAxis(A_AIM_X), @game.io.getAxis(A_AIM_Y)]
+    else
+      mouseWorldPosition = @game.camera.toWorld(@game.io.mousePosition)
+      [dx, dy] = [mouseWorldPosition[0] - @person.position[0], mouseWorldPosition[1] - @person.position[1]]
+    return Math.atan2(dy, dx)
 
   getSide: =>
     return @game.io.keys[K_RIGHT] - @game.io.keys[K_LEFT] + @game.io.getAxis(A_MOVE_X)
