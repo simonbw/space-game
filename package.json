@@ -11,6 +11,7 @@
     "browserify": "^9.0.8",
     "coffeeify": "~1.0.0",
     "gulp": "~3.8.11",
+    "numeric": "^1.2.6",
     "p2": "^0.6.1",
     "pixi.js": "^3.0.7",
     "vinyl-source-stream": "~1.0.0",

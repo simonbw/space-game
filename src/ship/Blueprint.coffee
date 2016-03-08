@@ -17,21 +17,37 @@ class Blueprint extends Entity
   # Add a Part to this blueprint
   addPart: (part) =>
     @parts.push(part)
-    angle = if part.direction? then Math.PI / 2 * part.direction else 0
     if part.sprite?
       @sprite.addChild(part.sprite)
 
     @partGrid.set([part.x, part.y], part)
     return part
-  
+
   # Take a part off this blueprint
   removePart: (part) =>
     @parts.splice(@parts.indexOf(part), 1)
     if part.sprite?
       @sprite.removeChild(part.sprite)
-    
+
     @partGrid.remove([part.x, part.y])
 
     return part
+
+  isValid: () =>
+    connected = new Set()
+
+    queue = [@core]
+    while queue.length
+      current = queue.pop()
+      connected.add(current)
+      [x, y] = current.position
+      for adjacentPoint in [[x + 1, y], [x, y + 1], [x - 1, y], [x, y - 1]]
+        adjacentPart = @partGrid.get(adjacentPoint)
+        if adjacentPart? and not connected.has(adjacentPart)
+          queue.push(adjacentPart)
+    for part in @parts
+      if not connected.has(part)
+        return false
+    return true
 
 module.exports = Blueprint

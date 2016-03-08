@@ -184,5 +184,6 @@ class Person extends Entity
     if @chair
       @body.position = @chair.getWorldPosition()
       @body.velocity = @chair.getVelocity()
+      @body.angle = @chair.ship.body.angle - Math.PI / 2
 
 module.exports = Person

@@ -3,15 +3,16 @@
 Function::property = (prop, desc) ->
   Object.defineProperty this.prototype, prop, desc
 
-Blueprint = require 'ship/Blueprint'
+require 'numeric'
+
 BlueprintEditor = require 'BlueprintEditor'
 CameraController = require 'controllers/CameraController'
 FPSCounter = require 'util/FPSCounter'
 Game = require 'core/Game'
-Hull = require 'ship/parts/Hull'
 Person = require 'Person'
 PlayerPersonController = require 'controllers/PlayerPersonController'
 Ship = require 'ship/Ship'
+Ships = require 'Ships'
 ShipHud = require 'hud/ShipHud'
 PersonHud = require 'hud/PersonHud'
 
@@ -28,6 +29,8 @@ window.onload = ->
 
   callback = (bp) ->
     window.ship = new Ship(bp)
+    window.station = new Ship(Ships.simpleStation(), [0, -20])
+    game.addEntity(station)
     person = new Person([0, 1])
     person.board(ship)
     game.addEntity(new ShipHud(ship))
@@ -37,5 +40,16 @@ window.onload = ->
     game.addEntity(new PlayerPersonController(person))
     game.addEntity(new CameraController(game.camera, person))
 
-  game.addEntity(new BlueprintEditor(new Blueprint, callback))
-  game.addEntity(new FPSCounter)
+  game.addEntity(new BlueprintEditor(Ships.starterShip(), callback))
+#  game.addEntity(new FPSCounter)
+
+
+  # maximize c * x
+  #
+  c = [1, 1]
+  A = [[-1,0],[0,-1],[-1,-2]]
+  b = [0, 0, 3]
+#  console.log 'c:', c
+#  console.log 'A', A
+#  console.log 'b', b
+#  console.log 'x', numeric.solveLP(c, A, b)

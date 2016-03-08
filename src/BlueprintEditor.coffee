@@ -120,12 +120,20 @@ class BlueprintEditor extends Entity
 # Handle key presses
   onKeyDown: (key) =>
     switch key
-      when K_CLOSE then @destroy()
+      when K_CLOSE then @close()
       when K_NEXT_PART then @nextPart(1)
       when K_PREVIOUS_PART then @nextPart(-1)
       when K_ROTATE_LEFT then @rotate(-1)
       when K_ROTATE_RIGHT then @rotate(1)
 
+  # Try to close the editor
+  close: () =>
+    if @blueprint.isValid()
+      @destroy()
+    else
+      console.log "invalid blueprint"
+
+  # Actually close the editor
   destroyed: () =>
     @partLabel.destroy()
     if @onclose?

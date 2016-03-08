@@ -16,8 +16,6 @@ class GameRenderer
     @stage = new Pixi.Container()
     @camera = new Camera(this)
 
-    console.log "resolution", @pixiRenderer.resolution, Pixi.RESOLUTION
-
     @layerInfos = {}
     @layerInfos['menu'] = { scroll: 0 }
     @layerInfos['hud'] = { scroll: 0 }

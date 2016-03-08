@@ -32,9 +32,8 @@ class Game
   # Begin everything
   start: =>
     @addEntity(@camera)
-    console.log "Game Started"
     window.requestAnimationFrame(@loop)
-  
+
   loop: () =>
     window.requestAnimationFrame(@loop)
     @tick()
@@ -54,7 +53,7 @@ class Game
     if entity.afterTick? then @entities.afterTick.push(entity)
     if entity.sprite? then @renderer.add(entity.sprite, entity.layer)
     if entity.body? then @world.addBody(entity.body)
-    
+
     if entity.onClick? then @io.on(IO.CLICK, entity.onClick)
     if entity.onMouseDown? then @io.on(IO.MOUSE_DOWN, entity.onMouseDown)
     if entity.onMouseUp? then @io.on(IO.MOUSE_UP, entity.onMouseUp)
@@ -73,7 +72,7 @@ class Game
   removeEntity: (entity) =>
     @entities.toRemove.push(entity)
     return entity
-  
+
   # Actually removes references to the entities slated for removal
   cleanupEntities: =>
     # TODO: Do we really need a separate removal pass?
@@ -86,7 +85,7 @@ class Game
         @entities.tick.splice(@entities.tick.indexOf(entity), 1)
       if entity.afterTick?
         @entities.afterTick.splice(@entities.afterTick.indexOf(entity), 1)
-      
+
       if entity.sprite?
         @renderer.remove(entity.sprite, entity.layer)
       if entity.body?
@@ -121,7 +120,7 @@ class Game
     @cleanupEntities()
     for entity in @entities.afterTick
       entity.afterTick()
-  
+
   # Called before rendering
   render: =>
     @cleanupEntities()

@@ -1,9 +1,9 @@
-space-game
+Space Game
 ==========
 
 A game about building spaceships and destroying other people's space ships.
 
-
+## The Code
   - **bin**- Compiled files and assets
   - **src**- Source code
     - **controllers**-
@@ -21,3 +21,13 @@ A game about building spaceships and destroying other people's space ships.
         All the parts to put on a ship
     - **util**-
       Various utilities not specific to any system
+
+## Planned Features
+
+#### Better Controls
+
+
+#### Campaign
+
+
+#### Resources

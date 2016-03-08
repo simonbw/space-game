@@ -35,15 +35,27 @@ class PlayerPersonController extends Entity
 
 # Send inputs for the ship the player is in
   controlShip: () =>
-    forward = @getForward()
+    ship = @person.chair.ship
+
+    forward = -@getForward()
     side = @getSide()
     turn = @getTurn()
 
     if @game.io.keys[K_STABILIZE]
-      turn = Util.clamp(turn - @person.chair.ship.body.angularVelocity * 2)
-    # TODO: Linear Stabilization
+      turn = Util.clamp(turn - ship.body.angularVelocity * 2)
+      # TODO: Linear Stabilization
 
-    @person.chair.ship.thrustBalancer.balance(forward, side, turn)
+    # aim toward mouse
+#    k = 2.0 # spring constant
+#    m = 1
+#    d = 0.9 # damping coefficient
+#    c = 2 * Math.sqrt(m * k) * d
+#    v = ship.body.angularVelocity
+#    x = Util.angleDelta(ship.body.angle, @getAimAngle() + Math.PI / 2)
+#    x = 0.9 * x + 0.1 * x ** 3
+#    turn = Util.clamp(k * x - c * v)
+
+    ship.thrustBalancer.balance(forward, side, turn)
 
 # Send inputs to control a person not a ship
   controlPerson: () =>

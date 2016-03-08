@@ -18,10 +18,16 @@ Util = require 'util/Util'
 # Second it manages power, through the PowerManger class.
 # It manages how air pressure flows through rooms with the RoomManager.
 # It manages control systems, i.e. thrust through the thrust manager.
+#
+# There are a few different coordinate systems used in relation to ships.
+#   Grid coordinates -
+#   Local Coordinates -
+#   Sprite Coordinates -
+#   World Coordinates -
 class Ship extends Entity
   BASE_MASS = 0.1
 
-  constructor: (@blueprint, x = 0, y = 0) ->
+  constructor: (@blueprint, [x, y]=[0, 0]) ->
     @blueprint ?= new Blueprint()
     @sprite = new Pixi.Graphics()
     @layer = 'world'
@@ -92,14 +98,16 @@ class Ship extends Entity
 
     @roomManager.partAdded(part)
     @powerManager.partAdded(part)
-
-    if part.thruster
-      @thrustBalancer.addThruster(part)
+    @thrustBalancer.partAdded(part)
 
   removePart: (part) =>
     @parts.splice(@parts.indexOf(part), 1)
     @partGrid.remove([part.x, part.y])
+
     @roomManager.partRemoved(part)
+    @powerManager.partRemoved(part)
+    @thrustBalancer.partRemoved(part)
+
     if part.tick?
       @tickableParts.splice(@tickableParts.indexOf(part), 1)
     if part.sprite?
@@ -108,8 +116,7 @@ class Ship extends Entity
       @body.removeShape(part.shape)
     if part.sensor?
       @body.removeShape(part.sensor)
-    if part.thruster
-      @thrustBalancer.removeThruster(part)
+
     @body.mass -= part.mass
     @recenter()
     part.ship = null
