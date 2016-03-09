@@ -1,6 +1,6 @@
 Core = require 'ship/parts/Core'
 Entity = require 'core/Entity'
-Grid = require 'util/Grid'
+Grid = require 'gameutil/Grid'
 Pixi = require 'pixi.js'
 
 # A blueprint for the layout of parts on a ship

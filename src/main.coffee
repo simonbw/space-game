@@ -7,7 +7,7 @@ require 'numeric'
 
 BlueprintEditor = require 'BlueprintEditor'
 CameraController = require 'controllers/CameraController'
-FPSCounter = require 'util/FPSCounter'
+FPSCounter = require 'gameutil/FPSCounter'
 Game = require 'core/Game'
 Person = require 'Person'
 PlayerPersonController = require 'controllers/PlayerPersonController'

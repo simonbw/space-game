@@ -1,6 +1,6 @@
 Blueprint = require 'ship/Blueprint'
 Entity = require 'core/Entity'
-Grid = require 'util/Grid'
+Grid = require 'gameutil/Grid'
 Hull = require 'ship/parts/Hull'
 p2 = require 'p2'
 Pixi = require 'pixi.js'
@@ -8,7 +8,7 @@ PowerManager = require 'ship/PowerManager'
 RoomManager = require 'ship/RoomManager'
 ThrustBalancer = require 'ship/ThrustBalancer'
 Thruster = require 'ship/parts/Thruster'
-Util = require 'util/Util'
+Util = require 'gameutil/Util'
 
 # A space ship.
 #

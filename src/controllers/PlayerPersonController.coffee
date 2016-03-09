@@ -1,6 +1,6 @@
 Entity = require 'core/Entity'
 IO = require 'core/IO'
-Util = require 'util/Util'
+Util = require 'gameutil/Util'
 
 # Controls the player's character
 class PlayerPersonController extends Entity
@@ -42,7 +42,7 @@ class PlayerPersonController extends Entity
     turn = @getTurn()
 
     if @game.io.keys[K_STABILIZE]
-      turn = Util.clamp(turn - ship.body.angularVelocity * 2)
+      turn = Util.clamp(2 * turn - ship.body.angularVelocity * 2)
       # TODO: Linear Stabilization
 
     # aim toward mouse

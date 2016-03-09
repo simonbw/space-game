@@ -9,7 +9,7 @@ Interior = require 'ship/parts/Interior'
 IO = require 'core/IO'
 Pixi = require 'pixi.js'
 Thruster = require 'ship/parts/Thruster'
-Util = require 'util/Util'
+Util = require 'gameutil/Util'
 
 class PartLabel extends Entity
   constructor: () ->
@@ -74,13 +74,13 @@ class BlueprintEditor extends Entity
       color = 0xFF3333
 
     @selector.lineStyle(0.05, color)
-    @selector.drawRect(-1, -1, 1, 1)
+    @selector.drawRect(-0.5, -0.5, 1, 1)
 
     if @Part.prototype.directional
       @selector.lineStyle(0.05, 0xFFFFFF, 0.5)
-      @selector.moveTo(-0.5, -0.5) # for some reason this has to have this offset
+      @selector.moveTo(0, 0)
       angle = (@direction + 3) * Math.PI / 2
-      @selector.lineTo(Math.cos(angle) * 0.5 - 0.5, Math.sin(angle) * 0.5 - 0.5)
+      @selector.lineTo(Math.cos(angle) * 0.5, Math.sin(angle) * 0.5)
 
     # painting
     if game.io.lmb

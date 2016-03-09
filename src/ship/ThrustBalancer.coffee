@@ -1,4 +1,4 @@
-Util = require 'util/Util'
+Util = require 'gameutil/Util'
 
 # Controls the thrusters
 class ThrustBalancer
@@ -106,12 +106,28 @@ class ThrustBalancer
     if @dirty
       @calculateThrusterData()
 
-    scale = Math.max(Math.abs(xControl), Math.abs(yControl), Math.abs(turn));
-    @setThrottles(@throttlePresets.getThrottles(xControl, yControl, turn), scale)
+    a = @throttlePresets.getThrottles(Math.floor(xControl), Math.floor(yControl), Math.floor(turn))
+    b = @throttlePresets.getThrottles(Math.floor(xControl), Math.floor(yControl), Math.ceil(turn))
+    c = @throttlePresets.getThrottles(Math.floor(xControl), Math.ceil(yControl), Math.floor(turn))
+    d = @throttlePresets.getThrottles(Math.floor(xControl), Math.ceil(yControl), Math.ceil(turn))
+    e = @throttlePresets.getThrottles(Math.ceil(xControl), Math.floor(yControl), Math.floor(turn))
+    f = @throttlePresets.getThrottles(Math.ceil(xControl), Math.floor(yControl), Math.ceil(turn))
+    g = @throttlePresets.getThrottles(Math.ceil(xControl), Math.ceil(yControl), Math.floor(turn))
+    h = @throttlePresets.getThrottles(Math.ceil(xControl), Math.ceil(yControl), Math.ceil(turn))
 
-    # TODO: Average corners of box
+    ab = @mixThrottles(a, b, 1 - Util.mod(turn, 1))
+    cd = @mixThrottles(c, d, 1 - Util.mod(turn, 1))
+    ef = @mixThrottles(e, f, 1 - Util.mod(turn, 1))
+    gh = @mixThrottles(g, h, 1 - Util.mod(turn, 1))
 
-  # Backup method for thruster balancing
+    abcd = @mixThrottles(ab, cd, 1 - Util.mod(yControl, 1))
+    efgh = @mixThrottles(ef, gh, 1 - Util.mod(yControl, 1))
+
+    abcdefgh = @mixThrottles(abcd, efgh, 1 - Util.mod(xControl, 1))
+
+    @setThrottles(abcdefgh)
+
+# Backup method for thruster balancing
   oldBalance: (yControl, xControl, turn) =>
       for thruster in @thrusters
         throttle = 0

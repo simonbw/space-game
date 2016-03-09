@@ -1,7 +1,7 @@
 Part = require 'ship/parts/Part'
 Pixi = require 'pixi.js'
 
-Util = require 'util/Util'
+Util = require 'gameutil/Util'
 
 
 # Provides thrust
@@ -28,8 +28,8 @@ class Thruster extends Part
   renderThrust: (thrust) =>
     @sprite.flame.clear()
     @sprite.flame.lineStyle(0.4 * thrust / @maxThrust, 0xFFAA00)
-    @sprite.flame.moveTo(-1, -1)
-    @sprite.flame.lineTo(0, -1)
+    @sprite.flame.moveTo(-0.5, -0.5)
+    @sprite.flame.lineTo(0.5, -0.5)
 
   setThrottle: (value) =>
     @throttle = Util.clamp(value, 0)

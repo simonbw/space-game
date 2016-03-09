@@ -1,6 +1,6 @@
 Door = require 'ship/parts/Door'
 Entity = require 'core/Entity'
-Util = require 'util/Util'
+Util = require 'gameutil/Util'
 
 roomCount = 0
 

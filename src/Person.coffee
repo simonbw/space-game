@@ -3,7 +3,7 @@ Entity = require 'core/Entity'
 p2 = require 'p2'
 Part = require 'ship/parts/Part'
 Pixi = require 'pixi.js'
-Util = require 'util/Util'
+Util = require 'gameutil/Util'
 
 # A person
 class Person extends Entity
@@ -68,8 +68,8 @@ class Person extends Entity
     sprite.endFill()
 
     sprite.lineStyle(0.05, 0xFFFFFF)
-    sprite.moveTo(-0.5, -0.5)
-    sprite.lineTo(RADIUS - 0.5, -0.5)
+    sprite.moveTo(0, 0)
+    sprite.lineTo(RADIUS, 0)
     return sprite
 
   # Interact with the first part in the list
