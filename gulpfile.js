@@ -1,59 +1,50 @@
-var gulp = require('gulp');
-var browserify = require('browserify');
-var watchify = require('watchify');
-var source = require('vinyl-source-stream');
+const gulp = require('gulp');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
+const browserify = require('browserify');
+const watchify = require('watchify');
+const babelify = require('babelify');
 
-/**
- * Returns a browserify object.
- */
-function getBundler() {
-  return browserify({
-    cache: {},        // needed for watchify
-    packageCache: {}, // needed for watchify
-    fullPaths: true,  // needed for watchify
-
-    debug: true,
-    entries: ['./src/main.coffee'],
-    extensions: ['.coffee'],
-    paths: ['./src', './node_modules']
-  }).transform('coffeeify');
-}
-
-/**
- * Puts the output of browserify into bin/
- */
-function publish(b) {
-  var success = true
-  var start = Date.now();
-  b.bundle()
-    .on('error', function(e) {
-      console.log(e);
-      success = false;
-    })
-    .pipe(source('main.js'))
-    .pipe(gulp.dest('./bin'));
-  if (success) {
-    console.log("Updated in", Date.now() - start, "ms");
+function compile(watch) {
+  var bundler = browserify('./src/main.js', {debug: true, cache: {}, packageCache: {}});
+  if (watch) {
+    bundler = watchify(bundler);
   }
-  return b;
+  bundler = bundler.transform(babelify, {presets: ['es2015']});
+
+  function rebundle() {
+    return bundler.bundle()
+      .on('error', function (err) {
+        console.error(err);
+        this.emit('end');
+      })
+      .pipe(source('main.js'))
+      .pipe(buffer())
+      .pipe(gulp.dest('./bin'));
+  }
+
+  if (watch) {
+    bundler.on('update', function () {
+      process.stdout.write('-> bundling...');
+      rebundle().on('end', function () {
+        console.log('done');
+      });
+    });
+  }
+
+  return rebundle();
 }
 
-/**
- * Compiles everything once.
- */
-gulp.task('default', function() {
-  publish(getBundler());
+function watch() {
+  return compile(true);
+}
+
+gulp.task('build', function () {
+  return compile();
 });
 
-/**
- * Watches for changes and recompiles.
- */
-gulp.task('watch', function() {
-  var b = watchify(getBundler());
-  b.on('update', function() {
-    publish(b);
-  }).on('error', function(e) {
-    console.log('Watch Error', e);
-  });
-  publish(b);
+gulp.task('watch', function () {
+  return watch();
 });
+
+gulp.task('default', ['build']);
