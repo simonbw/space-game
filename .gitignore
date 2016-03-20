@@ -1,5 +1,5 @@
 node_modules/
+bin/main.js
 
-*.sublime-workspace
-push_to_midgard.sh
 .idea
+.DS_Store
